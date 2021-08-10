@@ -2,7 +2,6 @@ package contracts
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 	"time"
 
@@ -101,7 +100,7 @@ var _ = Describe("OCR Feed", func() {
 					P2PBootstrapPeers:  []client.Chainlink{bootstrapNode},
 					KeyBundleID:        nodeOCRKeyId,
 					TransmitterAddress: nodeTransmitterAddress,
-					ObservationSource:  client.ObservationSourceSpec(fmt.Sprintf("%s/variable", adapter.ClusterURL())),
+					ObservationSource:  client.ObservationSourceSpec(adapter.VariableEndPoint(true)),
 				}
 				_, err = chainlinkNodes[index].CreateJob(ocrSpec)
 				Expect(err).ShouldNot(HaveOccurred())

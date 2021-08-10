@@ -88,7 +88,7 @@ var _ = Describe("Flux monitor suite", func() {
 					ContractAddress:   fluxInstance.Address(),
 					PollTimerPeriod:   15 * time.Second, // min 15s
 					PollTimerDisabled: false,
-					ObservationSource: client.ObservationSourceSpec(adapter.ClusterURL() + "/variable"),
+					ObservationSource: client.ObservationSourceSpec(adapter.VariableEndPoint(true)),
 				}
 				_, err = n.CreateJob(fluxSpec)
 				Expect(err).ShouldNot(HaveOccurred())

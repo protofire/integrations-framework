@@ -53,6 +53,10 @@ type ExternalAdapter interface {
 	LocalURL() string
 	ClusterURL() string
 	SetVariable(variable int) error
+
+	VariableEndPoint(remote bool) string
+	FiveEndPoint(remote bool) string
+	RandomEndPoint(remote bool) string
 }
 
 type externalAdapter struct {
@@ -83,6 +87,31 @@ func (ex *externalAdapter) SetVariable(variable int) error {
 		return err
 	}
 	return nil
+}
+
+// VariableEndPoint returns the full URL for a GET on the variable endpoint, remote or local version depends on the
+// remote param
+func (ex *externalAdapter) VariableEndPoint(remote bool) string {
+	if remote {
+		return fmt.Sprintf("%s/variable", ex.clusterURL)
+	}
+	return fmt.Sprintf("%s/variable", ex.localURL)
+}
+
+// FiveEndPoint returns the full URL for the five endpoint, remote or local version depends on the remote param
+func (ex *externalAdapter) FiveEndPoint(remote bool) string {
+	if remote {
+		return fmt.Sprintf("%s/five", ex.clusterURL)
+	}
+	return fmt.Sprintf("%s/five", ex.localURL)
+}
+
+// RandomEndPoint returns the full URL for the random endpoint, remote or local version depends on the remote param
+func (ex *externalAdapter) RandomEndPoint(remote bool) string {
+	if remote {
+		return fmt.Sprintf("%s/random", ex.clusterURL)
+	}
+	return fmt.Sprintf("%s/random", ex.localURL)
 }
 
 // GetExternalAdapter will return a deployed external adapter on an environment
