@@ -94,6 +94,34 @@ func NewPostgresManifest() *K8sManifest {
 	}
 }
 
+// NewKafkaManifest is k8s manifest used to deploy a kafka broker for explorer
+func NewKafkaManifest() *K8sManifest {
+	return &K8sManifest{
+		id: "kafka",
+		DeploymentFile: filepath.Join(tools.ProjectRoot, "environment/templates/kafka-deployment.yml"),
+		ServiceFile: filepath.Join(tools.ProjectRoot, "environment/templates/kafka-service.yml"),
+
+		SetValuesFunc: func(manifest *K8sManifest) error {
+			manifest.values["clusterURL"] = fmt.Sprintf("PLAINTEXT://%s:9092", manifest.Service.Spec.ClusterIP)
+			return nil
+		},
+	}
+}
+
+//// NewZookeeperManifest is k8s manifest used to deploy zookeeper which is used by kafka
+//func NewZookeeperManifest() *K8sManifest {
+//	return &K8sManifest{
+//		id: "zookeeper",
+//		DeploymentFile: filepath.Join(tools.ProjectRoot, "environment/templates/zookeeper-deployment.yml"),
+//		ServiceFile: filepath.Join(tools.ProjectRoot, "environment/templates/zookeeper-service.yml"),
+//
+//		SetValuesFunc: func(manifest *K8sManifest) error {
+//			manifest.values["clusterURL"] = fmt.Sprintf("%s:2181", manifest.Service.Spec.ClusterIP)
+//			return nil
+//		},
+//	}
+//}
+
 // NewGethManifest is the k8s manifest that when used will deploy geth to an environment
 func NewGethManifest() *K8sManifest {
 	return &K8sManifest{
@@ -309,6 +337,11 @@ func getMixedVersions(versionCount int) ([]string, error) {
 // addDependencyGroup add everything that has no dependencies but other pods have
 // dependencies on in the first group
 func addDependencyGroup(nodeCount int, envName string, chainlinkGroup *K8sManifestGroup) K8sEnvSpecInit {
+	group0 := &K8sManifestGroup{
+		id: "KafkaGroup",
+		manifests: []K8sEnvResource{NewKafkaManifest()},
+	}
+
 	group := &K8sManifestGroup{
 		id:        "DependencyGroup",
 		manifests: []K8sEnvResource{NewAdapterManifest()},
@@ -359,8 +392,8 @@ func addDependencyGroup(nodeCount int, envName string, chainlinkGroup *K8sManife
 				NewExplorerManifest(nodeCount))
 		}
 		if len(chainlinkGroup.manifests) > 0 {
-			return envName, K8sEnvSpecs{group, chainlinkGroup}
+			return envName, K8sEnvSpecs{group0, group, chainlinkGroup}
 		}
-		return envName, K8sEnvSpecs{group}
+		return envName, K8sEnvSpecs{group0, group}
 	}
 }

@@ -39,6 +39,21 @@ spec:
               value: postgres
             - name: LOG_LEVEL
               value: debug
+#             Kafka settings
+            - name: EXPLORER_KAFKA_BROKERS
+              value: {{ .Values.KafkaGroup.kafka.clusterURL }}
+            - name: EXPLORER_KAFKA_CLIENT_ID
+              value: "explorer"
+            - name: EXPLORER_KAFKA_TOPIC
+              value: "ocr-telemetry-v0"
+            - name: EXPLORER_KAFKA_CONNECTION_TIMEOUT
+              value: 1000
+            - name: EXPLORER_KAFKA_REQUEST_TIMEOUT
+              value: 30000
+            - name: EXPLORER_KAFKA_INITIAL_RETRY_TIME
+              value: 300
+            - name: EXPLORER_KAFKA_RETRIES
+              value: 5
           image: 'smartcontract/explorer:candidate-0.9.21-rc1'
           ports:
             - containerPort: 8080
