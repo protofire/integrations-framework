@@ -5,12 +5,12 @@
 #  labels:
 #    name: kafka
 metadata:
-  name: kafka
+  name: kafka-pod
 spec:
   ports:
     - name: kafka-port
       port: 9092
       targetPort: 9092
   selector:
-    app: kafka
+    app: kafka-pod
   type: ClusterIP

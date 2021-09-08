@@ -102,7 +102,8 @@ func NewKafkaManifest() *K8sManifest {
 		ServiceFile: filepath.Join(tools.ProjectRoot, "environment/templates/kafka-service.yml"),
 
 		SetValuesFunc: func(manifest *K8sManifest) error {
-			manifest.values["clusterURL"] = fmt.Sprintf("PLAINTEXT://%s:9092", manifest.Service.Spec.ClusterIP)
+			//manifest.values["clusterURL"] = fmt.Sprintf("PLAINTEXT://%s:9092", manifest.Service.Spec.ClusterIP)
+			manifest.values["clusterURL"] = "kafka:9092"
 			return nil
 		},
 	}
@@ -315,6 +316,19 @@ func NewGethReorgHelmChart() *HelmChart {
 	}
 }
 
+func NewKafkaHelmChart() *HelmChart {
+	return &HelmChart{
+		id:          "kafka",
+		chartPath:   filepath.Join(tools.ProjectRoot, "environment/charts/kafka/kafka-14.1.0.tgz"),
+		releaseName: "kafka-1",
+		SetValuesHelmFunc: func(manifest *HelmChart) error {
+			//manifest.values["clusterURL"] = fmt.Sprintf("PLAINTEXT://%s:9092", manifest.Service.Spec.ClusterIP)
+			manifest.values["clusterURL"] = "kafka-1:9092"
+			return nil
+		},
+	}
+}
+
 // Queries github for the latest major release versions
 func getMixedVersions(versionCount int) ([]string, error) {
 	githubClient := github.NewClient(nil)
@@ -339,7 +353,7 @@ func getMixedVersions(versionCount int) ([]string, error) {
 func addDependencyGroup(nodeCount int, envName string, chainlinkGroup *K8sManifestGroup) K8sEnvSpecInit {
 	group0 := &K8sManifestGroup{
 		id: "KafkaGroup",
-		manifests: []K8sEnvResource{NewKafkaManifest()},
+		manifests: []K8sEnvResource{NewKafkaHelmChart()},
 	}
 
 	group := &K8sManifestGroup{
@@ -377,7 +391,8 @@ func addDependencyGroup(nodeCount int, envName string, chainlinkGroup *K8sManife
 			group.manifests = append(
 				group.manifests,
 				NewGethManifest(),
-				NewExplorerManifest(nodeCount))
+				NewExplorerManifest(nodeCount),
+				)
 		case "Ethereum Hardhat":
 			group.manifests = append(
 				group.manifests,
