@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"helm.sh/helm/v3/pkg/chartutil"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -93,35 +94,6 @@ func NewPostgresManifest() *K8sManifest {
 		},
 	}
 }
-
-// NewKafkaManifest is k8s manifest used to deploy a kafka broker for explorer
-func NewKafkaManifest() *K8sManifest {
-	return &K8sManifest{
-		id: "kafka",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "environment/templates/kafka-deployment.yml"),
-		ServiceFile: filepath.Join(tools.ProjectRoot, "environment/templates/kafka-service.yml"),
-
-		SetValuesFunc: func(manifest *K8sManifest) error {
-			//manifest.values["clusterURL"] = fmt.Sprintf("PLAINTEXT://%s:9092", manifest.Service.Spec.ClusterIP)
-			manifest.values["clusterURL"] = "kafka:9092"
-			return nil
-		},
-	}
-}
-
-//// NewZookeeperManifest is k8s manifest used to deploy zookeeper which is used by kafka
-//func NewZookeeperManifest() *K8sManifest {
-//	return &K8sManifest{
-//		id: "zookeeper",
-//		DeploymentFile: filepath.Join(tools.ProjectRoot, "environment/templates/zookeeper-deployment.yml"),
-//		ServiceFile: filepath.Join(tools.ProjectRoot, "environment/templates/zookeeper-service.yml"),
-//
-//		SetValuesFunc: func(manifest *K8sManifest) error {
-//			manifest.values["clusterURL"] = fmt.Sprintf("%s:2181", manifest.Service.Spec.ClusterIP)
-//			return nil
-//		},
-//	}
-//}
 
 // NewGethManifest is the k8s manifest that when used will deploy geth to an environment
 func NewGethManifest() *K8sManifest {
@@ -253,9 +225,11 @@ func NewChainlinkCluster(nodeCount int) K8sEnvSpecInit {
 		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
 	}
 
+	dependencyGroups := []*K8sManifestGroup{}
 	dependencyGroup := getBasicDependencyGroup()
 	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
-	return addNetworkManifestToDependencyGroup("basic-chainlink", dependencyGroup, chainlinkGroup)
+	dependencyGroups = append(dependencyGroups, dependencyGroup)
+	return addNetworkManifestToDependencyGroup("basic-chainlink", chainlinkGroup, dependencyGroups)
 }
 
 func NewChainlinkClusterForAlertsTesting(nodeCount int) K8sEnvSpecInit {
@@ -268,10 +242,21 @@ func NewChainlinkClusterForAlertsTesting(nodeCount int) K8sEnvSpecInit {
 		cManifest.id = fmt.Sprintf("%s-%d", cManifest.id, i)
 		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
 	}
+
+	dependencyGroups := []*K8sManifestGroup{}
+
+	kafkaDependecyGroup := &K8sManifestGroup{
+		id:        "KafkaGroup",
+		manifests: []K8sEnvResource{NewKafkaHelmChart()},
+	}
+
 	dependencyGroup := getBasicDependencyGroup()
-	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
 	addServicesForTestingAlertsToDependencyGroup(dependencyGroup, nodeCount)
-	return addNetworkManifestToDependencyGroup("basic-chainlink", dependencyGroup, chainlinkGroup)
+	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
+
+	dependencyGroups = append(dependencyGroups, kafkaDependecyGroup)
+	dependencyGroups = append(dependencyGroups, dependencyGroup)
+	return addNetworkManifestToDependencyGroup("basic-chainlink", chainlinkGroup, dependencyGroups)
 }
 
 // NewMixedVersionChainlinkCluster mixes the currently latest chainlink version (as defined by the config file) with
@@ -308,9 +293,11 @@ func NewMixedVersionChainlinkCluster(nodeCount, pastVersionsCount int) K8sEnvSpe
 		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
 	}
 
+	dependencyGroups := []*K8sManifestGroup{}
 	dependencyGroup := getBasicDependencyGroup()
 	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
-	return addNetworkManifestToDependencyGroup("mixed-version-chainlink", dependencyGroup, chainlinkGroup)
+	dependencyGroups = append(dependencyGroups, dependencyGroup)
+	return addNetworkManifestToDependencyGroup("mixed-version-chainlink", chainlinkGroup, dependencyGroups)
 }
 
 // NewGethReorgHelmChart creates new helm chart for multi-node Geth network
@@ -337,16 +324,29 @@ func NewGethReorgHelmChart() *HelmChart {
 }
 
 func NewKafkaHelmChart() *HelmChart {
-	return &HelmChart{
+	valuesFilePath := filepath.Join(tools.ProjectRoot, "environment/charts/kafka/overrideValues.yaml")
+	overrideValues, err := chartutil.ReadValuesFile(valuesFilePath)
+	log.Debug().Interface("read values", overrideValues).Msg("read values")
+	if err != nil {
+		return nil
+	}
+
+	chart := &HelmChart{
 		id:          "kafka",
 		chartPath:   filepath.Join(tools.ProjectRoot, "environment/charts/kafka/kafka-14.1.0.tgz"),
-		releaseName: "kafka-1",
+		releaseName: "kafka",
+		values: map[string]interface{}{},
 		SetValuesHelmFunc: func(manifest *HelmChart) error {
-			//manifest.values["clusterURL"] = fmt.Sprintf("PLAINTEXT://%s:9092", manifest.Service.Spec.ClusterIP)
-			manifest.values["clusterURL"] = "kafka-1:9092"
+			manifest.values["clusterURL"] = "kafka:9092"
 			return nil
 		},
 	}
+
+	for index, element  := range overrideValues{
+		chart.values[index] = element
+	}
+
+	return chart
 }
 
 // Queries github for the latest major release versions
@@ -393,31 +393,38 @@ func getBasicDependencyGroup() *K8sManifestGroup {
 
 // addNetworkManifestToDependencyGroup adds the correct network to the dependency group and returns
 // an array of all groups, this should be called as the last function when creating deploys
-func addNetworkManifestToDependencyGroup(envName string, dependencyGroup *K8sManifestGroup, chainlinkGroup *K8sManifestGroup) K8sEnvSpecInit {
+func addNetworkManifestToDependencyGroup(envName string, chainlinkGroup *K8sManifestGroup, dependencyGroups []*K8sManifestGroup) K8sEnvSpecInit {
 	return func(config *config.NetworkConfig) (string, K8sEnvSpecs) {
+		var specs K8sEnvSpecs
+		indexOfLastElementInDependencyGroups := len(dependencyGroups) - 1
 		switch config.Name {
 		case "Ethereum Geth reorg":
-			dependencyGroup.manifests = append(
-				dependencyGroup.manifests,
+			dependencyGroups[indexOfLastElementInDependencyGroups].manifests = append(
+				dependencyGroups[indexOfLastElementInDependencyGroups].manifests,
 				NewGethReorgHelmChart())
 		case "Ethereum Geth dev":
-			dependencyGroup.manifests = append(
-				dependencyGroup.manifests,
+			dependencyGroups[indexOfLastElementInDependencyGroups].manifests = append(
+				dependencyGroups[indexOfLastElementInDependencyGroups].manifests,
 				NewGethManifest())
 		case "Ethereum Hardhat":
-			dependencyGroup.manifests = append(
-				dependencyGroup.manifests,
+			dependencyGroups[indexOfLastElementInDependencyGroups].manifests = append(
+				dependencyGroups[indexOfLastElementInDependencyGroups].manifests,
 				NewHardhatManifest())
 		case "Ethereum Ganache":
-			dependencyGroup.manifests = append(
-				dependencyGroup.manifests,
+			dependencyGroups[indexOfLastElementInDependencyGroups].manifests = append(
+				dependencyGroups[indexOfLastElementInDependencyGroups].manifests,
 				NewGanacheManifest())
 		default: // no simulated chain
 		}
-		if len(chainlinkGroup.manifests) > 0 {
-			return envName, K8sEnvSpecs{dependencyGroup, chainlinkGroup}
+		for _, group := range dependencyGroups {
+			specs = append(specs, group)
 		}
-		return envName, K8sEnvSpecs{dependencyGroup}
+
+		if len(chainlinkGroup.manifests) > 0 {
+			specs = append(specs, chainlinkGroup)
+			return envName, specs
+		}
+		return envName, specs
 	}
 }
 

@@ -18,7 +18,7 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 		testcommon.CheckRound(i)
 		By("Tearing down the environment", i.SuiteSetup.TearDown())
 	},
-		Entry("all the same version", environment.NewChainlinkCluster(5)),
+		Entry("all the same version", environment.NewChainlinkClusterForAlertsTesting(5)),
 		//Entry("different versions", environment.NewMixedVersionChainlinkCluster(5, 2)),
 	)
 })
