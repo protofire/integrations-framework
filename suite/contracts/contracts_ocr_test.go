@@ -7,7 +7,7 @@ import (
 	"github.com/smartcontractkit/integrations-framework/suite/testcommon"
 )
 
-var _ = FDescribe("OCR Feed @ocr", func() {
+var _ = Describe("OCR Feed @ocr", func() {
 
 	DescribeTable("Deploys and watches an OCR feed @ocr", func(
 		envInit environment.K8sEnvSpecInit,
@@ -19,6 +19,6 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 		By("Tearing down the environment", i.SuiteSetup.TearDown())
 	},
 		Entry("all the same version", environment.NewChainlinkClusterForAlertsTesting(5)),
-		//Entry("different versions", environment.NewMixedVersionChainlinkCluster(5, 2)),
+		Entry("different versions", environment.NewMixedVersionChainlinkCluster(5, 2)),
 	)
 })
