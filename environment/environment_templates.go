@@ -225,10 +225,9 @@ func NewChainlinkCluster(nodeCount int) K8sEnvSpecInit {
 		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
 	}
 
-	dependencyGroups := []*K8sManifestGroup{}
 	dependencyGroup := getBasicDependencyGroup()
 	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
-	dependencyGroups = append(dependencyGroups, dependencyGroup)
+	dependencyGroups := []*K8sManifestGroup{dependencyGroup}
 	return addNetworkManifestToDependencyGroup("basic-chainlink", chainlinkGroup, dependencyGroups)
 }
 
@@ -243,8 +242,6 @@ func NewChainlinkClusterForAlertsTesting(nodeCount int) K8sEnvSpecInit {
 		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
 	}
 
-	dependencyGroups := []*K8sManifestGroup{}
-
 	kafkaDependecyGroup := &K8sManifestGroup{
 		id:        "KafkaGroup",
 		manifests: []K8sEnvResource{NewKafkaHelmChart()},
@@ -254,8 +251,7 @@ func NewChainlinkClusterForAlertsTesting(nodeCount int) K8sEnvSpecInit {
 	addServicesForTestingAlertsToDependencyGroup(dependencyGroup, nodeCount)
 	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
 
-	dependencyGroups = append(dependencyGroups, kafkaDependecyGroup)
-	dependencyGroups = append(dependencyGroups, dependencyGroup)
+	dependencyGroups := []*K8sManifestGroup{kafkaDependecyGroup, dependencyGroup}
 	return addNetworkManifestToDependencyGroup("basic-chainlink", chainlinkGroup, dependencyGroups)
 }
 
@@ -293,10 +289,9 @@ func NewMixedVersionChainlinkCluster(nodeCount, pastVersionsCount int) K8sEnvSpe
 		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
 	}
 
-	dependencyGroups := []*K8sManifestGroup{}
 	dependencyGroup := getBasicDependencyGroup()
 	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
-	dependencyGroups = append(dependencyGroups, dependencyGroup)
+	dependencyGroups := []*K8sManifestGroup{dependencyGroup}
 	return addNetworkManifestToDependencyGroup("mixed-version-chainlink", chainlinkGroup, dependencyGroups)
 }
 
@@ -323,6 +318,7 @@ func NewGethReorgHelmChart() *HelmChart {
 	}
 }
 
+// NewKafkaHelmChart creates new helm chart for kafka
 func NewKafkaHelmChart() *HelmChart {
 	valuesFilePath := filepath.Join(tools.ProjectRoot, "environment/charts/kafka/overrideValues.yaml")
 	overrideValues, err := chartutil.ReadValuesFile(valuesFilePath)
