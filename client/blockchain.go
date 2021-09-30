@@ -10,8 +10,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/core/types"
-
 	"github.com/smartcontractkit/integrations-framework/config"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -284,18 +282,6 @@ func walletSliceIndexInRange(wallets []BlockchainWallet, i int) error {
 		return fmt.Errorf("invalid index in list of wallets")
 	}
 	return nil
-}
-
-// NodeBlock block with a node ID which mined it
-type NodeBlock struct {
-	NodeID int
-	*types.Block
-}
-
-// HeaderEventSubscription is an interface for allowing callbacks when the client receives a new header
-type HeaderEventSubscription interface {
-	ReceiveBlock(header NodeBlock) error
-	Wait() error
 }
 
 // GasUsedEstimations contains some known gas values for contracts for every network
