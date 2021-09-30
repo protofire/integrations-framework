@@ -5,8 +5,8 @@
 # APPS_CHAINLINK_VERSION=1.0.0
 
 networks: # Selected network(s) for test execution
-    - "ethereum_geth" 
-    - "ethereum_geth" 
+    - "ethereum_geth"
+    - "ethereum_geth"
 keep_environments: Never # Options: Always, OnFail, Never
 
 apps:
@@ -203,6 +203,14 @@ network_configs:
         private_url: iotex_testnet_url
         private_keys:
             - iotex_testnet_1
+    alfajores_celo:
+        <<: *common_ethereum_testnet
+        name: "Alfajores celo"
+        chain_id: 44787
+        type: evm_celo
+        private_url: alfajores_celo_url
+        private_keys:
+            - alfajores_celo_1
 retry:
     attempts: 120
     linear_delay: 1s
