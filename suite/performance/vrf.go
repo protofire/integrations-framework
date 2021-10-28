@@ -2,7 +2,7 @@ package performance
 
 import (
 	"context"
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
@@ -128,7 +128,7 @@ func (f *VRFTest) deployCommonContracts() error {
 	return f.Blockchain.WaitForEvents()
 }
 
-// deployContracts deploys common contracts and required amount of VRF consumers
+// deployContracts deploys celoextended contracts and required amount of VRF consumers
 func (f *VRFTest) deployContracts() error {
 	if err := f.deployCommonContracts(); err != nil {
 		return err

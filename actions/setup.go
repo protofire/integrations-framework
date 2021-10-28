@@ -39,9 +39,9 @@ func buildNetworkInfo(network client.BlockchainNetwork, env environment.Environm
 	var bcc client.BlockchainClient
 	var err error
 	switch network.Config().Type {
-	case client.BlockchainTypeEVMMultinode:
+	case client.BlockchainTypeEVMCeloMultinode:
 		bcc, err = environment.NewBlockchainClients(env, network)
-	case client.BlockchainTypeEVM:
+	case client.BlockchainTypeEVMCelo:
 		bcc, err = environment.NewBlockchainClient(env, network)
 	}
 	if err != nil {
@@ -70,7 +70,7 @@ func buildNetworkInfo(network client.BlockchainNetwork, env environment.Environm
 	}, nil
 }
 
-// SuiteSetup enables common use cases, and safe handling of different blockchain networks for test scenarios
+// SuiteSetup enables celoextended use cases, and safe handling of different blockchain networks for test scenarios
 type SuiteSetup interface {
 	Config() *config.Config
 	Environment() environment.Environment

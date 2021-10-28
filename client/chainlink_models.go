@@ -271,7 +271,7 @@ observationSource = """
 	return tools.MarshallTemplate(c, "CRON Job", cronJobTemplateString)
 }
 
-// PipelineSpec common API call pipeline
+// PipelineSpec celoextended API call pipeline
 type PipelineSpec struct {
 	BridgeTypeAttributes BridgeTypeAttributes
 	DataPath             string
@@ -612,8 +612,8 @@ observationSource = """
 // WebhookJobSpec reprsents a webhook job
 type WebhookJobSpec struct {
 	Name              string `toml:"name"`
-	Initiator         string `toml:"initiator"` // External initiator name
-	InitiatorSpec     string `toml:"initiatorSpec"` // External initiator spec object in stringified form
+	Initiator         string `toml:"initiator"`         // External initiator name
+	InitiatorSpec     string `toml:"initiatorSpec"`     // External initiator spec object in stringified form
 	ObservationSource string `toml:"observationSource"` // List of commands for the chainlink node
 }
 
