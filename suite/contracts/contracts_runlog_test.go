@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
@@ -113,7 +113,7 @@ var _ = Describe("Direct request suite @runlog", func() {
 
 	Describe("with DirectRequest job", func() {
 		It("receives API call data on-chain", func() {
-			Eventually(func(g Gomega){
+			Eventually(func(g Gomega) {
 				d, err := consumer.Data(context.Background())
 				g.Expect(err).ShouldNot(HaveOccurred())
 				g.Expect(d).ShouldNot(BeNil())

@@ -3,7 +3,10 @@ package performance
 import (
 	"context"
 	"fmt"
-	"github.com/ethereum/go-ethereum/common"
+	"math/big"
+	"time"
+
+	"github.com/celo-org/celo-blockchain/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/actions"
@@ -11,8 +14,6 @@ import (
 	"github.com/smartcontractkit/integrations-framework/contracts"
 	"github.com/smartcontractkit/integrations-framework/environment"
 	"golang.org/x/sync/errgroup"
-	"math/big"
-	"time"
 )
 
 // OCRJobMap is a custom map type that holds the record of jobs by the contract instance and the chainlink node

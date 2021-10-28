@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 	"github.com/smartcontractkit/integrations-framework/client"

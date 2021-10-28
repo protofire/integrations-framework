@@ -4,7 +4,7 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
@@ -147,7 +147,7 @@ var _ = Describe("Keeper suite @keeper", func() {
 	})
 	Describe("with Keeper job", func() {
 		It("performs upkeep of a target contract", func() {
-			Eventually(func(g Gomega){
+			Eventually(func(g Gomega) {
 				cnt, err := consumer.Counter(context.Background())
 				g.Expect(err).ShouldNot(HaveOccurred())
 				g.Expect(cnt.Int64()).Should(BeNumerically(">", 0))
