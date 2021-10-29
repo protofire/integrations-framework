@@ -63,9 +63,9 @@ func DefaultLocalSetup(
 	// Initialize blockchain client
 	var bcc client.BlockchainClient
 	switch network.Config().Type {
-	case client.BlockchainTypeEVMMultinode:
+	case client.BlockchainTypeEVMCeloMultinode:
 		bcc, err = environment.NewBlockchainClients(env, network)
-	case client.BlockchainTypeEVM:
+	case client.BlockchainTypeEVMCelo:
 		bcc, err = environment.NewBlockchainClient(env, network)
 	}
 	if err != nil {
