@@ -7,6 +7,11 @@ import (
 	"github.com/smartcontractkit/integrations-framework/tools"
 )
 
+// EIServiceConfig represents External Initiator service config
+type EIServiceConfig struct {
+	URL string
+}
+
 // ChainlinkConfig represents the variables needed to connect to a Chainlink node
 type ChainlinkConfig struct {
 	URL      string

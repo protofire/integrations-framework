@@ -11,7 +11,7 @@ spec:
         secret:
           secretName: {{ .Manifest.Secret.ObjectMeta.Name }}
       containers:
-      - name: node
+      - name: node-{{ .Values.chainlinkCluster.chainlink.idx }}
         image: {{ .Config.Apps.Chainlink.Image }}:{{ .Config.Apps.Chainlink.Version }}
         imagePullPolicy: IfNotPresent
         args:
@@ -35,13 +35,17 @@ spec:
           value: chainlink
           # TODO: Placeholders until CL 1.0.0 is cut, and we can use the new chain configuration options through the API
         - name: ETH_URL
-          value: {{ if .Values.DependencyGroup.ethereum_geth_0.clusterURL }}{{ .Values.DependencyGroup.ethereum_geth_0.clusterURL }}{{ else if .Values.DependencyGroup.ethereum_geth_performance_0.clusterURL }}{{ .Values.DependencyGroup.ethereum_geth_performance_0.clusterURL }}{{ else if .Values.DependencyGroup.ethereum_ganache_0.clusterURL }}{{ .Values.DependencyGroup.ethereum_ganache_0.clusterURL }}{{ else if .Values.DependencyGroup.ethereum_hardhat_0.clusterURL }}{{ .Values.DependencyGroup.ethereum_hardhat_0.clusterURL }}{{ end }}
+          value: {{ .DefaultNetwork.ClusterURL }}
         - name: ETH_CHAIN_ID
           value: {{ .DefaultNetwork.ChainID }}
         - name: ALLOW_ORIGINS
           value: '*'
         - name: CHAINLINK_DEV
           value: "true"
+        - name: ETH_DISABLED
+          value: {{ .Values.chainlinkCluster.chainlink.eth_disabled }}
+        - name: FEATURE_EXTERNAL_INITIATORS
+          value: {{ .Values.chainlinkCluster.chainlink.feature_external_initiators }}
         - name: CHAINLINK_PGPASSWORD
           value: node
         - name: CHAINLINK_PORT

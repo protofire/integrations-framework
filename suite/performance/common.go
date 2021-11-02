@@ -22,7 +22,7 @@ type Test interface {
 	RecordValues(b ginkgo.Benchmarker) error
 }
 
-// TestOptions celoextended perf/soak test options
+// TestOptions common perf/soak test options
 // either TestDuration can be set or NumberOfRounds, or both
 type TestOptions struct {
 	NumberOfContracts    int
@@ -32,7 +32,7 @@ type TestOptions struct {
 	GracefulStopDuration time.Duration
 }
 
-// PercentileReport celoextended percentile report
+// PercentileReport common percentile report
 type PercentileReport struct {
 	StdDev float64
 	Max    float64
@@ -268,7 +268,7 @@ func (r *PerfRequestIDTestResults) calculateLatencies(b ginkgo.Benchmarker) erro
 	return nil
 }
 
-// NodeData celoextended node data
+// NodeData common node data
 type NodeData interface {
 	GetJobID() string
 	GetProvingKeyHash() [32]byte
@@ -305,7 +305,7 @@ func (n VRFNodeData) GetProvingKeyHash() [32]byte {
 	return n.ProvingKeyHash
 }
 
-// ContractsNodesJobsMap celoextended contract to node to job id mapping for perf/soak tests
+// ContractsNodesJobsMap common contract to node to job id mapping for perf/soak tests
 type ContractsNodesJobsMap map[interface{}]map[client.Chainlink]NodeData
 
 // FromJobsChan fills ContractsNodesJobsMap from a chan used in parallel deployment
