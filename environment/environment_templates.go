@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/smartcontractkit/integrations-framework/utils"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,7 +17,6 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/config"
-	"github.com/smartcontractkit/integrations-framework/tools"
 	coreV1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -29,6 +29,7 @@ const (
 	ExplorerAPIPort   uint16 = 8080
 	PrometheusAPIPort uint16 = 9090
 	MockserverAPIPort uint16 = 1080
+	KafkaRestAPIPort  uint16 = 8082
 )
 
 // Ethereum ports
@@ -96,8 +97,8 @@ func NewChainlinkCustomNetworksCluster(nodeCount int, networkDeploymentConfigs [
 func NewAdapterManifest() *K8sManifest {
 	return &K8sManifest{
 		id:             "adapter",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/adapter-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/adapter-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/adapter-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/adapter-service.yml"),
 
 		values: map[string]interface{}{
 			"apiPort": AdapterAPIPort,
@@ -122,8 +123,8 @@ func NewAdapterManifest() *K8sManifest {
 func NewHeadlessChainlinkManifest(idx int) *K8sManifest {
 	return &K8sManifest{
 		id:             "chainlink",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/chainlink/chainlink-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/chainlink/chainlink-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/chainlink/chainlink-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/chainlink/chainlink-service.yml"),
 
 		values: map[string]interface{}{
 			"idx":                         idx,
@@ -147,8 +148,8 @@ func NewHeadlessChainlinkManifest(idx int) *K8sManifest {
 func NewChainlinkManifest(idx int) *K8sManifest {
 	return &K8sManifest{
 		id:             "chainlink",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/chainlink/chainlink-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/chainlink/chainlink-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/chainlink/chainlink-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/chainlink/chainlink-service.yml"),
 
 		values: map[string]interface{}{
 			"idx":                         idx,
@@ -172,8 +173,8 @@ func NewChainlinkManifest(idx int) *K8sManifest {
 func NewPostgresManifest() *K8sManifest {
 	return &K8sManifest{
 		id:             "postgres",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/postgres/postgres-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/postgres/postgres-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/postgres/postgres-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/postgres/postgres-service.yml"),
 
 		SetValuesFunc: func(manifest *K8sManifest) error {
 			manifest.values["clusterURL"] = fmt.Sprintf(
@@ -192,8 +193,8 @@ func NewPostgresManifest() *K8sManifest {
 func NewExplorerManifest(nodeCount int) *K8sManifest {
 	return &K8sManifest{
 		id:             "explorer",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/explorer-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/explorer-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/explorer-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/explorer-service.yml"),
 		SetValuesFunc: func(manifest *K8sManifest) error {
 			manifest.values["clusterURL"] = fmt.Sprintf(
 				"ws://%s:8080",
@@ -238,8 +239,8 @@ func NewExplorerManifest(nodeCount int) *K8sManifest {
 func NewOTPEManifest() *K8sManifest {
 	return &K8sManifest{
 		id:             "otpe",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/otpe-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/otpe-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/otpe-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/otpe-service.yml"),
 		SetValuesFunc: func(manifest *K8sManifest) error {
 			manifest.values["clusterURL"] = fmt.Sprintf(
 				"%s:%d",
@@ -255,7 +256,7 @@ func NewOTPEManifest() *K8sManifest {
 func NewMockserverConfigHelmChart() *HelmChart {
 	return &HelmChart{
 		id:          "mockserver-config",
-		chartPath:   filepath.Join(tools.ProjectRoot, "environment/charts/mockserver-config"),
+		chartPath:   filepath.Join(utils.ProjectRoot, "environment/charts/mockserver-config"),
 		releaseName: "mockserver-config",
 	}
 }
@@ -264,7 +265,7 @@ func NewMockserverConfigHelmChart() *HelmChart {
 func NewMockserverHelmChart() *HelmChart {
 	chart := &HelmChart{
 		id:          "mockserver",
-		chartPath:   filepath.Join(tools.ProjectRoot, "environment/charts/mockserver/mockserver-5.11.1.tgz"),
+		chartPath:   filepath.Join(utils.ProjectRoot, "environment/charts/mockserver/mockserver-5.11.1.tgz"),
 		releaseName: "mockserver",
 		values:      map[string]interface{}{},
 		SetValuesHelmFunc: func(manifest *HelmChart) error {
@@ -298,9 +299,9 @@ func NewPrometheusManifest(rules map[string]*os.File) *K8sManifest {
 
 	return &K8sManifest{
 		id:             "prometheus",
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/prometheus/prometheus-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/prometheus/prometheus-service.yml"),
-		ConfigMapFile:  filepath.Join(tools.ProjectRoot, "/environment/templates/prometheus/prometheus-config-map.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/prometheus/prometheus-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/prometheus/prometheus-service.yml"),
+		ConfigMapFile:  filepath.Join(utils.ProjectRoot, "/environment/templates/prometheus/prometheus-config-map.yml"),
 
 		values: vals,
 	}
@@ -312,9 +313,9 @@ func NewGethManifest(networkCount int, network *config.NetworkConfig) *K8sManife
 	network.RPCPort = GetFreePort()
 	return &K8sManifest{
 		id:             network.Name,
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "environment/templates/geth-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "environment/templates/geth-service.yml"),
-		ConfigMapFile:  filepath.Join(tools.ProjectRoot, "environment/templates/geth-config-map.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "environment/templates/geth-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "environment/templates/geth-service.yml"),
+		ConfigMapFile:  filepath.Join(utils.ProjectRoot, "environment/templates/geth-config-map.yml"),
 		Network:        network,
 		values: map[string]interface{}{
 			"rpcPort": network.RPCPort,
@@ -351,7 +352,7 @@ func NewGethReorgHelmChart(networkCount int, network *config.NetworkConfig) *Hel
 	network.RPCPort = GetFreePort()
 	return &HelmChart{
 		id:          network.Name,
-		chartPath:   filepath.Join(tools.ProjectRoot, "environment/charts/geth-reorg"),
+		chartPath:   filepath.Join(utils.ProjectRoot, "environment/charts/geth-reorg"),
 		releaseName: "reorg-1",
 		network:     network,
 		values: map[string]interface{}{
@@ -380,9 +381,9 @@ func NewHardhatManifest(networkCount int, network *config.NetworkConfig) *K8sMan
 	network.RPCPort = GetFreePort()
 	return &K8sManifest{
 		id:             network.Name,
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/hardhat-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/hardhat-service.yml"),
-		ConfigMapFile:  filepath.Join(tools.ProjectRoot, "/environment/templates/hardhat-config-map.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/hardhat-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/hardhat-service.yml"),
+		ConfigMapFile:  filepath.Join(utils.ProjectRoot, "/environment/templates/hardhat-config-map.yml"),
 		Network:        network,
 		values: map[string]interface{}{
 			"rpcPort": network.RPCPort,
@@ -408,8 +409,8 @@ func NewGanacheManifest(networkCount int, network *config.NetworkConfig) *K8sMan
 	network.RPCPort = GetFreePort()
 	return &K8sManifest{
 		id:             network.Name,
-		DeploymentFile: filepath.Join(tools.ProjectRoot, "/environment/templates/ganache-deployment.yml"),
-		ServiceFile:    filepath.Join(tools.ProjectRoot, "/environment/templates/ganache-service.yml"),
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/ganache-deployment.yml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/ganache-service.yml"),
 		Network:        network,
 		values: map[string]interface{}{
 			"rpcPort": network.RPCPort,
@@ -426,6 +427,63 @@ func NewGanacheManifest(networkCount int, network *config.NetworkConfig) *K8sMan
 			manifest.values["localURL"] = network.LocalURL
 			return nil
 		},
+	}
+}
+
+// NewAtlasEvmBlocksManifest is the k8s manifest that when used will deploy atlas-evm-blocks to an env
+func NewAtlasEvmBlocksManifest() *K8sManifest {
+	return &K8sManifest{
+		id:             "atlas_evm_blocks",
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/atlas-evm/atlas-evm-blocks-deployment.yaml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/atlas-evm/atlas-evm-blocks-service.yaml"),
+	}
+}
+
+// NewAtlasEvmEventsManifest is the k8s manifest that when used will deploy atlas-evm-events to an env
+func NewAtlasEvmEventsManifest() *K8sManifest {
+	return &K8sManifest{
+		id:             "atlas_evm_events",
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/atlas-evm/atlas-evm-events-deployment.yaml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/atlas-evm/atlas-evm-events-service.yaml"),
+	}
+}
+
+// NewAtlasEvmReceiptsManifest is the k8s manifest that when used will deploy atlas-evm-receipts to an env
+func NewAtlasEvmReceiptsManifest() *K8sManifest {
+	return &K8sManifest{
+		id:             "atlas_evm_receipts",
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/atlas-evm/atlas-evm-receipts-deployment.yaml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/atlas-evm/atlas-evm-receipts-service.yaml"),
+	}
+}
+
+// NewSchemaRegistryManifest is the k8s manifest that when used will deploy schema registry to an env
+// Confluent Schema Registry provides a serving layer for your metadata. It provides a RESTful interface for storing
+// and retrieving your Avro®, JSON Schema, and Protobuf schemas. In Atlas it stores the schemas for different
+// components like atlas-evm-blocks, atlas-evm-events etc.
+func NewSchemaRegistryManifest() *K8sManifest {
+	return &K8sManifest{
+		id:             "schema_registry",
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/schema-registry/schema-registry-deployment.yaml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/schema-registry/schema-registry-service.yaml"),
+		SetValuesFunc: func(manifest *K8sManifest) error {
+			manifest.values["clusterURL"] = fmt.Sprintf(
+				"http://%s:%d",
+				manifest.Service.Spec.ClusterIP,
+				manifest.Service.Spec.Ports[0].Port,
+			)
+			return nil
+		},
+	}
+}
+
+// NewKafkaRestManifest is the k8s manifest that when used will deploy kafka rest to an env
+// this is used to retrieve kafka info through REST
+func NewKafkaRestManifest() *K8sManifest {
+	return &K8sManifest{
+		id:             "kafka_rest",
+		DeploymentFile: filepath.Join(utils.ProjectRoot, "/environment/templates/kafka-rest/kafka-rest-deployment.yaml"),
+		ServiceFile:    filepath.Join(utils.ProjectRoot, "/environment/templates/kafka-rest/kafka-rest-service.yaml"),
 	}
 }
 
@@ -493,6 +551,58 @@ func NewChainlinkClusterForObservabilityTesting(nodeCount int) K8sEnvSpecInit {
 	return addNetworkManifestToDependencyGroup(chainlinkGroup, dependencyGroups)
 }
 
+// NewChainlinkClusterForAtlasTesting is a basic environment that deploys a chainlink cluster with dependencies
+// for testing Atlas
+func NewChainlinkClusterForAtlasTesting(nodeCount int) K8sEnvSpecInit {
+	mockserverConfigDependencyGroup := &K8sManifestGroup{
+		id:        "MockserverConfigDependencyGroup",
+		manifests: []K8sEnvResource{NewMockserverConfigHelmChart()},
+	}
+
+	mockserverDependencyGroup := &K8sManifestGroup{
+		id:        "MockserverDependencyGroup",
+		manifests: []K8sEnvResource{NewMockserverHelmChart()},
+	}
+
+	chainlinkGroup := &K8sManifestGroup{
+		id:        "chainlinkCluster",
+		manifests: []K8sEnvResource{},
+	}
+	for i := 0; i < nodeCount; i++ {
+		cManifest := NewChainlinkManifest(i)
+		cManifest.id = fmt.Sprintf("%s-%d", cManifest.id, i)
+		chainlinkGroup.manifests = append(chainlinkGroup.manifests, cManifest)
+	}
+
+	kafkaDependecyGroup := &K8sManifestGroup{
+		id:        "KafkaGroup",
+		manifests: []K8sEnvResource{NewKafkaHelmChart()},
+	}
+
+	schemaRegistryDependencyGroup := &K8sManifestGroup{
+		id:        "SchemaRegistryGroup",
+		manifests: []K8sEnvResource{NewSchemaRegistryManifest()},
+	}
+
+	kafkaRestDependencyGroup := &K8sManifestGroup{
+		id:        "KafkaRestGroup",
+		manifests: []K8sEnvResource{NewKafkaRestManifest()},
+	}
+
+	dependencyGroup := getBasicDependencyGroup()
+	addPostgresDbsToDependencyGroup(dependencyGroup, nodeCount)
+	dependencyGroups := []*K8sManifestGroup{
+		mockserverConfigDependencyGroup,
+		mockserverDependencyGroup,
+		kafkaDependecyGroup,
+		schemaRegistryDependencyGroup,
+		kafkaRestDependencyGroup,
+		dependencyGroup,
+	}
+
+	return addNetworkManifestToDependencyGroup(chainlinkGroup, dependencyGroups)
+}
+
 // NewMixedVersionChainlinkCluster mixes the currently latest chainlink version (as defined by the config file) with
 // a number of past stable versions (defined by pastVersionsCount), ensuring that at least one of each is deployed
 func NewMixedVersionChainlinkCluster(nodeCount, pastVersionsCount int) K8sEnvSpecInit {
@@ -545,7 +655,7 @@ func NewMixedVersionChainlinkCluster(nodeCount, pastVersionsCount int) K8sEnvSpe
 
 // NewKafkaHelmChart creates new helm chart for kafka
 func NewKafkaHelmChart() *HelmChart {
-	valuesFilePath := filepath.Join(tools.ProjectRoot, "environment/charts/kafka/overrideValues.yaml")
+	valuesFilePath := filepath.Join(utils.ProjectRoot, "environment/charts/kafka/overrideValues.yaml")
 	overrideValues, err := chartutil.ReadValuesFile(valuesFilePath)
 	if err != nil {
 		return nil
@@ -553,11 +663,12 @@ func NewKafkaHelmChart() *HelmChart {
 
 	chart := &HelmChart{
 		id:          "kafka",
-		chartPath:   filepath.Join(tools.ProjectRoot, "environment/charts/kafka/kafka-14.1.0.tgz"),
+		chartPath:   filepath.Join(utils.ProjectRoot, "environment/charts/kafka/kafka-14.1.0.tgz"),
 		releaseName: "kafka",
 		values:      map[string]interface{}{},
 		SetValuesHelmFunc: func(manifest *HelmChart) error {
 			manifest.values["clusterURL"] = "kafka:9092"
+			manifest.values["zookeeperURL"] = "kafka-zookeeper:2181"
 			return nil
 		},
 	}
@@ -679,9 +790,7 @@ func OtpeGroup() K8sEnvSpecInit {
 			id:        "OTPEDependencyGroup",
 			manifests: []K8sEnvResource{NewOTPEManifest()},
 		}
-
 		specs = append(specs, otpeDependencyGroup)
-
 		return specs
 	}
 }
@@ -695,6 +804,34 @@ func PrometheusGroup(rules map[string]*os.File) K8sEnvSpecInit {
 			manifests: []K8sEnvResource{NewPrometheusManifest(rules)},
 		}
 		specs = append(specs, prometheusDependencyGroup)
+		return specs
+	}
+}
+
+// AtlasEvmBlocksGroup contains manifests for atlas-evm-blocks
+func AtlasEvmBlocksGroup() K8sEnvSpecInit {
+	return func(networks ...client.BlockchainNetwork) K8sEnvSpecs {
+		var specs K8sEnvSpecs
+		atlasEvmBlocksDependencyGroup := &K8sManifestGroup{
+			id:        "AtlasEvmBlocksGroup",
+			manifests: []K8sEnvResource{NewAtlasEvmBlocksManifest()},
+		}
+		specs = append(specs, atlasEvmBlocksDependencyGroup)
+		return specs
+	}
+}
+
+// AtlasEvmEventsAndReceiptsGroup contains manifests for atlas-evm-events and atlas-evm-receipts
+func AtlasEvmEventsAndReceiptsGroup() K8sEnvSpecInit {
+	return func(networks ...client.BlockchainNetwork) K8sEnvSpecs {
+		var specs K8sEnvSpecs
+
+		atlasEvmEventsAndReceiptsDependencyGroup := &K8sManifestGroup{
+			id:        "AtlasEvmEventsAndReceiptsGroup",
+			manifests: []K8sEnvResource{NewAtlasEvmEventsManifest(), NewAtlasEvmReceiptsManifest()},
+		}
+
+		specs = append(specs, atlasEvmEventsAndReceiptsDependencyGroup)
 		return specs
 	}
 }

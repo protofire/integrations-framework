@@ -3,10 +3,10 @@ package environment
 import (
 	"fmt"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/integrations-framework/chaos"
 	"github.com/smartcontractkit/integrations-framework/client"
+	"github.com/smartcontractkit/integrations-framework/client/chaos"
 	"github.com/smartcontractkit/integrations-framework/config"
-	"github.com/smartcontractkit/integrations-framework/types"
+	"github.com/smartcontractkit/integrations-framework/hooks"
 	"net/http"
 	"net/url"
 )
@@ -71,6 +71,17 @@ func GetMockserverClientFromEnv(env Environment) (*client.MockserverClient, erro
 	return client.NewMockserverClient(&client.MockserverConfig{
 		LocalURL:   sd.LocalURL.String(),
 		ClusterURL: sd.RemoteURL.String(),
+	}), nil
+}
+
+// GetKafkaRestClientFromEnv returns a KafkaRestClient
+func GetKafkaRestClientFromEnv(env Environment) (*client.KafkaRestClient, error) {
+	sd, err := env.GetServiceDetails(KafkaRestAPIPort)
+	if err != nil {
+		return nil, err
+	}
+	return client.NewKafkaRestClient(&client.KafkaRestConfig{
+		URL: sd.LocalURL.String(),
 	}), nil
 }
 
@@ -165,7 +176,7 @@ func GetExternalAdapter(env Environment) (ExternalAdapter, error) {
 }
 
 // NewExternalBlockchainClient connects external client implementation to particular network
-func NewExternalBlockchainClient(clientFunc types.NewClientHook, env Environment, network client.BlockchainNetwork) (client.BlockchainClient, error) {
+func NewExternalBlockchainClient(clientFunc hooks.NewClientHook, env Environment, network client.BlockchainNetwork) (client.BlockchainClient, error) {
 	sd, err := env.GetServiceDetails(network.RemotePort())
 	if err == nil {
 		var url string

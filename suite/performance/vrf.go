@@ -2,6 +2,9 @@ package performance
 
 import (
 	"context"
+	"math/big"
+	"time"
+
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
@@ -11,8 +14,6 @@ import (
 	"github.com/smartcontractkit/integrations-framework/contracts"
 	"github.com/smartcontractkit/integrations-framework/environment"
 	"golang.org/x/sync/errgroup"
-	"math/big"
-	"time"
 )
 
 // VRFProvingData proving key and job ID pair
@@ -128,7 +129,7 @@ func (f *VRFTest) deployCommonContracts() error {
 	return f.Blockchain.WaitForEvents()
 }
 
-// deployContracts deploys celoextended contracts and required amount of VRF consumers
+// deployContracts deploys common contracts and required amount of VRF consumers
 func (f *VRFTest) deployContracts() error {
 	if err := f.deployCommonContracts(); err != nil {
 		return err
@@ -280,7 +281,7 @@ func (f *VRFTest) createChainlinkJobs() error {
 				if err != nil {
 					return err
 				}
-				pubKeyCompressed := nodeKeys.Data[0].ID
+				pubKeyCompressed := nodeKeys.Data[0].Data.ID
 				jobUUID := uuid.NewV4()
 				os := &client.VRFTxPipelineSpec{
 					Address: p.coordinator.Address(),
