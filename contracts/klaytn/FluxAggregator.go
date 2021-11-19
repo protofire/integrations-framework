@@ -1,25 +1,26 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	klaytn "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = celo.NotFound
+	_ = klaytn.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -199,7 +200,7 @@ func (_FluxAggregator *FluxAggregatorCaller) AllocatedFunds(opts *bind.CallOpts)
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -230,7 +231,7 @@ func (_FluxAggregator *FluxAggregatorCaller) AvailableFunds(opts *bind.CallOpts)
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -261,7 +262,7 @@ func (_FluxAggregator *FluxAggregatorCaller) Decimals(opts *bind.CallOpts) (uint
 		return *new(uint8), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint8)).(*uint8)
 
 	return out0, err
 
@@ -292,7 +293,7 @@ func (_FluxAggregator *FluxAggregatorCaller) Description(opts *bind.CallOpts) (s
 		return *new(string), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+	out0 := *klaytnextended.ConvertType(out[0], new(string)).(*string)
 
 	return out0, err
 
@@ -323,7 +324,7 @@ func (_FluxAggregator *FluxAggregatorCaller) GetAdmin(opts *bind.CallOpts, _orac
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -354,7 +355,7 @@ func (_FluxAggregator *FluxAggregatorCaller) GetAnswer(opts *bind.CallOpts, _rou
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -385,7 +386,7 @@ func (_FluxAggregator *FluxAggregatorCaller) GetOracles(opts *bind.CallOpts) ([]
 		return *new([]common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new([]common.Address)).(*[]common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new([]common.Address)).(*[]common.Address)
 
 	return out0, err
 
@@ -429,11 +430,11 @@ func (_FluxAggregator *FluxAggregatorCaller) GetRoundData(opts *bind.CallOpts, _
 		return *outstruct, err
 	}
 
-	outstruct.RoundId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Answer = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.StartedAt = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.UpdatedAt = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
-	outstruct.AnsweredInRound = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
+	outstruct.RoundId = *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Answer = *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.StartedAt = *klaytnextended.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.UpdatedAt = *klaytnextended.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.AnsweredInRound = *klaytnextended.ConvertType(out[4], new(*big.Int)).(**big.Int)
 
 	return *outstruct, err
 
@@ -476,7 +477,7 @@ func (_FluxAggregator *FluxAggregatorCaller) GetTimestamp(opts *bind.CallOpts, _
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -507,7 +508,7 @@ func (_FluxAggregator *FluxAggregatorCaller) LatestAnswer(opts *bind.CallOpts) (
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -538,7 +539,7 @@ func (_FluxAggregator *FluxAggregatorCaller) LatestRound(opts *bind.CallOpts) (*
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -582,11 +583,11 @@ func (_FluxAggregator *FluxAggregatorCaller) LatestRoundData(opts *bind.CallOpts
 		return *outstruct, err
 	}
 
-	outstruct.RoundId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Answer = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.StartedAt = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.UpdatedAt = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
-	outstruct.AnsweredInRound = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
+	outstruct.RoundId = *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Answer = *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.StartedAt = *klaytnextended.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.UpdatedAt = *klaytnextended.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.AnsweredInRound = *klaytnextended.ConvertType(out[4], new(*big.Int)).(**big.Int)
 
 	return *outstruct, err
 
@@ -629,7 +630,7 @@ func (_FluxAggregator *FluxAggregatorCaller) LatestTimestamp(opts *bind.CallOpts
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -660,7 +661,7 @@ func (_FluxAggregator *FluxAggregatorCaller) LinkToken(opts *bind.CallOpts) (com
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -691,7 +692,7 @@ func (_FluxAggregator *FluxAggregatorCaller) MaxSubmissionCount(opts *bind.CallO
 		return *new(uint32), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint32)).(*uint32)
 
 	return out0, err
 
@@ -722,7 +723,7 @@ func (_FluxAggregator *FluxAggregatorCaller) MaxSubmissionValue(opts *bind.CallO
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -753,7 +754,7 @@ func (_FluxAggregator *FluxAggregatorCaller) MinSubmissionCount(opts *bind.CallO
 		return *new(uint32), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint32)).(*uint32)
 
 	return out0, err
 
@@ -784,7 +785,7 @@ func (_FluxAggregator *FluxAggregatorCaller) MinSubmissionValue(opts *bind.CallO
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -815,7 +816,7 @@ func (_FluxAggregator *FluxAggregatorCaller) OracleCount(opts *bind.CallOpts) (u
 		return *new(uint8), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint8)).(*uint8)
 
 	return out0, err
 
@@ -865,14 +866,14 @@ func (_FluxAggregator *FluxAggregatorCaller) OracleRoundState(opts *bind.CallOpt
 		return *outstruct, err
 	}
 
-	outstruct.EligibleToSubmit = *abi.ConvertType(out[0], new(bool)).(*bool)
-	outstruct.RoundId = *abi.ConvertType(out[1], new(uint32)).(*uint32)
-	outstruct.LatestSubmission = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.StartedAt = *abi.ConvertType(out[3], new(uint64)).(*uint64)
-	outstruct.Timeout = *abi.ConvertType(out[4], new(uint64)).(*uint64)
-	outstruct.AvailableFunds = *abi.ConvertType(out[5], new(*big.Int)).(**big.Int)
-	outstruct.OracleCount = *abi.ConvertType(out[6], new(uint8)).(*uint8)
-	outstruct.PaymentAmount = *abi.ConvertType(out[7], new(*big.Int)).(**big.Int)
+	outstruct.EligibleToSubmit = *klaytnextended.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.RoundId = *klaytnextended.ConvertType(out[1], new(uint32)).(*uint32)
+	outstruct.LatestSubmission = *klaytnextended.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.StartedAt = *klaytnextended.ConvertType(out[3], new(uint64)).(*uint64)
+	outstruct.Timeout = *klaytnextended.ConvertType(out[4], new(uint64)).(*uint64)
+	outstruct.AvailableFunds = *klaytnextended.ConvertType(out[5], new(*big.Int)).(**big.Int)
+	outstruct.OracleCount = *klaytnextended.ConvertType(out[6], new(uint8)).(*uint8)
+	outstruct.PaymentAmount = *klaytnextended.ConvertType(out[7], new(*big.Int)).(**big.Int)
 
 	return *outstruct, err
 
@@ -921,7 +922,7 @@ func (_FluxAggregator *FluxAggregatorCaller) Owner(opts *bind.CallOpts) (common.
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -952,7 +953,7 @@ func (_FluxAggregator *FluxAggregatorCaller) PaymentAmount(opts *bind.CallOpts) 
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -983,7 +984,7 @@ func (_FluxAggregator *FluxAggregatorCaller) RestartDelay(opts *bind.CallOpts) (
 		return *new(uint32), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint32)).(*uint32)
 
 	return out0, err
 
@@ -1014,7 +1015,7 @@ func (_FluxAggregator *FluxAggregatorCaller) Timeout(opts *bind.CallOpts) (uint3
 		return *new(uint32), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint32)).(*uint32)
 
 	return out0, err
 
@@ -1045,7 +1046,7 @@ func (_FluxAggregator *FluxAggregatorCaller) Validator(opts *bind.CallOpts) (com
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -1076,7 +1077,7 @@ func (_FluxAggregator *FluxAggregatorCaller) Version(opts *bind.CallOpts) (*big.
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -1107,7 +1108,7 @@ func (_FluxAggregator *FluxAggregatorCaller) WithdrawablePayment(opts *bind.Call
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -1429,7 +1430,7 @@ type FluxAggregatorAnswerUpdatedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -1583,7 +1584,7 @@ type FluxAggregatorAvailableFundsUpdatedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -1727,7 +1728,7 @@ type FluxAggregatorNewRoundIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -1881,7 +1882,7 @@ type FluxAggregatorOracleAdminUpdateRequestedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2027,7 +2028,7 @@ type FluxAggregatorOracleAdminUpdatedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2180,7 +2181,7 @@ type FluxAggregatorOraclePermissionsUpdatedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2333,7 +2334,7 @@ type FluxAggregatorOwnershipTransferRequestedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2486,7 +2487,7 @@ type FluxAggregatorOwnershipTransferredIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2639,7 +2640,7 @@ type FluxAggregatorRequesterPermissionsSetIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2785,7 +2786,7 @@ type FluxAggregatorRoundDetailsUpdatedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -2949,7 +2950,7 @@ type FluxAggregatorSubmissionReceivedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -3111,7 +3112,7 @@ type FluxAggregatorValidatorUpdatedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }

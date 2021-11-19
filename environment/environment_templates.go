@@ -21,7 +21,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Ports for celoextended services
+// Ports for common services
 const (
 	AdapterAPIPort    uint16 = 6060
 	ChainlinkWebPort  uint16 = 6688

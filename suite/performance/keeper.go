@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
@@ -40,7 +40,7 @@ type KeeperTest struct {
 	Blockchain  client.BlockchainClient
 	Wallets     client.BlockchainWallets
 	Deployer    contracts.ContractDeployer
-	// celoextended contracts
+	// common contracts
 	Link      contracts.LinkToken
 	GasFeed   contracts.MockGasFeed
 	LinkFeed  contracts.MockETHLINKFeed

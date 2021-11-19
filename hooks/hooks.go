@@ -25,12 +25,12 @@ type NewMultinetworkHook func(conf *config.Config) ([]client.BlockchainNetwork, 
 
 // EthereumDeployerHook deployer hook
 func EthereumDeployerHook(bcClient client.BlockchainClient) (contracts.ContractDeployer, error) {
-	return contracts.NewEthereumContractDeployer(bcClient.Get().(*client.CeloClient)), nil
+	return contracts.NewEthereumContractDeployer(bcClient.Get().(*client.KlaytnClient)), nil
 }
 
 // EthereumClientHook client hook
 func EthereumClientHook(network client.BlockchainNetwork) (client.BlockchainClient, error) {
-	return client.NewCeloClient(network)
+	return client.NewKlaytnClient(network)
 }
 
 // EVMNetworkFromConfigHook evm network from config hook

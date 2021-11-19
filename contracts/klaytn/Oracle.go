@@ -1,18 +1,19 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	celo "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -199,7 +200,7 @@ func (_Oracle *OracleCaller) EXPIRYTIME(opts *bind.CallOpts) (*big.Int, error) {
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -230,7 +231,7 @@ func (_Oracle *OracleCaller) GetAuthorizationStatus(opts *bind.CallOpts, _node c
 		return *new(bool), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+	out0 := *klaytnextended.ConvertType(out[0], new(bool)).(*bool)
 
 	return out0, err
 
@@ -261,7 +262,7 @@ func (_Oracle *OracleCaller) GetChainlinkToken(opts *bind.CallOpts) (common.Addr
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -292,7 +293,7 @@ func (_Oracle *OracleCaller) IsOwner(opts *bind.CallOpts) (bool, error) {
 		return *new(bool), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+	out0 := *klaytnextended.ConvertType(out[0], new(bool)).(*bool)
 
 	return out0, err
 
@@ -323,7 +324,7 @@ func (_Oracle *OracleCaller) Owner(opts *bind.CallOpts) (common.Address, error) 
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -354,7 +355,7 @@ func (_Oracle *OracleCaller) Withdrawable(opts *bind.CallOpts) (*big.Int, error)
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 

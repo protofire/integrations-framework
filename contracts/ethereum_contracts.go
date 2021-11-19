@@ -9,12 +9,12 @@ import (
 
 	"strings"
 
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/client"
-	"github.com/smartcontractkit/integrations-framework/contracts/celo"
+	"github.com/smartcontractkit/integrations-framework/contracts/klaytn"
 	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
 	ocrTypes "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
 )
@@ -22,8 +22,8 @@ import (
 // EthereumOracle oracle for "directrequest" job tests
 type EthereumOracle struct {
 	address      *common.Address
-	client       *client.CeloClient
-	oracle       *celo.Oracle
+	client       *client.KlaytnClient
+	oracle       *klaytn.Oracle
 	callerWallet client.BlockchainWallet
 }
 
@@ -51,8 +51,8 @@ func (e *EthereumOracle) SetFulfillmentPermission(fromWallet client.BlockchainWa
 // EthereumAPIConsumer API consumer for job type "directrequest" tests
 type EthereumAPIConsumer struct {
 	address      *common.Address
-	client       *client.CeloClient
-	consumer     *celo.APIConsumer
+	client       *client.KlaytnClient
+	consumer     *klaytn.APIConsumer
 	callerWallet client.BlockchainWallet
 }
 
@@ -74,7 +74,7 @@ func (e *EthereumAPIConsumer) Fund(fromWallet client.BlockchainWallet, ethAmount
 }
 
 func (e *EthereumAPIConsumer) WatchPerfEvents(ctx context.Context, eventChan chan<- *PerfEvent) error {
-	ethEventChan := make(chan *celo.APIConsumerPerfMetricsEvent)
+	ethEventChan := make(chan *klaytn.APIConsumerPerfMetricsEvent)
 	sub, err := e.consumer.WatchPerfMetricsEvent(&bind.WatchOpts{}, ethEventChan)
 	if err != nil {
 		return err
@@ -133,8 +133,8 @@ func (e *EthereumAPIConsumer) CreateRequestTo(
 
 // EthereumFluxAggregator represents the basic flux aggregation contract
 type EthereumFluxAggregator struct {
-	client         *client.CeloClient
-	fluxAggregator *celo.FluxAggregator
+	client         *client.KlaytnClient
+	fluxAggregator *klaytn.FluxAggregator
 	callerWallet   client.BlockchainWallet
 	address        *common.Address
 }
@@ -187,7 +187,7 @@ func (f *EthereumFluxAggregator) RequestNewRound(ctx context.Context, fromWallet
 
 // WatchSubmissionReceived subscribes to any submissions on a flux feed
 func (f *EthereumFluxAggregator) WatchSubmissionReceived(ctx context.Context, eventChan chan<- *SubmissionEvent) error {
-	ethEventChan := make(chan *celo.FluxAggregatorSubmissionReceived)
+	ethEventChan := make(chan *klaytn.FluxAggregatorSubmissionReceived)
 	sub, err := f.fluxAggregator.WatchSubmissionReceived(&bind.WatchOpts{}, ethEventChan, nil, nil, nil)
 	if err != nil {
 		return err
@@ -494,8 +494,8 @@ func (f *VRFConsumerRoundConfirmer) Wait() error {
 
 // EthereumLinkToken represents a LinkToken address
 type EthereumLinkToken struct {
-	client       *client.CeloClient
-	linkToken    *celo.LinkToken
+	client       *client.KlaytnClient
+	linkToken    *klaytn.LinkToken
 	callerWallet client.BlockchainWallet
 	address      common.Address
 }
@@ -570,8 +570,8 @@ func (l *EthereumLinkToken) TransferAndCall(fromWallet client.BlockchainWallet, 
 
 // EthereumOffchainAggregator represents the offchain aggregation contract
 type EthereumOffchainAggregator struct {
-	client       *client.CeloClient
-	ocr          *celo.OffchainAggregator
+	client       *client.KlaytnClient
+	ocr          *klaytn.OffchainAggregator
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -936,10 +936,10 @@ func (o *KeeperConsumerRoundConfirmer) Wait() error {
 	}
 }
 
-// EthereumStorage acts as a conduit for the celo version of the storage contract
+// EthereumStorage acts as a conduit for the klaytn version of the storage contract
 type EthereumStorage struct {
-	client       *client.CeloClient
-	store        *celo.Store
+	client       *client.KlaytnClient
+	store        *klaytn.Store
 	callerWallet client.BlockchainWallet
 }
 
@@ -969,8 +969,8 @@ func (e *EthereumStorage) Get(ctxt context.Context) (*big.Int, error) {
 
 // EthereumVRF represents a VRF contract
 type EthereumVRF struct {
-	client       *client.CeloClient
-	vrf          *celo.VRF
+	client       *client.KlaytnClient
+	vrf          *klaytn.VRF
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -992,8 +992,8 @@ func (v *EthereumVRF) ProofLength(ctxt context.Context) (*big.Int, error) {
 
 // EthereumMockETHLINKFeed represents mocked ETH/LINK feed contract
 type EthereumMockETHLINKFeed struct {
-	client       *client.CeloClient
-	feed         *celo.MockETHLINKAggregator
+	client       *client.KlaytnClient
+	feed         *klaytn.MockETHLINKAggregator
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1004,8 +1004,8 @@ func (v *EthereumMockETHLINKFeed) Address() string {
 
 // EthereumMockGASFeed represents mocked Gas feed contract
 type EthereumMockGASFeed struct {
-	client       *client.CeloClient
-	feed         *celo.MockGASAggregator
+	client       *client.KlaytnClient
+	feed         *klaytn.MockGASAggregator
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1016,8 +1016,8 @@ func (v *EthereumMockGASFeed) Address() string {
 
 // EthereumKeeperRegistry represents keeper registry contract
 type EthereumKeeperRegistry struct {
-	client       *client.CeloClient
-	registry     *celo.KeeperRegistry
+	client       *client.KlaytnClient
+	registry     *klaytn.KeeperRegistry
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1156,8 +1156,8 @@ func (v *EthereumKeeperRegistry) GetKeeperList(ctx context.Context) ([]string, e
 
 // EthereumKeeperConsumer represents keeper consumer (upkeep) contract
 type EthereumKeeperConsumer struct {
-	client       *client.CeloClient
-	consumer     *celo.KeeperConsumer
+	client       *client.KlaytnClient
+	consumer     *klaytn.KeeperConsumer
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1185,8 +1185,8 @@ func (v *EthereumKeeperConsumer) Counter(ctx context.Context) (*big.Int, error) 
 
 // EthereumUpkeepRegistrationRequests keeper contract to register upkeeps
 type EthereumUpkeepRegistrationRequests struct {
-	client       *client.CeloClient
-	registrar    *celo.UpkeepRegistrationRequests
+	client       *client.KlaytnClient
+	registrar    *klaytn.UpkeepRegistrationRequests
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1230,7 +1230,7 @@ func (v *EthereumUpkeepRegistrationRequests) EncodeRegisterRequest(
 	amount *big.Int,
 	source uint8,
 ) ([]byte, error) {
-	registryABI, err := abi.JSON(strings.NewReader(celo.UpkeepRegistrationRequestsABI))
+	registryABI, err := abi.JSON(strings.NewReader(klaytn.UpkeepRegistrationRequestsABI))
 	if err != nil {
 		return nil, err
 	}
@@ -1254,8 +1254,8 @@ func (v *EthereumUpkeepRegistrationRequests) EncodeRegisterRequest(
 // EthereumBlockhashStore represents a blockhash store for VRF contract
 type EthereumBlockhashStore struct {
 	address        *common.Address
-	client         *client.CeloClient
-	blockHashStore *celo.BlockhashStore
+	client         *client.KlaytnClient
+	blockHashStore *klaytn.BlockhashStore
 	callerWallet   client.BlockchainWallet
 }
 
@@ -1266,8 +1266,8 @@ func (v *EthereumBlockhashStore) Address() string {
 // EthereumVRFCoordinator represents VRF coordinator contract
 type EthereumVRFCoordinator struct {
 	address      *common.Address
-	client       *client.CeloClient
-	coordinator  *celo.VRFCoordinator
+	client       *client.KlaytnClient
+	coordinator  *klaytn.VRFCoordinator
 	callerWallet client.BlockchainWallet
 }
 
@@ -1309,8 +1309,8 @@ func (v *EthereumVRFCoordinator) RegisterProvingKey(
 // EthereumVRFConsumer represents VRF consumer contract
 type EthereumVRFConsumer struct {
 	address      *common.Address
-	client       *client.CeloClient
-	consumer     *celo.VRFConsumer
+	client       *client.KlaytnClient
+	consumer     *klaytn.VRFConsumer
 	callerWallet client.BlockchainWallet
 }
 
@@ -1345,7 +1345,7 @@ func (v *EthereumVRFConsumer) CurrentRoundID(ctx context.Context) (*big.Int, err
 }
 
 func (v *EthereumVRFConsumer) WatchPerfEvents(ctx context.Context, eventChan chan<- *PerfEvent) error {
-	ethEventChan := make(chan *celo.VRFConsumerPerfMetricsEvent)
+	ethEventChan := make(chan *klaytn.VRFConsumerPerfMetricsEvent)
 	sub, err := v.consumer.WatchPerfMetricsEvent(&bind.WatchOpts{}, ethEventChan)
 	if err != nil {
 		return err
@@ -1383,8 +1383,8 @@ func (v *EthereumVRFConsumer) RandomnessOutput(ctx context.Context) (*big.Int, e
 
 // EthereumReadAccessController represents read access controller contract
 type EthereumReadAccessController struct {
-	client       *client.CeloClient
-	rac          *celo.SimpleReadAccessController
+	client       *client.KlaytnClient
+	rac          *klaytn.SimpleReadAccessController
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1422,8 +1422,8 @@ func (e *EthereumReadAccessController) Address() string {
 
 // EthereumFlags represents flags contract
 type EthereumFlags struct {
-	client       *client.CeloClient
-	flags        *celo.Flags
+	client       *client.KlaytnClient
+	flags        *klaytn.Flags
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }
@@ -1448,8 +1448,8 @@ func (e *EthereumFlags) GetFlag(ctx context.Context, addr string) (bool, error) 
 
 // EthereumDeviationFlaggingValidator represents deviation flagging validator contract
 type EthereumDeviationFlaggingValidator struct {
-	client       *client.CeloClient
-	dfv          *celo.DeviationFlaggingValidator
+	client       *client.KlaytnClient
+	dfv          *klaytn.DeviationFlaggingValidator
 	callerWallet client.BlockchainWallet
 	address      *common.Address
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/smartcontractkit/integrations-framework/utils"
 	"math/big"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"

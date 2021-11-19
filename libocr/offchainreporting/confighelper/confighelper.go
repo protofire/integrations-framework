@@ -8,7 +8,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers/offchainaggregator"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/config"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/crypto"
 
 	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers/exposedoffchainaggregator"
 

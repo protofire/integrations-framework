@@ -1,25 +1,26 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	klaytn "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = celo.NotFound
+	_ = klaytn.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -199,7 +200,7 @@ func (_APIConsumer *APIConsumerCaller) CurrentRoundID(opts *bind.CallOpts) (*big
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -230,7 +231,7 @@ func (_APIConsumer *APIConsumerCaller) Data(opts *bind.CallOpts) (*big.Int, erro
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -261,7 +262,7 @@ func (_APIConsumer *APIConsumerCaller) GetChainlinkToken(opts *bind.CallOpts) (c
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -292,7 +293,7 @@ func (_APIConsumer *APIConsumerCaller) IsOwner(opts *bind.CallOpts) (bool, error
 		return *new(bool), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+	out0 := *klaytnextended.ConvertType(out[0], new(bool)).(*bool)
 
 	return out0, err
 
@@ -323,7 +324,7 @@ func (_APIConsumer *APIConsumerCaller) Owner(opts *bind.CallOpts) (common.Addres
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -354,7 +355,7 @@ func (_APIConsumer *APIConsumerCaller) Selector(opts *bind.CallOpts) ([4]byte, e
 		return *new([4]byte), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new([4]byte)).(*[4]byte)
+	out0 := *klaytnextended.ConvertType(out[0], new([4]byte)).(*[4]byte)
 
 	return out0, err
 
@@ -487,7 +488,7 @@ type APIConsumerChainlinkCancelledIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -631,7 +632,7 @@ type APIConsumerChainlinkFulfilledIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -775,7 +776,7 @@ type APIConsumerChainlinkRequestedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -919,7 +920,7 @@ type APIConsumerOwnershipTransferredIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -1072,7 +1073,7 @@ type APIConsumerPerfMetricsEventIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }

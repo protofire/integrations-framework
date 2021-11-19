@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"

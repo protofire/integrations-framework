@@ -4,8 +4,8 @@ import (
 	"crypto/aes"
 	"fmt"
 
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/crypto"
 	"github.com/pkg/errors"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
 	"golang.org/x/crypto/curve25519"

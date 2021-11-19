@@ -1,25 +1,26 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	klaytn "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = celo.NotFound
+	_ = klaytn.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -199,7 +200,7 @@ func (_LinkToken *LinkTokenCaller) Allowance(opts *bind.CallOpts, _owner common.
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -230,7 +231,7 @@ func (_LinkToken *LinkTokenCaller) BalanceOf(opts *bind.CallOpts, _owner common.
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -261,7 +262,7 @@ func (_LinkToken *LinkTokenCaller) Decimals(opts *bind.CallOpts) (uint8, error) 
 		return *new(uint8), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint8)).(*uint8)
 
 	return out0, err
 
@@ -292,7 +293,7 @@ func (_LinkToken *LinkTokenCaller) Name(opts *bind.CallOpts) (string, error) {
 		return *new(string), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+	out0 := *klaytnextended.ConvertType(out[0], new(string)).(*string)
 
 	return out0, err
 
@@ -323,7 +324,7 @@ func (_LinkToken *LinkTokenCaller) Symbol(opts *bind.CallOpts) (string, error) {
 		return *new(string), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+	out0 := *klaytnextended.ConvertType(out[0], new(string)).(*string)
 
 	return out0, err
 
@@ -354,7 +355,7 @@ func (_LinkToken *LinkTokenCaller) TotalSupply(opts *bind.CallOpts) (*big.Int, e
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -508,7 +509,7 @@ type LinkTokenApprovalIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -662,7 +663,7 @@ type LinkTokenTransferIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -817,7 +818,7 @@ type LinkTokenTransfer0Iterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }

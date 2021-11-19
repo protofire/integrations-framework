@@ -6,9 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/common"
 	"github.com/pkg/errors"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
 )
 
@@ -86,11 +87,13 @@ func decodeContractSetConfigEncodedComponents(
 			"attempt to deserialize a too-long config (%d bytes)", len(b),
 		)
 	}
+
+	// TODO koteld: NOTE
 	var vals []interface{}
-	if vals, err = encoding.Unpack(b); err != nil {
+	if vals, err = klaytnextended.Unpack(encoding, b); err != nil {
 		return o, errors.Wrapf(err, "could not deserialize setConfig binary blob")
 	}
-	setConfig := abi.ConvertType(vals[0], &setConfigSerializationTypes{}).(*setConfigSerializationTypes)
+	setConfig := klaytnextended.ConvertType(vals[0], &setConfigSerializationTypes{}).(*setConfigSerializationTypes)
 	return setConfig.golangRepresentation(), nil
 }
 

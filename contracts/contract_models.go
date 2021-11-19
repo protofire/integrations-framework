@@ -8,7 +8,7 @@ import (
 
 	"github.com/smartcontractkit/integrations-framework/client"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
 )
 

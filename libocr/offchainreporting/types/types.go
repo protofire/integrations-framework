@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -274,7 +274,7 @@ type OffchainPublicKey ed25519.PublicKey
 type OnChainSigningAddress common.Address
 
 // SharedSecretEncryptionPublicKey is the public key used to receive an encrypted
-// version of the secret shared amongst all oracles on a celoextended contract.
+// version of the secret shared amongst all oracles on a common contract.
 type SharedSecretEncryptionPublicKey [curve25519.PointSize]byte // X25519
 
 // PrivateKeys contains the secret keys needed for the OCR protocol, and methods

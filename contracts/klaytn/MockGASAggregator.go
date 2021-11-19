@@ -1,25 +1,26 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	klaytn "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = celo.NotFound
+	_ = klaytn.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -199,7 +200,7 @@ func (_MockGASAggregator *MockGASAggregatorCaller) Answer(opts *bind.CallOpts) (
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -230,7 +231,7 @@ func (_MockGASAggregator *MockGASAggregatorCaller) Decimals(opts *bind.CallOpts)
 		return *new(uint8), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+	out0 := *klaytnextended.ConvertType(out[0], new(uint8)).(*uint8)
 
 	return out0, err
 
@@ -261,7 +262,7 @@ func (_MockGASAggregator *MockGASAggregatorCaller) Description(opts *bind.CallOp
 		return *new(string), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+	out0 := *klaytnextended.ConvertType(out[0], new(string)).(*string)
 
 	return out0, err
 
@@ -305,11 +306,11 @@ func (_MockGASAggregator *MockGASAggregatorCaller) GetRoundData(opts *bind.CallO
 		return *outstruct, err
 	}
 
-	outstruct.RoundId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Answer = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.StartedAt = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.UpdatedAt = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
-	outstruct.AnsweredInRound = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
+	outstruct.RoundId = *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Answer = *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.StartedAt = *klaytnextended.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.UpdatedAt = *klaytnextended.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.AnsweredInRound = *klaytnextended.ConvertType(out[4], new(*big.Int)).(**big.Int)
 
 	return *outstruct, err
 
@@ -365,11 +366,11 @@ func (_MockGASAggregator *MockGASAggregatorCaller) LatestRoundData(opts *bind.Ca
 		return *outstruct, err
 	}
 
-	outstruct.RoundId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Answer = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.StartedAt = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.UpdatedAt = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
-	outstruct.AnsweredInRound = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
+	outstruct.RoundId = *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Answer = *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.StartedAt = *klaytnextended.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.UpdatedAt = *klaytnextended.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.AnsweredInRound = *klaytnextended.ConvertType(out[4], new(*big.Int)).(**big.Int)
 
 	return *outstruct, err
 
@@ -412,7 +413,7 @@ func (_MockGASAggregator *MockGASAggregatorCaller) Version(opts *bind.CallOpts) 
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 

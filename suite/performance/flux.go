@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/klaytn/klaytn/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/actions"
@@ -390,7 +390,7 @@ func (f *FluxTest) setResultEndTime(
 			return err
 		}
 		loc, _ := time.LoadLocation("UTC")
-		f.headerTimestampCache[submission.BlockNumber] = time.Unix(int64(blockTime), 0).In(loc)
+		f.headerTimestampCache[submission.BlockNumber] = time.Unix(blockTime, 0).In(loc)
 	}
 
 	roundID := int64(submission.Round)

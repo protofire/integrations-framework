@@ -3,17 +3,14 @@ package client
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math/big"
-	"math/rand"
-	"reflect"
 	"strings"
 
 	"github.com/smartcontractkit/integrations-framework/config"
 
-	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/klaytn/klaytn/crypto"
 )
 
 var (
@@ -25,8 +22,8 @@ var (
 
 // Commonly used variables
 const (
-	BlockchainTypeEVMCelo          = "evm_celo"
-	BlockchainTypeEVMCeloMultinode = "evm_celo_multi"
+	BlockchainTypeEVMKlaytn          = "evm_klaytn"
+	BlockchainTypeEVMKlaytnMultinode = "evm_klaytn_multi"
 )
 
 type HashInterface interface {
@@ -35,8 +32,6 @@ type HashInterface interface {
 	TerminalString() string
 	String() string
 	Format(s fmt.State, c rune)
-	Generate(rand *rand.Rand, size int) reflect.Value
-	Value() (driver.Value, error)
 }
 
 type AddressInterface interface {
@@ -44,7 +39,6 @@ type AddressInterface interface {
 	Hex() string
 	String() string
 	Format(s fmt.State, c rune)
-	Value() (driver.Value, error)
 }
 
 // BlockchainClient is the interface that wraps a given client implementation for a blockchain, to allow for switching
@@ -59,7 +53,7 @@ type BlockchainClient interface {
 	SuggestGasPrice(ctx context.Context) (*big.Int, error)
 	HeaderHashByNumber(ctx context.Context, bn *big.Int) (string, error)
 	BlockNumber(ctx context.Context) (uint64, error)
-	HeaderTimestampByNumber(ctx context.Context, bn *big.Int) (uint64, error)
+	HeaderTimestampByNumber(ctx context.Context, bn *big.Int) (int64, error)
 	CalculateTxGas(gasUsedValue *big.Int) (*big.Float, error)
 	Fund(fromWallet BlockchainWallet, toAddress string, nativeAmount, linkAmount *big.Float) error
 	GasStats() *GasStats
@@ -74,10 +68,10 @@ type BlockchainClient interface {
 // NewBlockchainClient returns an instantiated network client implementation based on the network configuration given
 func NewBlockchainClient(network BlockchainNetwork) (BlockchainClient, error) {
 	switch network.Type() {
-	case BlockchainTypeEVMCeloMultinode:
-		return NewCeloClients(network)
-	case BlockchainTypeEVMCelo:
-		return NewCeloClient(network)
+	case BlockchainTypeEVMKlaytnMultinode:
+		return NewKlaytnClients(network)
+	case BlockchainTypeEVMKlaytn:
+		return NewKlaytnClient(network)
 	}
 	return nil, errors.New("invalid blockchain network ID, not found")
 }
@@ -120,7 +114,7 @@ func NewNetworkFromConfig(conf *config.Config, networkID string) (BlockchainNetw
 		return nil, err
 	}
 	switch networkConfig.Type {
-	case BlockchainTypeEVMCelo, BlockchainTypeEVMCeloMultinode:
+	case BlockchainTypeEVMKlaytn, BlockchainTypeEVMKlaytnMultinode:
 		return NewEthereumNetwork(networkID, networkConfig)
 	}
 	return nil, fmt.Errorf(

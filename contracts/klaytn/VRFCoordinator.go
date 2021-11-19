@@ -1,25 +1,26 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	klaytn "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = celo.NotFound
+	_ = klaytn.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -199,7 +200,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) PRESEEDOFFSET(opts *bind.CallOpts) 
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -230,7 +231,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) PROOFLENGTH(opts *bind.CallOpts) (*
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -261,7 +262,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) PUBLICKEYOFFSET(opts *bind.CallOpts
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -301,9 +302,9 @@ func (_VRFCoordinator *VRFCoordinatorCaller) Callbacks(opts *bind.CallOpts, arg0
 		return *outstruct, err
 	}
 
-	outstruct.CallbackContract = *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	outstruct.RandomnessFee = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.SeedAndBlockNum = *abi.ConvertType(out[2], new([32]byte)).(*[32]byte)
+	outstruct.CallbackContract = *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
+	outstruct.RandomnessFee = *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.SeedAndBlockNum = *klaytnextended.ConvertType(out[2], new([32]byte)).(*[32]byte)
 
 	return *outstruct, err
 
@@ -342,7 +343,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) HashOfKey(opts *bind.CallOpts, _pub
 		return *new([32]byte), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+	out0 := *klaytnextended.ConvertType(out[0], new([32]byte)).(*[32]byte)
 
 	return out0, err
 
@@ -373,7 +374,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) IsOwner(opts *bind.CallOpts) (bool,
 		return *new(bool), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+	out0 := *klaytnextended.ConvertType(out[0], new(bool)).(*bool)
 
 	return out0, err
 
@@ -404,7 +405,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) Owner(opts *bind.CallOpts) (common.
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -444,9 +445,9 @@ func (_VRFCoordinator *VRFCoordinatorCaller) ServiceAgreements(opts *bind.CallOp
 		return *outstruct, err
 	}
 
-	outstruct.VRFOracle = *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	outstruct.Fee = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.JobID = *abi.ConvertType(out[2], new([32]byte)).(*[32]byte)
+	outstruct.VRFOracle = *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
+	outstruct.Fee = *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.JobID = *klaytnextended.ConvertType(out[2], new([32]byte)).(*[32]byte)
 
 	return *outstruct, err
 
@@ -485,7 +486,7 @@ func (_VRFCoordinator *VRFCoordinatorCaller) WithdrawableTokens(opts *bind.CallO
 		return *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
 
@@ -618,7 +619,7 @@ type VRFCoordinatorNewServiceAgreementIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -753,7 +754,7 @@ type VRFCoordinatorOwnershipTransferredIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -906,7 +907,7 @@ type VRFCoordinatorRandomnessRequestIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -1055,7 +1056,7 @@ type VRFCoordinatorRandomnessRequestFulfilledIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }

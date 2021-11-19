@@ -1,25 +1,26 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package celo
+package klaytn
 
 import (
 	"math/big"
 	"strings"
 
-	celo "github.com/celo-org/celo-blockchain"
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
-	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/celo-org/celo-blockchain/event"
+	klaytn "github.com/klaytn/klaytn"
+	"github.com/klaytn/klaytn/accounts/abi"
+	"github.com/klaytn/klaytn/accounts/abi/bind"
+	"github.com/klaytn/klaytn/common"
+	"github.com/klaytn/klaytn/blockchain/types"
+	"github.com/klaytn/klaytn/event"
+	"github.com/smartcontractkit/integrations-framework/klaytnextended"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = big.NewInt
 	_ = strings.NewReader
-	_ = celo.NotFound
+	_ = klaytn.NotFound
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -199,7 +200,7 @@ func (_UpkeepRegistrationRequests *UpkeepRegistrationRequestsCaller) LINK(opts *
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -230,8 +231,8 @@ func (_UpkeepRegistrationRequests *UpkeepRegistrationRequestsCaller) GetPendingR
 		return *new(common.Address), *new(*big.Int), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	out1 := *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out1 := *klaytnextended.ConvertType(out[1], new(*big.Int)).(**big.Int)
 
 	return out0, out1, err
 
@@ -279,13 +280,13 @@ func (_UpkeepRegistrationRequests *UpkeepRegistrationRequestsCaller) GetRegistra
 		return *outstruct, err
 	}
 
-	outstruct.Enabled = *abi.ConvertType(out[0], new(bool)).(*bool)
-	outstruct.WindowSizeInBlocks = *abi.ConvertType(out[1], new(uint32)).(*uint32)
-	outstruct.AllowedPerWindow = *abi.ConvertType(out[2], new(uint16)).(*uint16)
-	outstruct.KeeperRegistry = *abi.ConvertType(out[3], new(common.Address)).(*common.Address)
-	outstruct.MinLINKJuels = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
-	outstruct.WindowStart = *abi.ConvertType(out[5], new(uint64)).(*uint64)
-	outstruct.ApprovedInCurrentWindow = *abi.ConvertType(out[6], new(uint16)).(*uint16)
+	outstruct.Enabled = *klaytnextended.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.WindowSizeInBlocks = *klaytnextended.ConvertType(out[1], new(uint32)).(*uint32)
+	outstruct.AllowedPerWindow = *klaytnextended.ConvertType(out[2], new(uint16)).(*uint16)
+	outstruct.KeeperRegistry = *klaytnextended.ConvertType(out[3], new(common.Address)).(*common.Address)
+	outstruct.MinLINKJuels = *klaytnextended.ConvertType(out[4], new(*big.Int)).(**big.Int)
+	outstruct.WindowStart = *klaytnextended.ConvertType(out[5], new(uint64)).(*uint64)
+	outstruct.ApprovedInCurrentWindow = *klaytnextended.ConvertType(out[6], new(uint16)).(*uint16)
 
 	return *outstruct, err
 
@@ -332,7 +333,7 @@ func (_UpkeepRegistrationRequests *UpkeepRegistrationRequestsCaller) Owner(opts 
 		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+	out0 := *klaytnextended.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
@@ -507,7 +508,7 @@ type UpkeepRegistrationRequestsConfigChangedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -645,7 +646,7 @@ type UpkeepRegistrationRequestsOwnershipTransferRequestedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -798,7 +799,7 @@ type UpkeepRegistrationRequestsOwnershipTransferredIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -951,7 +952,7 @@ type UpkeepRegistrationRequestsRegistrationApprovedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
@@ -1107,7 +1108,7 @@ type UpkeepRegistrationRequestsRegistrationRequestedIterator struct {
 	event    string              // Event name to use for unpacking event data
 
 	logs chan types.Log    // Log channel receiving the found contract events
-	sub  celo.Subscription // Subscription for errors, completion and termination
+	sub  klaytn.Subscription // Subscription for errors, completion and termination
 	done bool              // Whether the subscription completed delivering logs
 	fail error             // Occurred error to stop iteration
 }
