@@ -27,6 +27,35 @@ require (
 )
 
 require (
+	github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9 // indirect
+	github.com/VictoriaMetrics/fastcache v1.5.7 // indirect
+	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
+	github.com/andybalholm/brotli v1.0.0 // indirect
+	github.com/clevergo/websocket v1.0.0 // indirect
+	github.com/dgraph-io/badger v1.6.0 // indirect
+	github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 // indirect
+	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/fjl/memsize v0.0.0-20180427083637-f6d5545993d6 // indirect
+	github.com/gin-gonic/gin v1.7.0 // indirect
+	github.com/go-playground/locales v0.13.0 // indirect
+	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-playground/validator/v10 v10.4.1 // indirect
+	github.com/go-redis/redis/v7 v7.4.0 // indirect
+	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/newrelic/go-agent/v3 v3.11.0 // indirect
+	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563 // indirect
+	github.com/rs/cors v1.4.0 // indirect
+	github.com/steakknife/bloomfilter v0.0.0-20180922174646-6819c0d2a570 // indirect
+	github.com/steakknife/hamming v0.0.0-20180906055917-c99c65617cd3 // indirect
+	github.com/ugorji/go/codec v1.1.7 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasthttp v1.16.0 // indirect
+	gopkg.in/fatih/set.v0 v0.1.0 // indirect
+	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
+	oras.land/oras-go v0.4.0 // indirect
+)
+
+require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
@@ -182,3 +211,5 @@ require (
 // If that happens to get released in a 3.X.X version, we can add a constraint to our go.mod
 // for it. If its in 4.X.X, then we need all our transitive deps to upgrade to it.
 replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+incompatible
+
+replace github.com/klaytn/klaytn => github.com/protofire/klaytn v1.7.0-rc.4.0.20211206162225-b863bde25f27
