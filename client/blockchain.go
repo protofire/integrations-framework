@@ -8,20 +8,38 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/core/types"
-
 	"github.com/smartcontractkit/integrations-framework/config"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/klaytn/klaytn/crypto"
+)
+
+var (
+	// OneGWei represents 1 GWei
+	OneGWei = big.NewInt(1e9)
+	// OneEth represents 1 Ethereum
+	OneEth = big.NewFloat(1e18)
 )
 
 // Commonly used variables
 const (
-	BlockchainTypeEVM          = "evm"
-	BlockchainTypeEVMMultinode = "evm_multi"
-	NetworkGethPerformance     = "ethereum_geth_performance"
+	BlockchainTypeEVMKlaytn          = "evm_klaytn"
+	BlockchainTypeEVMKlaytnMultinode = "evm_klaytn_multi"
 )
+
+type HashInterface interface {
+	Big() *big.Int
+	Hex() string
+	TerminalString() string
+	String() string
+	Format(s fmt.State, c rune)
+}
+
+type AddressInterface interface {
+	Bytes() []byte
+	Hex() string
+	String() string
+	Format(s fmt.State, c rune)
+}
 
 // BlockchainClient is the interface that wraps a given client implementation for a blockchain, to allow for switching
 // of network types within the test suite
@@ -35,7 +53,7 @@ type BlockchainClient interface {
 	SuggestGasPrice(ctx context.Context) (*big.Int, error)
 	HeaderHashByNumber(ctx context.Context, bn *big.Int) (string, error)
 	BlockNumber(ctx context.Context) (uint64, error)
-	HeaderTimestampByNumber(ctx context.Context, bn *big.Int) (uint64, error)
+	HeaderTimestampByNumber(ctx context.Context, bn *big.Int) (int64, error)
 	CalculateTxGas(gasUsedValue *big.Int) (*big.Float, error)
 	Fund(fromWallet BlockchainWallet, toAddress string, nativeAmount, linkAmount *big.Float) error
 	GasStats() *GasStats
@@ -50,10 +68,10 @@ type BlockchainClient interface {
 // NewBlockchainClient returns an instantiated network client implementation based on the network configuration given
 func NewBlockchainClient(network BlockchainNetwork) (BlockchainClient, error) {
 	switch network.Type() {
-	case BlockchainTypeEVM:
-		return NewEthereumClient(network)
-	case BlockchainTypeEVMMultinode:
-		return NewEthereumClients(network)
+	case BlockchainTypeEVMKlaytnMultinode:
+		return NewKlaytnClients(network)
+	case BlockchainTypeEVMKlaytn:
+		return NewKlaytnClient(network)
 	}
 	return nil, errors.New("invalid blockchain network ID, not found")
 }
@@ -96,7 +114,7 @@ func NewNetworkFromConfig(conf *config.Config, networkID string) (BlockchainNetw
 		return nil, err
 	}
 	switch networkConfig.Type {
-	case BlockchainTypeEVM, BlockchainTypeEVMMultinode:
+	case BlockchainTypeEVMKlaytn, BlockchainTypeEVMKlaytnMultinode:
 		return NewEthereumNetwork(networkID, networkConfig)
 	}
 	return nil, fmt.Errorf(
@@ -232,7 +250,7 @@ type BlockchainWallet interface {
 // EthereumWallet is the implementation to allow testing with ETH based wallets
 type EthereumWallet struct {
 	privateKey string
-	address    common.Address
+	address    AddressInterface
 }
 
 // NewEthereumWallet returns the instantiated ETH wallet based on a given private key
@@ -291,10 +309,16 @@ func walletSliceIndexInRange(wallets []BlockchainWallet, i int) error {
 	return nil
 }
 
+type BlockInterface interface {
+	GetHash() HashInterface
+	Number() *big.Int
+	NumberU64() uint64
+}
+
 // NodeBlock block with a node ID which mined it
 type NodeBlock struct {
 	NodeID int
-	*types.Block
+	BlockInterface
 }
 
 // HeaderEventSubscription is an interface for allowing callbacks when the client receives a new header

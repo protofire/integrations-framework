@@ -6,10 +6,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/smartcontractkit/integrations-framework/hooks"
-	"github.com/smartcontractkit/integrations-framework/utils"
-
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/klaytn/klaytn/common"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
@@ -18,6 +15,8 @@ import (
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts"
 	"github.com/smartcontractkit/integrations-framework/environment"
+	"github.com/smartcontractkit/integrations-framework/hooks"
+	"github.com/smartcontractkit/integrations-framework/utils"
 )
 
 var _ = Describe("Direct request suite @runlog", func() {

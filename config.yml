@@ -12,7 +12,7 @@ keep_environments: Never # Options: Always, OnFail, Never
 apps:
     chainlink:
         image: public.ecr.aws/chainlink/chainlink
-        version: 1.0.0
+        version: 0.10.14
         requests:
             memory: 768Mi
             cpu: 300m
@@ -248,6 +248,22 @@ network_configs:
         private_url: iotex_testnet_url
         private_keys:
             - iotex_testnet_1
+    alfajores_celo:
+        <<: *common_ethereum_testnet
+        name: "Alfajores celo"
+        chain_id: 44787
+        type: evm_celo
+        private_url: alfajores_celo_url
+        private_keys:
+            - alfajores_celo_1
+    klaytn_testnet:
+        <<: *common_ethereum_testnet
+        name: "Klaytn testnet"
+        chain_id: 1001
+        type: evm_klaytn
+        private_url: klaytn_testnet_url
+        private_keys:
+            - klaytn_testnet_1
 retry:
     attempts: 120
     linear_delay: 1s

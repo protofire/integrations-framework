@@ -22,13 +22,13 @@ type GasStats struct {
 }
 
 // TXGasData transaction gas data
+// TODO koteld: CumulativeGasUsed removed
 type TXGasData struct {
 	TXHash            string
 	Value             uint64
 	GasLimit          uint64
 	GasUsed           uint64
 	GasPrice          uint64
-	CumulativeGasUsed uint64
 }
 
 // NewGasStats creates new gas stats collector

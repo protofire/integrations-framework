@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/klaytn/klaytn/common"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
