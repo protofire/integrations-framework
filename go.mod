@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.93.3 // indirect
 	github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9 // indirect
 	github.com/VictoriaMetrics/fastcache v1.5.7 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
