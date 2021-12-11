@@ -29,6 +29,7 @@ type TXGasData struct {
 	GasLimit          uint64
 	GasUsed           uint64
 	GasPrice          uint64
+	CumulativeGasUsed uint64
 }
 
 // NewGasStats creates new gas stats collector

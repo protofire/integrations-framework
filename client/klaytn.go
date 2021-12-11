@@ -427,7 +427,7 @@ func (e *KlaytnClient) SendTransaction(
 
 	tx := types.NewTransaction(
 		nonce,
-		&to,
+		to,
 		weiValue,
 		21000,
 		suggestedGasPrice,
@@ -670,12 +670,12 @@ func (e *KlaytnClient) errorReason(
 	if err != nil {
 		return "", err
 	}
-	msg, err := tx.AsMessage(types.NewEIP155Signer(chID), nil)
+	from, err := types.Sender(types.NewEIP155Signer(chID), tx)
 	if err != nil {
 		return "", err
 	}
 	callMsg := ethereum.CallMsg{
-		From:     msg.From(),
+		From:     from,
 		To:       tx.To(),
 		Gas:      tx.Gas(),
 		GasPrice: tx.GasPrice(),
@@ -694,7 +694,7 @@ type KlaytnTransactionConfirmer struct {
 	minConfirmations int
 	confirmations    int
 	eth              *KlaytnClient
-	txHash           common.Hash
+	tx               *types.Transaction
 	doneChan         chan struct{}
 	context          context.Context
 	cancel           context.CancelFunc
@@ -724,7 +724,7 @@ func (t *KlaytnTransactionConfirmer) ReceiveBlock(block NodeBlock) error {
 		return nil
 	}
 	confirmationLog := log.Debug().Str("Network", t.eth.Network.ID()).
-		Str("Block Hash", block.Hash().Hex()).
+		Str("Block Hash", block.GetHash().Hex()).
 		Str("Block Number", block.Number().String()).
 		Str("Tx Hash", t.tx.Hash().String()).
 		Uint64("Nonce", t.tx.Nonce()).
