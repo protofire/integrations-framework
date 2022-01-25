@@ -4,9 +4,8 @@ go 1.17
 
 require (
 	github.com/ethereum/go-ethereum v1.10.11
-	gopkg.in/guregu/null.v4 v4.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/onsi/ginkgo/v2 v2.0.0
+	github.com/onsi/ginkgo/v2 v2.1.0
 	github.com/onsi/gomega v1.17.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
@@ -17,6 +16,7 @@ require (
 	github.com/smartcontractkit/libocr v0.0.0-20210826183649-d12971936c12
 	github.com/spf13/viper v1.10.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
