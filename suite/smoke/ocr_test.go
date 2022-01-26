@@ -33,11 +33,17 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 		By("Deploying the environment", func() {
 			envConfig := make(map[string]interface{})
 			networkConfig := make(map[string]interface{})
+			nodeConfig := make(map[string]interface{})
 			envConfig["eth_url"] = "wss://alfajores-forno.celo-testnet.org/ws"
 			envConfig["eth_chain_id"] = "44787"
-			envConfig["chainlink_image"] = "celo-chainlink"
-			envConfig["chainlink_version"] = "latest"
+			nodeConfig["image"] = map[string]interface{}{
+				"image" : "celo-chainlink",
+				"version": "latest",
+			}
+			//envConfig["chainlink_image"] = "celo-chainlink"
+			//envConfig["chainlink_version"] = "latest"
 
+			networkConfig["chainlink"] = nodeConfig
 			networkConfig["env"] = envConfig
 
 
