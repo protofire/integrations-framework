@@ -37,7 +37,7 @@ var spec = `{
   ]
 }`
 
-var _ = Describe("Chainlink @unit", func() {
+var _ = Describe("Chainlink", func() {
 
 	// Mocks the creation, read, delete cycle for any job type
 	It("can Create, Read, and Delete jobs", func() {

@@ -3,12 +3,14 @@ package smoke
 //revive:disable:dot-imports
 import (
 	"context"
+	"fmt"
+	"github.com/smartcontractkit/helmenv/tools"
+	"log"
 	"math/big"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts"
@@ -29,21 +31,22 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 
 	BeforeEach(func() {
 		By("Deploying the environment", func() {
-			chainlinkValues := map[string]interface{}{}
-			chainlinkValues["env"] = map[string]string{
-				"eth_url":      "wss://alfajores-forno.celo-testnet.org/ws",
-				"eth_chain_id": "44787",
-			}
-			chainlinkValues["chainlink"] = map[string]map[string]interface{}{
-				"image": {
-					"image":   "celo-chainlink",
-					"version": "latest",
-				},
-			}
+			envConfig := make(map[string]interface{})
+			networkConfig := make(map[string]interface{})
+			envConfig["eth_url"] = "wss://alfajores-forno.celo-testnet.org/ws"
+			envConfig["eth_chain_id"] = "44787"
+			envConfig["chainlink_image"] = "celo-chainlink"
+			envConfig["chainlink_version"] = "latest"
 
+			networkConfig["env"] = envConfig
+
+
+			chainlinkConfig := environment.NewChainlinkConfig(
+				environment.ChainlinkReplicas(6, networkConfig),
+			)
+			//chainlinkConfig.Namespace = "chainlink-mpd5q"
 			env, err = environment.DeployOrLoadEnvironment(
-				//environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil)),
-				environment.NewChainlinkConfig(chainlinkValues),
+				chainlinkConfig,
 				tools.ChartsRoot,
 			)
 			Expect(err).ShouldNot(HaveOccurred())
@@ -52,10 +55,15 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 		})
 
 		By("Connecting to launched resources", func() {
+			fmt.Printf("WS-RPC : %+v",env.Config.Charts["geth"])
+			//.ChartConnections["geth_0_geth-network"].RemotePorts["ws-rpc"]
 			// Load Networks
 			networkRegistry := client.NewNetworkRegistry()
 			var err error
 			networks, err = networkRegistry.GetNetworks(env)
+			if err != nil {
+				log.Fatalln("Error found here: ", err)
+			}
 			Expect(err).ShouldNot(HaveOccurred())
 			contractDeployer, err = contracts.NewContractDeployer(networks.Default)
 			Expect(err).ShouldNot(HaveOccurred())
