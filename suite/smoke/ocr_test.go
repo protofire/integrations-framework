@@ -40,17 +40,14 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 				"image" : "celo-chainlink",
 				"version": "latest",
 			}
-			//envConfig["chainlink_image"] = "celo-chainlink"
-			//envConfig["chainlink_version"] = "latest"
 
 			networkConfig["chainlink"] = nodeConfig
 			networkConfig["env"] = envConfig
 
-
 			chainlinkConfig := environment.NewChainlinkConfig(
 				environment.ChainlinkReplicas(6, networkConfig),
 			)
-			//chainlinkConfig.Namespace = "chainlink-mpd5q"
+
 			env, err = environment.DeployOrLoadEnvironment(
 				chainlinkConfig,
 				tools.ChartsRoot,

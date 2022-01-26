@@ -145,7 +145,7 @@ func StartNewRound(
 	networks *client.Networks,
 ) func() {
 	return func() {
-		roundTimeout := time.Minute * 2
+		roundTimeout := time.Minute * 5
 		for i := 0; i < len(ocrInstances); i++ {
 			err := ocrInstances[i].RequestNewRound()
 			Expect(err).ShouldNot(HaveOccurred())
