@@ -35,7 +35,7 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 			nodeConfig := make(map[string]interface{})
 			envConfig["eth_url"] = "wss://alfajores-forno.celo-testnet.org/ws"
 			envConfig["eth_chain_id"] = "44787"
-			envConfig["eth_min_gas_price_wei"] = 1000000
+			envConfig["eth_min_gas_price_wei"] = "100000000"
 			nodeConfig["image"] = map[string]interface{}{
 				"image" : "celo-chainlink",
 				"version": "latest",
