@@ -5,9 +5,9 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/celo-org/celo-blockchain/accounts/abi"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/crypto"
 
 	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers2/exposedocr2aggregator"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"

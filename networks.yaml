@@ -169,7 +169,7 @@ networks:
         urls:
             - wss://alfajores-forno.celo-testnet.org/ws
         private_keys:
-            - celo_testnet_1
+            - private_key
         chainlink_transaction_limit: 7667850
         transaction_timeout: 5m
         minimum_confirmations: 1
@@ -183,7 +183,7 @@ networks:
         urls:
             - ws://127.0.0.1:8546
         private_keys:
-            - 79d9dbd15e44d89e7d15581e202e85e0cabd206a196dbb2fa78d8f7b9551726d
+            - private_key
         chainlink_transaction_limit: 7667850
         transaction_timeout: 5m
         minimum_confirmations: 1

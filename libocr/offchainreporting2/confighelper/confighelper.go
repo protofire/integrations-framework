@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/config"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/reportingplugin/median"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"

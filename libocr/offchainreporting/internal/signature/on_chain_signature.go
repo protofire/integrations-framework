@@ -5,9 +5,9 @@ import (
 	"crypto/ecdsa"
 	"math"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/crypto/secp256k1"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/celo-org/celo-blockchain/crypto/secp256k1"
 	"github.com/pkg/errors"
 	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"

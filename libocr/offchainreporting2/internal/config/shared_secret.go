@@ -4,8 +4,8 @@ import (
 	"crypto/aes"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/crypto"
 	"github.com/pkg/errors"
 	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"

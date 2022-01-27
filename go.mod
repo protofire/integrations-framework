@@ -20,7 +20,7 @@ require (
 require github.com/sirupsen/logrus v1.8.1
 
 require (
-	github.com/ethereum/go-ethereum v1.10.11
+	github.com/celo-org/celo-blockchain v1.10.11
 	github.com/leanovate/gopter v0.2.9
 	github.com/libp2p/go-libp2p v0.13.0
 	github.com/libp2p/go-libp2p-asn-util v0.0.0-20201026210036-4f868c957324 // indirect

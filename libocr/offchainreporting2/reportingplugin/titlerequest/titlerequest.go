@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/celo-org/celo-blockchain/accounts/abi"
+	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
+	"github.com/celo-org/celo-blockchain/ethclient"
 	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers2/ocr2titlerequest"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
 )

@@ -1,3 +1,4 @@
+//go:build tools
 // +build tools
 
 // this is a tools.go file for pinning tool versions as recommended by https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module and
@@ -6,5 +7,5 @@
 package tools
 
 import (
-	_ "github.com/ethereum/go-ethereum/cmd/abigen"
+	_ "github.com/celo-org/celo-blockchain/cmd/abigen"
 )

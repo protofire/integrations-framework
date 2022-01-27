@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers2/ocr2aggregator"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
 )

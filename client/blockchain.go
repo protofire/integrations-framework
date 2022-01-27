@@ -20,7 +20,7 @@ import (
 const (
 	SimulatedEthNetwork    = "eth_simulated"
 	LiveEthTestNetwork     = "eth_testnet"
-	NetworkGethPerformance = "ethereum_geth_performance"
+	NetworkGethPerformance = "celo_geth_performance"
 )
 
 // NewBlockchainClientFn external client implementation function
