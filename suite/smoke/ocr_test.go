@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/smartcontractkit/helmenv/tools"
-	"log"
 	"math/big"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -36,6 +35,7 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 			nodeConfig := make(map[string]interface{})
 			envConfig["eth_url"] = "wss://alfajores-forno.celo-testnet.org/ws"
 			envConfig["eth_chain_id"] = "44787"
+			envConfig["eth_min_gas_price_wei"] = 100000000
 			nodeConfig["image"] = map[string]interface{}{
 				"image" : "celo-chainlink",
 				"version": "latest",
@@ -59,14 +59,10 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 
 		By("Connecting to launched resources", func() {
 			fmt.Printf("WS-RPC : %+v",env.Config.Charts["geth"])
-			//.ChartConnections["geth_0_geth-network"].RemotePorts["ws-rpc"]
 			// Load Networks
 			networkRegistry := client.NewNetworkRegistry()
 			var err error
 			networks, err = networkRegistry.GetNetworks(env)
-			if err != nil {
-				log.Fatalln("Error found here: ", err)
-			}
 			Expect(err).ShouldNot(HaveOccurred())
 			contractDeployer, err = contracts.NewContractDeployer(networks.Default)
 			Expect(err).ShouldNot(HaveOccurred())
