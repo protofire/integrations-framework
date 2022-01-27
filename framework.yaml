@@ -8,9 +8,12 @@ logging:
     level: 0
 
 # Specify the image and version of the chainlink image you want to run tests against. Leave blank for default.
-chainlink_image: 
-chainlink_version: 
+chainlink_image: celo-chainlink
+chainlink_version: latest
 chainlink_env_values:
+    eth_url: "wss://alfajores-forno.celo-testnet.org/ws"
+    eth_chain_id: 44787
+    eth_min_gas_price_wei: 100000000
 
 # Specify the image and version of the simulated geth image you want to run tests against. Leave blank for default.
 # Has no effect when running tests on networks other than the simulated geth instances.
