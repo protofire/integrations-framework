@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
 
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/config"

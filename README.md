@@ -19,7 +19,7 @@ examples. If you just want a quick overview, keep reading.
 
 As of now, this framework is still very much a work in progress, and will have frequent changes, many of which will probably be breaking.
 
-**As of Monday, November 22, 2021, there has been a massive overhaul of how the framework works. Namely use of the [helmenv](https://github.com/smartcontractkit/helmenv) library**
+**As of Monday, November 22, 2021, there has been a massive overhaul of how the framework works. Namely use of the [helmenv](https://github.com/smartcontractkit/integrations-framework/helmenv) library**
 
 ## Setup
 
@@ -56,4 +56,4 @@ geth_args:    # List of CLI arguments to pass to simulated geth image. WARNING
 
 ### WARNING
 
-Values passed into `geth_args` will fully REPLACE all existing defaults we use in our launch. This enables freedom from defaults, but you should most definitely look at all the [current defaults](https://github.com/smartcontractkit/helmenv/blob/master/charts/geth/values.yaml#L16) we usually use and replace them as necessary.
+Values passed into `geth_args` will fully REPLACE all existing defaults we use in our launch. This enables freedom from defaults, but you should most definitely look at all the [current defaults](https://github.com/smartcontractkit/integrations-framework/helmenv/blob/master/charts/geth/values.yaml#L16) we usually use and replace them as necessary.

@@ -33,7 +33,7 @@ networks:
         namespace_for_secret: default
         <<: *private_keys
         chainlink_transaction_limit: 500000
-        transaction_timeout: 2m
+        transaction_timeout: 60m
         minimum_confirmations: 1
         gas_estimation_buffer: 10000
         block_gas_limit: 40000000
@@ -169,9 +169,9 @@ networks:
         urls:
             - wss://alfajores-forno.celo-testnet.org/ws
         private_keys:
-            - private_key
+            - 5eec8ff6873deb4c525c2d3c53cef4390d4bfe4bb2b60fe6293301ed9a6de727
         chainlink_transaction_limit: 7667850
-        transaction_timeout: 5m
+        transaction_timeout: 60m
         minimum_confirmations: 1
         gas_estimation_buffer: 10000
     private_celo_test:

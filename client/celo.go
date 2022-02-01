@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/smartcontractkit/helmenv/environment"
 	"github.com/smartcontractkit/integrations-framework/config"
+	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
 
 	"golang.org/x/sync/errgroup"
 

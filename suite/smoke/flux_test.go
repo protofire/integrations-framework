@@ -10,9 +10,9 @@ import (
 
 	"github.com/celo-org/celo-blockchain/common"
 	uuid "github.com/satori/go.uuid"
-	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
+	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/utils"
 
 	. "github.com/onsi/ginkgo/v2"

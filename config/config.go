@@ -12,7 +12,7 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/smartcontractkit/helmenv/tools"
+	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
 	"gopkg.in/yaml.v3"
 
 	"github.com/rs/zerolog/log"
