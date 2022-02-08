@@ -210,8 +210,8 @@ func (e *EthereumContractDeployer) DeployLinkTokenContract() (LinkToken, error) 
 // DefaultOffChainAggregatorOptions returns some base defaults for deploying an OCR contract
 func DefaultOffChainAggregatorOptions() OffchainOptions {
 	return OffchainOptions{
-		MaximumGasPrice:         uint32(3000),
-		ReasonableGasPrice:      uint32(10),
+		MaximumGasPrice:         uint32(30000),
+		ReasonableGasPrice:      uint32(2100),
 		MicroLinkPerEth:         uint32(500),
 		LinkGweiPerObservation:  uint32(500),
 		LinkGweiPerTransmission: uint32(500),
