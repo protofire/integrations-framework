@@ -38,7 +38,7 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 			envConfig["eth_min_gas_price_wei"] = "100000000"
 			nodeConfig["image"] = map[string]interface{}{
 				"image" : "celo-chainlink",
-				"version": "latest",
+				"version": "v1.1.0",
 			}
 
 			networkConfig["chainlink"] = nodeConfig
