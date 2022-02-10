@@ -31,7 +31,8 @@ func DeployOCRContracts(
 			contracts.DefaultOffChainAggregatorOptions(),
 		)
 		Expect(err).ShouldNot(HaveOccurred())
-		fmt.Println("Current Step: Deploy OffChain Aggregator")
+
+		fmt.Println("Current Step: SetConfig OffChain Aggregator")
 
 		// Exclude the first node, which will be used as a bootstrapper
 		err = ocrInstance.SetConfig(
@@ -39,13 +40,16 @@ func DeployOCRContracts(
 			contracts.DefaultOffChainAggregatorConfig(len(chainlinkNodes[1:])),
 		)
 
-		fmt.Println("Current Step: SetConfig OffChain Aggregator")
-
+		fmt.Println("Current Step: Done SetConfig OffChain Aggregator")
 
 		ocrInstances = append(ocrInstances, ocrInstance)
 		Expect(err).ShouldNot(HaveOccurred())
+		fmt.Println("Current Step: Transfer Link ")
+
 		err = linkTokenContract.Transfer(ocrInstance.Address(), big.NewInt(2e18))
 		Expect(err).ShouldNot(HaveOccurred())
+		fmt.Println("Current Step: Done Transfer Link ")
+
 		err = networks.Default.WaitForEvents()
 		Expect(err).ShouldNot(HaveOccurred())
 	}

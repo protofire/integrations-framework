@@ -446,7 +446,7 @@ func (e *CeloClient) Fund(
 	if amount != nil && big.NewFloat(0).Cmp(amount) != 0 {
 		wei := big.NewFloat(1).Mul(OneEth, amount)
 		log.Info().
-			Str("Token", "ETH").
+			Str("Token", "CELO").
 			Str("From", e.DefaultWallet.Address()).
 			Str("To", toAddress).
 			Str("Amount", amount.String()).
