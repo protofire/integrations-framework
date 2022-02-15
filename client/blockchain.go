@@ -196,7 +196,6 @@ func ConnectChainlinkNodes(e *environment.Environment) ([]Chainlink, error) {
 	return ConnectChainlinkNodesByCharts(e, []string{"chainlink"})
 }
 
-
 func ConnectChainlinkDBs(e *environment.Environment) ([]*PostgresConnector, error) {
 	return ConnectChainlinkDBByCharts(e, []string{"chainlink"})
 }

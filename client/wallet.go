@@ -5,7 +5,6 @@ import (
 
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/celo-org/celo-blockchain/crypto"
-
 )
 
 // EthereumWallet is the implementation to allow testing with ETH based wallets

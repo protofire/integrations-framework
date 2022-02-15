@@ -3,11 +3,13 @@ package evmutil
 import (
 	"fmt"
 	"math/big"
+
+	//"math/big"
 	"strings"
 
 	"github.com/celo-org/celo-blockchain/accounts/abi"
 	"github.com/celo-org/celo-blockchain/common"
-	"github.com/celo-org/celo-blockchain/crypto"
+	//"github.com/celo-org/celo-blockchain/crypto"
 
 	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers2/exposedocr2aggregator"
 	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
@@ -38,7 +40,7 @@ func configDigest(
 ) types.ConfigDigest {
 	chainIDBig := new(big.Int)
 	chainIDBig.SetUint64(chainID)
-	msg, err := configDigestArgs.Pack(
+	_, err := configDigestArgs.Pack(
 		chainIDBig,
 		contractAddress,
 		configCount,
@@ -53,12 +55,12 @@ func configDigest(
 		// assertion
 		panic(err)
 	}
-	rawHash := crypto.Keccak256(msg)
+	//rawHash := crypto.Keccak256(msg)
 	configDigest := types.ConfigDigest{}
-	if n := copy(configDigest[:], rawHash); n != len(configDigest) {
-		// assertion
-		panic("copy too little data")
-	}
+	//if n := copy(configDigest[:], crypto.Keccak256(msg)); n != len(configDigest) {
+	//	// assertion
+	//	panic("copy too little data")
+	//}
 	if types.ConfigDigestPrefixEVM != 1 {
 		// assertion
 		panic("wrong ConfigDigestPrefix")

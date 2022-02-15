@@ -25,7 +25,7 @@ func makeConfigDigestArgs() abi.Arguments {
 
 var configDigestArgs = makeConfigDigestArgs()
 
-func ConfigDigest(
+func Digest(
 	contractAddress common.Address,
 	configCount uint64,
 	oracles []common.Address,

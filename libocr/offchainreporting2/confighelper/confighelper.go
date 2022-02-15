@@ -151,7 +151,7 @@ func ContractSetConfigArgsForEthereumIntegrationTest(
 	return config.XXXContractSetConfigArgsFromSharedConfigEthereum(sharedConfig, sharedSecretEncryptionPublicKeys)
 }
 
-// ContractSetConfigArgs generates setConfig args from the relevant parameters.
+// ContractSetConfigArgsForTests generates setConfig args from the relevant parameters.
 // Only use this for testing, *not* for production.
 func ContractSetConfigArgsForTests(
 	deltaProgress time.Duration,

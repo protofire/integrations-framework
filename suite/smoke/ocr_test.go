@@ -103,7 +103,6 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 			Expect(err).ShouldNot(HaveOccurred(), "Getting latest answer from OCR contract shouldn't fail")
 			Expect(answer.Int64()).Should(Equal(int64(5)), "Expected latest answer from OCR contract to be 5 but got %d", answer.Int64())
 
-
 			By("setting adapter responses", actions.SetAllAdapterResponsesToTheSameValue(10, ocrInstances, chainlinkNodes, mockserver))
 			By("starting new round", actions.StartNewRound(2, ocrInstances, networks))
 
