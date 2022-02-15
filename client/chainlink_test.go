@@ -4,6 +4,7 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -222,6 +223,55 @@ var _ = Describe("Chainlink", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
+	// Mocks the creation, read, delete cycle for OCR keys
+	It("can Create, Read, and Delete OCR2 keys", func() {
+		for _, chain := range []string{"evm", "solana"} {
+			ocrKeyData := OCR2KeyData{
+				ID: "1",
+				Attributes: OCR2KeyAttributes{
+					ChainType:         chain,
+					ConfigPublicKey:   "someNon3sens3",
+					OffChainPublicKey: "mor3Non3sens3",
+					OnChainPublicKey:  "thisActuallyMak3sS3ns3",
+				},
+			}
+			server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+				switch req.Method {
+				case http.MethodPost:
+					Expect(req.URL.Path).Should(Or(Equal(fmt.Sprintf("/v2/keys/ocr2/%s", chain)), Equal("/sessions")))
+					if req.URL.Path == "/sessions" {
+						writeCookie(rw)
+					} else {
+						writeResponse(rw, http.StatusOK, OCR2Key{ocrKeyData})
+					}
+				case http.MethodGet:
+					Expect("/v2/keys/ocr2").Should(Equal(req.URL.Path))
+					writeResponse(rw, http.StatusOK, OCR2Keys{
+						Data: []OCR2KeyData{ocrKeyData},
+					})
+				case http.MethodDelete:
+					Expect("/v2/keys/ocr2/1").Should(Equal(req.URL.Path))
+					writeResponse(rw, http.StatusOK, nil)
+				}
+			})
+			defer server.Close()
+
+			c, err := newDefaultClient(server.URL)
+			Expect(err).ShouldNot(HaveOccurred())
+			c.SetClient(server.Client())
+
+			receivedKey, err := c.CreateOCR2Key(chain)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			keys, err := c.ReadOCR2Keys()
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(keys.Data).Should(ContainElement(receivedKey.Data))
+
+			err = c.DeleteOCR2Key("1")
+			Expect(err).ShouldNot(HaveOccurred())
+		}
+	})
+
 	// Mocks the creation, read, delete cycle for P2P keys
 	It("can Create, Read, and Delete P2P keys", func() {
 		p2pKeyData := P2PKeyData{
@@ -306,6 +356,173 @@ var _ = Describe("Chainlink", func() {
 		Expect(receivedKeys.Data).Should(ContainElement(ethKeyData))
 	})
 
+	// Mocks the creation, read, delete cycle for Tx keys
+	It("can Create, Read, and Delete Tx keys", func() {
+		for _, chain := range []string{"solana"} {
+			txKeyData := TxKeyData{
+				Type: "encryptedKeyPlacholder",
+				ID:   "someTestKeyID",
+				Attributes: TxKeyAttributes{
+					PublicKey: "aRandomTestPublicKeyForArbitraryChain",
+				},
+			}
+
+			server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+				endpoint := fmt.Sprintf("/v2/keys/%s", chain)
+				switch req.Method {
+				case http.MethodPost:
+					Expect(req.URL.Path).Should(Or(Equal(endpoint), Equal("/sessions")))
+					if req.URL.Path == "/sessions" {
+						writeCookie(rw)
+					} else {
+						writeResponse(rw, http.StatusOK, TxKey{txKeyData})
+					}
+				case http.MethodGet:
+					Expect(endpoint).Should(Equal(req.URL.Path))
+					writeResponse(rw, http.StatusOK, TxKeys{
+						Data: []TxKeyData{txKeyData},
+					})
+				case http.MethodDelete:
+					Expect(endpoint + "/1").Should(Equal(req.URL.Path))
+					writeResponse(rw, http.StatusOK, nil)
+				}
+			})
+			defer server.Close()
+
+			c, err := newDefaultClient(server.URL)
+			Expect(err).ShouldNot(HaveOccurred())
+			c.SetClient(server.Client())
+
+			receivedKey, err := c.CreateTxKey(chain)
+			Expect(err).ShouldNot(HaveOccurred())
+
+			keys, err := c.ReadTxKeys(chain)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(keys.Data).Should(ContainElement(receivedKey.Data))
+
+			err = c.DeleteTxKey(chain, "1")
+			Expect(err).ShouldNot(HaveOccurred())
+		}
+	})
+
+	// Mocks the reading transactions and attempted transactions
+	It("can read Transactions and Transaction Attempts from the chainlink node", func() {
+		mockTxString := `{
+	"data": [
+		{
+			"type": "transactions",
+			"id": "0xd694f4a84b3aa8f1fae2443c2444760306eed5d575a7eb22eb64101511a3a5c0",
+			"attributes": {
+				"state": "confirmed",
+				"data": "0x0",
+				"from": "0x0",
+				"gasLimit": "2650000",
+				"gasPrice": "10000001603",
+				"hash": "0xd694f4a84b3aa8f1fae2443c2444760306eed5d575a7eb22eb64101511a3a5c0",
+				"rawHex": "0x0",
+				"nonce": "1",
+				"sentAt": "199",
+				"to": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+				"value": "0.000000000000000000",
+				"evmChainID": "1337"
+			}
+		}
+	],
+	"meta": {
+		"count": 14
+	}
+}`
+		mockTxData := TransactionsData{}
+		err := json.Unmarshal([]byte(mockTxString), &mockTxData)
+		Expect(err).ShouldNot(HaveOccurred())
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			actualEndpoint := "/v2/transactions"
+			attemptsEndpoint := "/v2/tx_attempts"
+			switch req.Method {
+			case http.MethodGet:
+				Expect(req.URL.Path).Should(Or(Equal(actualEndpoint), Equal(attemptsEndpoint)))
+				writeResponse(rw, http.StatusOK, mockTxData)
+			case http.MethodPost:
+				Expect(req.URL.Path).Should(Equal("/sessions"))
+				writeCookie(rw)
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		_, err = c.ReadTransactionAttempts()
+		Expect(err).ShouldNot(HaveOccurred())
+
+		_, err = c.ReadTransactions()
+		Expect(err).ShouldNot(HaveOccurred())
+	})
+
+	// Mocks the reading transactions and attempted transactions
+	It("can send ETH transactions", func() {
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			switch req.Method {
+			case http.MethodPost:
+				if req.URL.Path == "/sessions" {
+					writeCookie(rw)
+				} else {
+					writeResponse(rw, http.StatusOK, nil)
+				}
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		_, err = c.SendNativeToken(big.NewInt(1), "0x123", "0x420")
+		Expect(err).ShouldNot(HaveOccurred())
+	})
+
+	// Mocks the creation, read cycle for CSA keys
+	It("can Create and Read CSA keys", func() {
+		csaKeyData := CSAKeyData{
+			"csaKeys",
+			"id",
+			CSAKeyAttributes{
+				PublicKey: "mor3Non3sens3",
+				Version:   1,
+			},
+		}
+
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			switch req.Method {
+			case http.MethodPost:
+				Expect(req.URL.Path).Should(Or(Equal("/v2/keys/csa"), Equal("/sessions")))
+				if req.URL.Path == "/sessions" {
+					writeCookie(rw)
+				} else {
+					writeResponse(rw, http.StatusOK, CSAKey{csaKeyData})
+				}
+			case http.MethodGet:
+				Expect("/v2/keys/csa").Should(Equal(req.URL.Path))
+				writeResponse(rw, http.StatusOK, CSAKeys{
+					Data: []CSAKeyData{csaKeyData},
+				})
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		receivedKey, err := c.CreateCSAKey()
+		Expect(err).ShouldNot(HaveOccurred())
+
+		keys, err := c.ReadCSAKeys()
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(keys.Data).Should(ContainElement(receivedKey.Data))
+	})
+
 	// Mocks the creation, read, delete cycle for Chainlink EIs
 	It("can Create, Read, and Delete external initiators", func() {
 		eia := EIAttributes{
@@ -362,6 +579,67 @@ var _ = Describe("Chainlink", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
+	// Mocks the creation, read cycle for chains
+	It("can create chains", func() {
+		attrs := TerraChainAttributes{
+			ChainID: "chainid",
+		}
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			endpoint := "/v2/chains/terra"
+			switch req.Method {
+			case http.MethodPost:
+				Expect(req.URL.Path).Should(Or(Equal(endpoint), Equal("/sessions")))
+				if req.URL.Path == "/sessions" {
+					writeCookie(rw)
+				} else {
+					writeResponse(rw, http.StatusCreated, TerraChainCreate{TerraChain{attrs}})
+				}
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		resp, err := c.CreateTerraChain(&attrs)
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(resp.Data.Attributes.ChainID).Should(Equal(attrs.ChainID))
+	})
+
+	// Mocks the creation, read cycle for nodes
+	It("can create nodes", func() {
+		attrs := TerraNodeAttributes{
+			Name:          "name",
+			TerraChainID:  "chainid",
+			TendermintURL: "http://tendermint.com",
+			FCDURL:        "http://fcd.com",
+		}
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			endpoint := "/v2/nodes/terra"
+			switch req.Method {
+			case http.MethodPost:
+				Expect(req.URL.Path).Should(Or(Equal(endpoint), Equal("/sessions")))
+				if req.URL.Path == "/sessions" {
+					writeCookie(rw)
+				} else {
+					writeResponse(rw, http.StatusOK, TerraNodeCreate{TerraNode{attrs}})
+				}
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		resp, err := c.CreateTerraNode(&attrs)
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(resp.Data.Attributes.Name).Should(Equal(attrs.Name))
+		Expect(resp.Data.Attributes.TerraChainID).Should(Equal(attrs.TerraChainID))
+		Expect(resp.Data.Attributes.TendermintURL).Should(Equal(attrs.TendermintURL))
+		Expect(resp.Data.Attributes.FCDURL).Should(Equal(attrs.FCDURL))
+	})
 })
 
 func newDefaultClient(url string) (Chainlink, error) {

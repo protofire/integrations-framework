@@ -38,6 +38,10 @@ type EthereumMultinodeClient struct {
 	Clients       []*CeloClient
 }
 
+func (e *EthereumMultinodeClient) ContractsDeployed() bool {
+	return e.DefaultClient.ContractsDeployed()
+}
+
 // EstimateCostForChainlinkOperations calculates TXs cost as a dirty estimation based on transactionLimit for that network
 func (e *EthereumMultinodeClient) EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error) {
 	return e.DefaultClient.EstimateCostForChainlinkOperations(amountOfOperations)
@@ -69,9 +73,19 @@ func (e *EthereumMultinodeClient) SetWallet(num int) error {
 	return nil
 }
 
+// DefaultWallet returns the default wallet for the network
+func (e *EthereumMultinodeClient) GetDefaultWallet() *EthereumWallet {
+	return e.DefaultClient.DefaultWallet
+}
+
 // GetNetworkName gets the ID of the chain that the clients are connected to
 func (e *EthereumMultinodeClient) GetNetworkName() string {
 	return e.DefaultClient.GetNetworkName()
+}
+
+// GetNetworkType retrieves the type of network this is running on
+func (e *EthereumMultinodeClient) GetNetworkType() string {
+	return e.DefaultClient.GetNetworkType()
 }
 
 // GetChainID retrieves the ChainID of the network that the client interacts with
@@ -193,6 +207,10 @@ type CeloClient struct {
 	queueTransactions   bool
 	gasStats            *GasStats
 	doneChan            chan struct{}
+}
+
+func (e *EthereumClient) ContractsDeployed() bool {
+	return e.NetworkConfig.ContractsDeployed
 }
 
 // EstimateCostForChainlinkOperations calculates required amount of ETH for amountOfOperations Chainlink operations
@@ -370,13 +388,28 @@ func NewEthereumMultiNodeClient(
 }
 
 // EthereumMultiNodeURLs returns the websocket URLs for a deployed Ethereum multi-node setup
-func EthereumMultiNodeURLs(e *environment.Environment) ([]*url.URL, error) {
+func SimulatedEthereumURLs(e *environment.Environment) ([]*url.URL, error) {
 	return e.Charts.Connections("geth").LocalURLsByPort("ws-rpc", environment.WS)
+}
+
+// LiveEthTestnetURLs indicates that there are no urls to fetch, except from the network config
+func LiveEthTestnetURLs(e *environment.Environment) ([]*url.URL, error) {
+	return []*url.URL{}, nil
+}
+
+// DefaultWallet returns the default wallet for the network
+func (e *EthereumClient) GetDefaultWallet() *EthereumWallet {
+	return e.DefaultWallet
 }
 
 // GetNetworkName retrieves the ID of the network that the client interacts with
 func (e *CeloClient) GetNetworkName() string {
 	return e.NetworkConfig.ID
+}
+
+// GetNetworkType retrieves the type of network this is running on
+func (e *EthereumClient) GetNetworkType() string {
+	return e.NetworkConfig.Type
 }
 
 // GetChainID retrieves the ChainID of the network that the client interacts with

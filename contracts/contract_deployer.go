@@ -31,12 +31,6 @@ type ContractDeployer interface {
 	) (DeviationFlaggingValidator, error)
 	DeployFluxAggregatorContract(linkAddr string, fluxOptions FluxAggregatorOptions) (FluxAggregator, error)
 	DeployLinkTokenContract() (LinkToken, error)
-	DeployOCRv2(
-		paymentControllerAddr string,
-		requesterControllerAddr string,
-		linkTokenAddr string,
-	) (OCRv2, error)
-	DeployOCRv2AccessController() (OCRv2AccessController, error)
 	DeployOffChainAggregator(linkAddr string, offchainOptions OffchainOptions) (OffchainAggregator, error)
 	DeployVRFContract() (VRF, error)
 	DeployMockETHLINKFeed(answer *big.Int) (MockETHLINKFeed, error)
@@ -44,6 +38,7 @@ type ContractDeployer interface {
 	DeployUpkeepRegistrationRequests(linkAddr string, minLinkJuels *big.Int) (UpkeepRegistrar, error)
 	DeployKeeperRegistry(opts *KeeperRegistryOpts) (KeeperRegistry, error)
 	DeployKeeperConsumer(updateInterval *big.Int) (KeeperConsumer, error)
+	DeployKeeperConsumerPerformance(testBlockRange, blockCadence *big.Int) (KeeperConsumerPerformance, error)
 	DeployVRFConsumer(linkAddr string, coordinatorAddr string) (VRFConsumer, error)
 	DeployVRFCoordinator(linkAddr string, bhsAddr string) (VRFCoordinator, error)
 	DeployBlockhashStore() (BlockHashStore, error)
@@ -61,18 +56,6 @@ func NewContractDeployer(bcClient client.BlockchainClient) (ContractDeployer, er
 // EthereumContractDeployer provides the implementations for deploying ETH (EVM) based contracts
 type EthereumContractDeployer struct {
 	eth *client.CeloClient
-}
-
-func (e *EthereumContractDeployer) DeployOCRv2(
-	paymentControllerAddr string,
-	requesterControllerAddr string,
-	linkTokenAddr string,
-) (OCRv2, error) {
-	panic("implement me")
-}
-
-func (e *EthereumContractDeployer) DeployOCRv2AccessController() (OCRv2AccessController, error) {
-	panic("implement me")
 }
 
 // NewEthereumContractDeployer returns an instantiated instance of the ETH contract deployer
@@ -431,6 +414,7 @@ func (e *EthereumContractDeployer) DeployKeeperRegistry(
 			common.HexToAddress(opts.ETHFeedAddr),
 			common.HexToAddress(opts.GasFeedAddr),
 			opts.PaymentPremiumPPB,
+			opts.FlatFeeMicroLINK,
 			opts.BlockCountPerTurn,
 			opts.CheckGasLimit,
 			opts.StalenessSeconds,
@@ -462,6 +446,23 @@ func (e *EthereumContractDeployer) DeployKeeperConsumer(updateInterval *big.Int)
 	return &EthereumKeeperConsumer{
 		client:   e.eth,
 		consumer: instance.(*celo.KeeperConsumer),
+		address:  address,
+	}, err
+}
+
+func (e *EthereumContractDeployer) DeployKeeperConsumerPerformance(testBlockRange, averageCadence *big.Int) (KeeperConsumerPerformance, error) {
+	address, _, instance, err := e.eth.DeployContract("KeeperConsumerPerformance", func(
+		auth *bind.TransactOpts,
+		backend bind.ContractBackend,
+	) (common.Address, *types.Transaction, interface{}, error) {
+		return ethereum.DeployKeeperConsumerPerformance(auth, backend, testBlockRange, averageCadence)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &EthereumKeeperConsumerPerformance{
+		client:   e.eth,
+		consumer: instance.(*ethereum.KeeperConsumerPerformance),
 		address:  address,
 	}, err
 }
