@@ -209,7 +209,7 @@ type CeloClient struct {
 	doneChan            chan struct{}
 }
 
-func (e *EthereumClient) ContractsDeployed() bool {
+func (e *CeloClient) ContractsDeployed() bool {
 	return e.NetworkConfig.ContractsDeployed
 }
 
@@ -387,7 +387,7 @@ func NewEthereumMultiNodeClient(
 	return ecl, nil
 }
 
-// EthereumMultiNodeURLs returns the websocket URLs for a deployed Ethereum multi-node setup
+// SimulatedEthereumURLs returns the websocket URLs for a deployed Ethereum multi-node setup
 func SimulatedEthereumURLs(e *environment.Environment) ([]*url.URL, error) {
 	return e.Charts.Connections("geth").LocalURLsByPort("ws-rpc", environment.WS)
 }
@@ -397,8 +397,8 @@ func LiveEthTestnetURLs(e *environment.Environment) ([]*url.URL, error) {
 	return []*url.URL{}, nil
 }
 
-// DefaultWallet returns the default wallet for the network
-func (e *EthereumClient) GetDefaultWallet() *EthereumWallet {
+// GetDefaultWallet returns the default wallet for the network
+func (e *CeloClient) GetDefaultWallet() *EthereumWallet {
 	return e.DefaultWallet
 }
 
@@ -408,7 +408,7 @@ func (e *CeloClient) GetNetworkName() string {
 }
 
 // GetNetworkType retrieves the type of network this is running on
-func (e *EthereumClient) GetNetworkType() string {
+func (e *CeloClient) GetNetworkType() string {
 	return e.NetworkConfig.Type
 }
 

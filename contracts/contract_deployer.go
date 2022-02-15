@@ -455,14 +455,14 @@ func (e *EthereumContractDeployer) DeployKeeperConsumerPerformance(testBlockRang
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployKeeperConsumerPerformance(auth, backend, testBlockRange, averageCadence)
+		return celo.DeployKeeperConsumerPerformance(auth, backend, testBlockRange, averageCadence)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumKeeperConsumerPerformance{
 		client:   e.eth,
-		consumer: instance.(*ethereum.KeeperConsumerPerformance),
+		consumer: instance.(*celo.KeeperConsumerPerformance),
 		address:  address,
 	}, err
 }

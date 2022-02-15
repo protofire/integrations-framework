@@ -1323,8 +1323,8 @@ func (v *EthereumKeeperConsumer) Counter(ctx context.Context) (*big.Int, error) 
 // EthereumKeeperConsumerPerformance represents a more complicated keeper consumer contract, one intended only for
 // performance tests.
 type EthereumKeeperConsumerPerformance struct {
-	client   *client.EthereumClient
-	consumer *ethereum.KeeperConsumerPerformance
+	client   *client.CeloClient
+	consumer *celo.KeeperConsumerPerformance
 	address  *common.Address
 }
 
