@@ -4,10 +4,10 @@ import (
 	"crypto/ed25519"
 	"encoding"
 	"fmt"
+	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/mtls"
 
 	"github.com/mr-tron/base58"
 	"github.com/pkg/errors"
-	"github.com/smartcontractkit/libocr/ragep2p/internal/mtls"
 )
 
 // Address represents a network address & port such as "192.168.1.2:8080". It
