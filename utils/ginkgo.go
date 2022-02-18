@@ -2,6 +2,7 @@ package utils
 
 //revive:disable:dot-imports
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -27,9 +28,10 @@ func GinkgoSuite(frameworkConfigFileLocation string) {
 
 	fConf, err := config.LoadFrameworkConfig(filepath.Join(absoluteConfigFileLocation, "framework.yaml"))
 	if err != nil {
+		fmt.Println("Error Occurred: ", err.Error())
 		log.Fatal().
 			Str("Path", absoluteConfigFileLocation).
-			Msg("Failed to load config")
+			Msg("Failed to load config: framework.yaml")
 		return
 	}
 	log.Logger = log.Logger.Level(zerolog.Level(fConf.Logging.Level))
@@ -38,7 +40,7 @@ func GinkgoSuite(frameworkConfigFileLocation string) {
 	if err != nil {
 		log.Fatal().
 			Str("Path", absoluteConfigFileLocation).
-			Msg("Failed to load config")
+			Msg("Failed to load config: networks.yaml")
 		return
 	}
 }
