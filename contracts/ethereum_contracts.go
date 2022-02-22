@@ -615,6 +615,7 @@ func (o *EthereumOffchainAggregator) SetPayees(
 	transmitters, payees []string,
 ) error {
 	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
+	opts.GasLimit = 500000
 	if err != nil {
 		return err
 	}
@@ -706,6 +707,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 
 	// Set Payees
 	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
+	opts.GasLimit = 300000
 	if err != nil {
 		return err
 	}
@@ -719,6 +721,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 
 	// Set Config
 	opts, err = o.client.TransactionOpts(o.client.DefaultWallet)
+	opts.GasLimit = 600000
 	if err != nil {
 		return err
 	}
@@ -732,6 +735,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 // RequestNewRound requests the OCR contract to create a new round
 func (o *EthereumOffchainAggregator) RequestNewRound() error {
 	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
+	opts.GasLimit = 500000
 	if err != nil {
 		return err
 	}
