@@ -721,7 +721,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 
 	// Set Config
 	opts, err = o.client.TransactionOpts(o.client.DefaultWallet)
-	opts.GasLimit = 500000	//@Todo Fix Gas estimation automatically
+	opts.GasLimit = 1000000	//@Todo Fix Gas estimation automatically
 	if err != nil {
 		return err
 	}
