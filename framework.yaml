@@ -14,6 +14,7 @@ chainlink_env_values:
     eth_url: "wss://alfajores-forno.celo-testnet.org/ws"
     eth_chain_id: 44787
     eth_min_gas_price_wei: 100000000
+    LINK_CONTRACT_ADDRESS: 0x5C4FD527394a2C21b6AE7e5DC646EcF7EaEB241A
 
 # Specify the image and version of the simulated geth image you want to run tests against. Leave blank for default.
 # Has no effect when running tests on networks other than the simulated geth instances.

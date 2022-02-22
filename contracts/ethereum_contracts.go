@@ -616,7 +616,7 @@ func (o *EthereumOffchainAggregator) SetPayees(
 	if err != nil {
 		return err
 	}
-
+	opts.GasLimit = 500000
 	tx, err := o.ocr.SetPayees(opts, transmitters, payees)
 	if err != nil {
 		return err
@@ -699,6 +699,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 	if err != nil {
 		return err
 	}
+	opts.GasLimit = 300000
 	tx, err := o.ocr.SetPayees(opts, transmitters, transmitters)
 	if err != nil {
 		return err
@@ -725,6 +726,7 @@ func (o *EthereumOffchainAggregator) RequestNewRound() error {
 	if err != nil {
 		return err
 	}
+	opts.GasLimit = 600000
 	tx, err := o.ocr.RequestNewRound(opts)
 	if err != nil {
 		return err
@@ -952,7 +954,7 @@ func (e *EthereumStorage) Set(value *big.Int) error {
 	if err != nil {
 		return err
 	}
-
+	opts.GasLimit = 500000
 	tx, err := e.store.Set(opts, value)
 	if err != nil {
 		return err
