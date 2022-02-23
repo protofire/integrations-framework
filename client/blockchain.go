@@ -8,11 +8,9 @@ import (
 	"math/big"
 	"net/http"
 	"net/url"
-	"path/filepath"
 
 	"github.com/celo-org/celo-blockchain/core/types"
 	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/integrations-framework/utils"
 	"gopkg.in/yaml.v2"
 
 	"github.com/smartcontractkit/integrations-framework/config"
@@ -20,7 +18,8 @@ import (
 
 // Commonly used blockchain network types
 const (
-	ETHNetworkType         = "eth_multinode"
+	SimulatedEthNetwork    = "eth_simulated"
+	LiveEthTestNetwork     = "eth_testnet"
 	NetworkGethPerformance = "ethereum_geth_performance"
 )
 
@@ -40,13 +39,16 @@ type BlockchainClientURLFn func(e *environment.Environment) ([]*url.URL, error)
 // of network types within the test suite
 // BlockchainClient can be connected to a single or multiple nodes,
 type BlockchainClient interface {
+	ContractsDeployed() bool
 	LoadWallets(ns interface{}) error
 	SetWallet(num int) error
+	GetDefaultWallet() *EthereumWallet
 
 	EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error)
 
 	Get() interface{}
 	GetNetworkName() string
+	GetNetworkType() string
 	GetChainID() int64
 	SwitchNode(node int) error
 	GetClients() []BlockchainClient
@@ -130,9 +132,13 @@ type registeredNetwork struct {
 func NewNetworkRegistry() *NetworkRegistry {
 	return &NetworkRegistry{
 		registeredNetworks: map[string]registeredNetwork{
-			ETHNetworkType: {
+			SimulatedEthNetwork: {
 				newBlockchainClientFn: NewEthereumMultiNodeClient,
-				blockchainClientURLFn: EthereumMultiNodeURLs,
+				blockchainClientURLFn: SimulatedEthereumURLs,
+			},
+			LiveEthTestNetwork: {
+				newBlockchainClientFn: NewEthereumMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
 		},
 	}
@@ -148,10 +154,7 @@ func (n *NetworkRegistry) RegisterNetwork(networkType string, fn NewBlockchainCl
 
 // GetNetworks returns a networks object with all the BlockchainClient(s) initialized
 func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, error) {
-	nc, err := config.LoadNetworksConfig(filepath.Join(utils.ProjectRoot, "networks.yaml"))
-	if err != nil {
-		return nil, err
-	}
+	nc := config.ProjectNetworkSettings
 	var clients []BlockchainClient
 	for _, networkName := range nc.SelectedNetworks {
 		networkSettings, ok := nc.NetworkSettings[networkName]
@@ -191,6 +194,35 @@ func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, 
 // ConnectChainlinkNodes creates new chainlink clients
 func ConnectChainlinkNodes(e *environment.Environment) ([]Chainlink, error) {
 	return ConnectChainlinkNodesByCharts(e, []string{"chainlink"})
+}
+
+func ConnectChainlinkDBs(e *environment.Environment) ([]*PostgresConnector, error) {
+	return ConnectChainlinkDBByCharts(e, []string{"chainlink"})
+}
+
+// ConnectChainlinkDBByCharts creates new chainlink DBs clients by charts
+func ConnectChainlinkDBByCharts(e *environment.Environment, charts []string) ([]*PostgresConnector, error) {
+	var dbs []*PostgresConnector
+	for _, chart := range charts {
+		pgUrls, err := e.Charts.Connections(chart).LocalURLsByPort("postgres", environment.HTTP)
+		if err != nil {
+			return nil, err
+		}
+		for _, u := range pgUrls {
+			c, err := NewPostgresConnector(&PostgresConfig{
+				Host:     "localhost",
+				Port:     u.Port(),
+				User:     "postgres",
+				Password: "node",
+				DBName:   "chainlink",
+			})
+			dbs = append(dbs, c)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return dbs, nil
 }
 
 // ConnectChainlinkNodesByCharts creates new chainlink clients by charts
