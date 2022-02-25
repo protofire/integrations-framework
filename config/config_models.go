@@ -4,15 +4,18 @@ import "time"
 
 // FrameworkConfig common framework config
 type FrameworkConfig struct {
-	KeepEnvironments   string            `mapstructure:"keep_environments" yaml:"keep_environments"`
-	Logging            *LoggingConfig    `mapstructure:"logging" yaml:"logging"`
-	EnvironmentFile    string            `mapstructure:"environment_file" yaml:"environment_file"`
-	ChainlinkImage     string            `mapstructure:"chainlink_image" yaml:"chainlink_image"`
-	ChainlinkVersion   string            `mapstructure:"chainlink_version" yaml:"chainlink_version"`
-	ChainlinkEnvValues map[string]string `mapstructure:"chainlink_env_values" yaml:"chainlink_env_values"`
-	GethImage          string            `mapstructure:"geth_image" yaml:"geth_image"`
-	GethVersion        string            `mapstructure:"geth_version" yaml:"geth_version"`
-	GethArgs           []interface{}     `mapstructure:"geth_args" yaml:"geth_args"`
+	KeepEnvironments         string            `mapstructure:"keep_environments" yaml:"keep_environments"`
+	Logging                  *LoggingConfig    `mapstructure:"logging" yaml:"logging"`
+	EnvironmentFile          string            `mapstructure:"environment_file" yaml:"environment_file"`
+	ChainlinkImage           string            `mapstructure:"chainlink_image" yaml:"chainlink_image"`
+	ChainlinkVersion         string            `mapstructure:"chainlink_version" yaml:"chainlink_version"`
+	ChainlinkEnvValues       map[string]string `mapstructure:"chainlink_env_values" yaml:"chainlink_env_values"`
+	GethImage                string            `mapstructure:"geth_image" yaml:"geth_image"`
+	GethVersion              string            `mapstructure:"geth_version" yaml:"geth_version"`
+	GethArgs                 []interface{}     `mapstructure:"geth_args" yaml:"geth_args"`
+	RemoteRunnerEmailServer  string            `mapstructure:"remote_runner_email_server" yaml:"remote_runner_email_server"`
+	RemoteRunnerEmailAddress string            `mapstructure:"remote_runner_email_address" yaml:"remote_runner_email_address"`
+	RemoteRunnerEmailPass    string            `mapstructure:"remote_runner_email_pass" yaml:"remote_runner_email_pass"`
 }
 
 // ETHNetwork data to configure fully ETH compatible network
@@ -75,13 +78,15 @@ type GethValuesWrapper struct {
 	Args     []interface{} `json:"args,omitempty"`
 }
 
+// GethValues wraps all values
 type GethValues struct {
 	Image *GethImage `json:"image,omitempty"`
 }
 
+// GethImage defines geth image and version
 type GethImage struct {
 	Image   string `json:"image,omitempty" yaml:"geth_image"`
-	Version string `json:"version,omitempty" yaml:"get_version"`
+	Version string `json:"version,omitempty" yaml:"geth_version"`
 }
 
 // ChainlinkChart holds the overall geth chart values
@@ -95,10 +100,12 @@ type ChainlinkValuesWrapper struct {
 	EnvironmentVariables map[string]string `json:"env,omitempty" yaml:"chainlink_env_values"`
 }
 
+// ChainlinkValues wraps all values
 type ChainlinkValues struct {
 	Image *ChainlinkImage `json:"image,omitempty"`
 }
 
+// ChainlinkImage defines chainlink image and version
 type ChainlinkImage struct {
 	Image   string `json:"image,omitempty" yaml:"chainlink_image"`
 	Version string `json:"version,omitempty" yaml:"chainlink_version"`

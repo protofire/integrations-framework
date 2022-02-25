@@ -30,7 +30,3 @@ test_performance:
 
 test_chaos:
 	ginkgo -r --junit-report=tests-chaos-report.xml --keep-going --trace --randomize-all --randomize-suites --progress $(args) ./suite/chaos 
-
-soak_docker:
-	docker build -t kalverra/soak-runner -f soak.runner.Dockerfile .
-	docker push kalverra/soak-runner:latest

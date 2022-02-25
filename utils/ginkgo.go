@@ -16,8 +16,13 @@ import (
 
 // GinkgoSuite provides the default setup for running a Ginkgo test suite
 func GinkgoSuite(frameworkConfigFileLocation string) {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	LoadConfigs(frameworkConfigFileLocation)
 	RegisterFailHandler(Fail)
+}
+
+func LoadConfigs(frameworkConfigFileLocation string) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	absoluteConfigFileLocation, err := filepath.Abs(frameworkConfigFileLocation)
 	if err != nil {
 		log.Fatal().
