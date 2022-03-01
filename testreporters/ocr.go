@@ -254,7 +254,7 @@ var soakTestSuccessSlack = `{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Test ran for {{ .TestDuration }}\nSummary CSV created on __remote-test-runner__ at __{{ .CSVLocation }}__"
+				"text": "Test ran for {{ .TestDuration }}\nSummary CSV created on _remote-test-runner_ at _{{ .CSVLocation }}_"
 			}
 		}
 	]
