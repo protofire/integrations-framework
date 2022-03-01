@@ -32,9 +32,9 @@ var _ = Describe("OCR Soak Test @soak-ocr", func() {
 
 		By("Setting up Soak Test", func() {
 			ocrSoakTest = testsetups.NewOCRSoakTest(&testsetups.OCRSoakTestInputs{
-				TestDuration:         time.Hour * 24,
+				TestDuration:         time.Minute * 30,
 				NumberOfContracts:    4,
-				ChainlinkNodeFunding: big.NewFloat(10),
+				ChainlinkNodeFunding: big.NewFloat(1),
 				RoundTimeout:         time.Minute * 1,
 				StartingAdapterValue: 5,
 			})
@@ -49,7 +49,7 @@ var _ = Describe("OCR Soak Test @soak-ocr", func() {
 	})
 
 	AfterEach(func() {
-		ocrSoakTest.TestReporter.WriteReport()
+		ocrSoakTest.TestReporter.WriteReport(env.Namespace)
 		log.Info().Msg("Soak Test Concluded")
 	})
 })
