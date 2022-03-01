@@ -26,9 +26,7 @@ func TestSoakOCR(t *testing.T) {
 		"main",               // The branch of the above repo to pull tests from
 		"./suite/soak/tests", // The path of test files
 		"@soak-ocr",          // REGEX name of the specific test you want to run
-		config.ProjectFrameworkSettings.RemoteRunnerEmailServer,
-		config.ProjectFrameworkSettings.RemoteRunnerEmailAddress,
-		config.ProjectFrameworkSettings.RemoteRunnerEmailPass,
+		config.ProjectFrameworkSettings.RemoteSlackWebhook,
 		tools.ChartsRoot,
 	)
 	require.NoError(t, err)

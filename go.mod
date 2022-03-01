@@ -12,7 +12,7 @@ require (
 	github.com/prometheus/common v0.32.1
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/smartcontractkit/helmenv v1.0.37-0.20220301153128-5769908299ed
+	github.com/smartcontractkit/helmenv v1.0.37-0.20220301192532-c2a108e9864b
 	github.com/smartcontractkit/libocr v0.0.0-20220121130134-5d2b1d5f424b
 	github.com/spf13/viper v1.10.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

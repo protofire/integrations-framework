@@ -1,19 +1,18 @@
 package testreporters
 
 import (
-	"crypto/tls"
+	"bytes"
 	"encoding/csv"
-	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
+	"text/template"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/utils"
-	"gopkg.in/gomail.v2"
 )
 
 type OCRSoakTestReporter struct {
@@ -37,21 +36,19 @@ type OCRSoakTestReport struct {
 
 // WriteReport writes OCR Soak test report to logs
 // TODO: Need to generally improve log creation for soak tests. Would like this to be a CSV or Grafana or something
-func (o *OCRSoakTestReporter) WriteReport() error {
+func (o *OCRSoakTestReporter) WriteReport(namespace string) {
 	for _, report := range o.Reports {
 		report.averageRoundBlocks = report.totalBlockLengths / report.TotalRounds
 		report.averageRoundTime = time.Duration(report.totalRoundTimes.Nanoseconds() / int64(report.TotalRounds))
 	}
-	emailServer := os.Getenv("EMAIL_SERVER")
-	emailAddress := os.Getenv("EMAIL_ADDRESS")
-	emailPassword := os.Getenv("EMAIL_PASSWORD")
-	if err := o.sendEmail(emailServer, emailAddress, emailPassword); err != nil {
-		log.Error().Err(err).
-			Str("Server", emailServer).
-			Str("User", emailAddress).
-			Str("Pass", emailPassword).
-			Msg("Error trying to send email to notify of soak test ending.")
+	csvPath := filepath.Join(utils.ProjectRoot, "ocr_soak_report.csv")
+	if err := o.writeCSV(csvPath); err != nil {
+		log.Error().Err(err).Str("Path", csvPath).Msg("Error writing CSV file")
 	}
+	if err := o.sendSlack(csvPath, namespace); err != nil {
+		log.Error().Err(err).Msg("Error sending slack message to webhook")
+	}
+
 	log.Info().Msg("OCR Soak Test Report")
 	log.Info().Msg("--------------------")
 	for contractAddress, report := range o.Reports {
@@ -67,7 +64,6 @@ func (o *OCRSoakTestReporter) WriteReport() error {
 			Msg(contractAddress)
 	}
 	log.Info().Msg("--------------------")
-	return nil
 }
 
 // UpdateReport updates the report based on the latest info
@@ -96,13 +92,8 @@ func (o *OCRSoakTestReport) UpdateReport(roundTime time.Duration, blockLength ui
 	}
 }
 
-// sends an email to whatever account is set in framework settings
-func (o *OCRSoakTestReporter) sendEmail(emailServer, emailAddress, emailPassword string) error {
-	if emailServer == "" ||
-		emailAddress == "" ||
-		emailPassword == "" {
-		return errors.New("Unable to send email: Test Runner email params not set")
-	}
+// writes a CSV report on the test runner
+func (o *OCRSoakTestReporter) writeCSV(csvPath string) error {
 	ocrReportFile, err := os.Create(filepath.Join(utils.ProjectRoot, "ocr_soak_report.csv"))
 	if err != nil {
 		return err
@@ -142,31 +133,129 @@ func (o *OCRSoakTestReporter) sendEmail(emailServer, emailAddress, emailPassword
 	}
 	ocrReportWriter.Flush()
 
-	mailSender := gomail.NewDialer(
-		emailServer,
-		587,
-		emailAddress,
-		emailPassword,
-	)
-	mailSender.TLSConfig = &tls.Config{InsecureSkipVerify: true} //#nosec G402
-	msg := gomail.NewMessage()
-	msg.SetHeaders(
-		map[string][]string{
-			"From": {emailAddress},
-			"To":   {emailAddress},
-		},
-	)
-	var emailBody strings.Builder
-	emailBody.WriteString("OCR Soak Test summary results are attached in a CSV\n\n")
-	formattedTime := time.Now().Format("Mon 3:04PM MST")
-	if ginkgo.CurrentSpecReport().Failed() {
-		msg.SetHeader("Subject", fmt.Sprintf("OCR Soak Test FAILED at %s", formattedTime))
-		emailBody.WriteString(ginkgo.CurrentSpecReport().Failure.Message)
-	} else {
-		msg.SetHeader("Subject", fmt.Sprintf("OCR Soak Test Passed at %s", formattedTime))
-	}
-	msg.SetBody("text/plain", emailBody.String())
-
-	msg.Attach(filepath.Join(utils.ProjectRoot, "ocr_soak_report.csv"))
-	return mailSender.DialAndSend(msg)
+	log.Info().Str("Location", filepath.Join(utils.ProjectRoot, "ocr_soak_report.csv")).Msg("Wrote CSV file")
+	return nil
 }
+
+// sends a slack message to a slack webhook if one is provided
+func (o *OCRSoakTestReporter) sendSlack(csvLocation, namespace string) error {
+	slackWebhook := os.Getenv("SLACK_WEBHOOK")
+	if slackWebhook == "" ||
+		slackWebhook == "https://hooks.slack.com/services/XXX" ||
+		slackWebhook == "https://hooks.slack.com/services/" {
+		return fmt.Errorf("Unable to send slack notification, Webhook not set '%s'", slackWebhook)
+	}
+
+	// Marshal values
+	slackMessageVars := map[string]interface{}{
+		"NameSpace":    namespace,
+		"TestDuration": ginkgo.CurrentSpecReport().RunTime,
+		"CSVLocation":  csvLocation,
+		"ErrorTrace":   ginkgo.CurrentSpecReport().FailureMessage(),
+	}
+	var buf bytes.Buffer
+	tmpl := template.New("slack")
+
+	if ginkgo.CurrentSpecReport().Failed() {
+		tmpl.Parse(soakTestFailureSlack)
+	} else {
+		tmpl.Parse(soakTestSuccessSlack)
+	}
+	tmpl.Execute(&buf, slackMessageVars)
+
+	req, err := http.NewRequest(http.MethodPost, slackWebhook, &buf)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Got invalid status code '%d' from webhook call. Expected '%d'", resp.StatusCode, http.StatusOK)
+	}
+	return nil
+}
+
+var soakTestFailureSlack = `{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": ":x: OCR Soak Test FAILED :x:"
+			}
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "{{ .NameSpace }}"
+				}
+			]
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Test ran for {{ .TestDuration }}\nSummary CSV created on __remote-test-runner__ at __{{ .CSVLocation }}__"
+			}
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Error Trace"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "plain_text",
+				"text": "{{ .ErrorTrace }}"
+			}
+		}
+	]
+}`
+
+var soakTestSuccessSlack = `{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": ":white_check_mark: OCR Soak Test PASSED :white_check_mark:"
+			}
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "{{ .NameSpace }}"
+				}
+			]
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Test ran for {{ .TestDuration }}\nSummary CSV created on __remote-test-runner__ at __{{ .CSVLocation }}__"
+			}
+		}
+	]
+}`
