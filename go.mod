@@ -6,15 +6,15 @@ require (
 	github.com/celo-org/celo-blockchain v0.0.0-20211207011603-8830ed5d90d8
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/onsi/ginkgo/v2 v2.0.0
-	github.com/onsi/gomega v1.17.0
+	github.com/onsi/ginkgo/v2 v2.1.2
+	github.com/onsi/gomega v1.18.1
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.12.0
+	github.com/prometheus/client_golang v1.12.1
 	github.com/prometheus/common v0.32.1
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/smartcontractkit/helmenv v1.0.35
-	github.com/smartcontractkit/libocr v0.0.0-20220125200954-5b957c834276
+	github.com/smartcontractkit/helmenv v1.0.37-0.20220301192532-c2a108e9864b
+	github.com/smartcontractkit/libocr v0.0.0-20220121130134-5d2b1d5f424b
 	github.com/spf13/viper v1.10.1
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

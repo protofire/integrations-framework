@@ -44,12 +44,12 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 			//networkConfig["chainlink"] = nodeConfig
 			//networkConfig["env"] = envConfig
 
-			chainlinkConfig := environment.NewChainlinkConfig(
-				environment.ChainlinkReplicas(6, nil),
-			)
+			//chainlinkConfig := environment.NewChainlinkConfig(
+			//	environment.ChainlinkReplicas(6, nil),
+			//)
 
 			env, err = environment.DeployOrLoadEnvironment(
-				chainlinkConfig,
+				environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), ""),
 				tools.ChartsRoot,
 			)
 			Expect(err).ShouldNot(HaveOccurred(), "Environment deployment shouldn't fail")
@@ -59,7 +59,7 @@ var _ = FDescribe("OCR Feed @ocr", func() {
 
 		By("Connecting to launched resources", func() {
 			// Load Networks
-			networkRegistry := client.NewNetworkRegistry()
+			networkRegistry := client.NewDefaultNetworkRegistry()
 			var err error
 			networks, err = networkRegistry.GetNetworks(env)
 			Expect(err).ShouldNot(HaveOccurred(), "Connecting to blockchain nodes shouldn't fail")

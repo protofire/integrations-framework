@@ -97,6 +97,7 @@ func LoadFrameworkConfig(cfgPath string) (*FrameworkConfig, error) {
 	}
 	if chartOverrides != "" {
 		os.Setenv("CHARTS", chartOverrides)
+		log.Debug().Str("Overrides", chartOverrides).Msg("Chart Overrides Set")
 	}
 	ProjectFrameworkSettings = cfg
 	return ProjectFrameworkSettings, err

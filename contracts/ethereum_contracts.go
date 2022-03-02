@@ -841,11 +841,13 @@ func (o *RunlogRoundConfirmer) Wait() error {
 
 // OffchainAggregatorRoundConfirmer is a header subscription that awaits for a certain OCR round to be completed
 type OffchainAggregatorRoundConfirmer struct {
-	ocrInstance OffchainAggregator
-	roundID     *big.Int
-	doneChan    chan struct{}
-	context     context.Context
-	cancel      context.CancelFunc
+	ocrInstance        OffchainAggregator
+	roundID            *big.Int
+	doneChan           chan struct{}
+	context            context.Context
+	cancel             context.CancelFunc
+	optionalTestReport *testreporters.OCRSoakTestReport
+	blocksSinceAnswer  uint
 }
 
 // NewOffchainAggregatorRoundConfirmer provides a new instance of a OffchainAggregatorRoundConfirmer
@@ -853,14 +855,16 @@ func NewOffchainAggregatorRoundConfirmer(
 	contract OffchainAggregator,
 	roundID *big.Int,
 	timeout time.Duration,
+	optionalTestReport *testreporters.OCRSoakTestReport,
 ) *OffchainAggregatorRoundConfirmer {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
 	return &OffchainAggregatorRoundConfirmer{
-		ocrInstance: contract,
-		roundID:     roundID,
-		doneChan:    make(chan struct{}),
-		context:     ctx,
-		cancel:      ctxCancel,
+		ocrInstance:        contract,
+		roundID:            roundID,
+		doneChan:           make(chan struct{}),
+		context:            ctx,
+		cancel:             ctxCancel,
+		optionalTestReport: optionalTestReport,
 	}
 }
 
@@ -870,6 +874,7 @@ func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ client.NodeBlock) erro
 	if err != nil {
 		return err
 	}
+	o.blocksSinceAnswer++
 	currRound := lr.RoundId
 	ocrLog := log.Info().
 		Str("Contract Address", o.ocrInstance.Address()).
@@ -886,6 +891,12 @@ func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ client.NodeBlock) erro
 
 // Wait is a blocking function that will wait until the round has confirmed, and timeout if the deadline has passed
 func (o *OffchainAggregatorRoundConfirmer) Wait() error {
+	startTime := time.Now()
+	defer func() {
+		if o.optionalTestReport != nil {
+			o.optionalTestReport.UpdateReport(time.Since(startTime), o.blocksSinceAnswer)
+		}
+	}()
 	for {
 		select {
 		case <-o.doneChan:

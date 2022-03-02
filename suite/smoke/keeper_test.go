@@ -34,7 +34,7 @@ var _ = Describe("Keeper suite @keeper", func() {
 	BeforeEach(func() {
 		By("Deploying the environment", func() {
 			env, err = environment.DeployOrLoadEnvironment(
-				environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil)),
+				environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), ""),
 				tools.ChartsRoot,
 			)
 
@@ -44,7 +44,7 @@ var _ = Describe("Keeper suite @keeper", func() {
 		})
 
 		By("Connecting to launched resources", func() {
-			networkRegistry := client.NewNetworkRegistry()
+			networkRegistry := client.NewDefaultNetworkRegistry()
 			networks, err = networkRegistry.GetNetworks(env)
 
 			Expect(err).ShouldNot(HaveOccurred(), "Connecting to blockchain nodes shouldn't fail")
