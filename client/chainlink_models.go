@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"text/template"
 	"time"
+
+	"gopkg.in/guregu/null.v4"
 )
 
 // EIServiceConfig represents External Initiator service config
@@ -203,6 +205,29 @@ type P2PKeyAttributes struct {
 	PublicKey string `json:"publicKey"`
 }
 
+// CSAKeys is the model that represents the created CSA keys when read
+type CSAKeys struct {
+	Data []CSAKeyData `json:"data"`
+}
+
+// CSAKey is the model that represents the created CSA key when created
+type CSAKey struct {
+	Data CSAKeyData `json:"data"`
+}
+
+// CSAKeyData is the model that represents the created CSA key when read
+type CSAKeyData struct {
+	Type       string           `json:"type"`
+	ID         string           `json:"id"`
+	Attributes CSAKeyAttributes `json:"attributes"`
+}
+
+// CSAKeyAttributes is the model that represents the attributes of a CSA Key
+type CSAKeyAttributes struct {
+	PublicKey string `json:"publicKey"`
+	Version   int    `json:"version"`
+}
+
 // ETHKeys is the model that represents the created ETH keys when read
 type ETHKeys struct {
 	Data []ETHKeyData `json:"data"`
@@ -271,7 +296,32 @@ type EIKey struct {
 	Attributes EIAttributes `json:"attributes"`
 }
 
-// TerraNodeAttributes is the model that represents the terra node when created
+type TerraChainConfig struct {
+	BlockRate             null.String
+	BlocksUntilTxTimeout  null.Int
+	ConfirmPollPeriod     null.String
+	FallbackGasPriceULuna null.String
+	GasLimitMultiplier    null.Float
+	MaxMsgsPerBatch       null.Int
+}
+
+// TerraChainAttributes is the model that represents the terra chain
+type TerraChainAttributes struct {
+	ChainID string           `json:"chainID"`
+	Config  TerraChainConfig `json:"config"`
+}
+
+// TerraChain is the model that represents the terra chain when read
+type TerraChain struct {
+	Attributes TerraChainAttributes `json:"attributes"`
+}
+
+// TerraChainCreate is the model that represents the terra chain when created
+type TerraChainCreate struct {
+	Data TerraChain `json:"data"`
+}
+
+// TerraNodeAttributes is the model that represents the terra noded
 type TerraNodeAttributes struct {
 	Name          string `json:"name"`
 	TerraChainID  string `json:"terraChainId"`
@@ -279,7 +329,7 @@ type TerraNodeAttributes struct {
 	FCDURL        string `json:"fcdURL" db:"fcd_url"`
 }
 
-// TerraNodeAttributes is the model that represents the terra node when created
+// TerraNode is the model that represents the terra node when read
 type TerraNode struct {
 	Attributes TerraNodeAttributes `json:"attributes"`
 }

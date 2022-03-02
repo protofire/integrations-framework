@@ -404,6 +404,47 @@ var _ = Describe("Chainlink @unit", func() {
 		}
 	})
 
+	// Mocks the creation, read cycle for CSA keys
+	It("can Create and Read CSA keys", func() {
+		csaKeyData := CSAKeyData{
+			"csaKeys",
+			"id",
+			CSAKeyAttributes{
+				PublicKey: "mor3Non3sens3",
+				Version:   1,
+			},
+		}
+
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			switch req.Method {
+			case http.MethodPost:
+				Expect(req.URL.Path).Should(Or(Equal("/v2/keys/csa"), Equal("/sessions")))
+				if req.URL.Path == "/sessions" {
+					writeCookie(rw)
+				} else {
+					writeResponse(rw, http.StatusOK, CSAKey{csaKeyData})
+				}
+			case http.MethodGet:
+				Expect("/v2/keys/csa").Should(Equal(req.URL.Path))
+				writeResponse(rw, http.StatusOK, CSAKeys{
+					Data: []CSAKeyData{csaKeyData},
+				})
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		receivedKey, err := c.CreateCSAKey()
+		Expect(err).ShouldNot(HaveOccurred())
+
+		keys, err := c.ReadCSAKeys()
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(keys.Data).Should(ContainElement(receivedKey.Data))
+	})
+
 	// Mocks the creation, read, delete cycle for Chainlink EIs
 	It("can Create, Read, and Delete external initiators", func() {
 		eia := EIAttributes{
@@ -460,7 +501,35 @@ var _ = Describe("Chainlink @unit", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
-	// Mocks the creation, read, delete cycle for nodes
+	// Mocks the creation, read cycle for chains
+	It("can create chains", func() {
+		attrs := TerraChainAttributes{
+			ChainID: "chainid",
+		}
+		server := mockedServer(func(rw http.ResponseWriter, req *http.Request) {
+			endpoint := "/v2/chains/terra"
+			switch req.Method {
+			case http.MethodPost:
+				Expect(req.URL.Path).Should(Or(Equal(endpoint), Equal("/sessions")))
+				if req.URL.Path == "/sessions" {
+					writeCookie(rw)
+				} else {
+					writeResponse(rw, http.StatusCreated, TerraChainCreate{TerraChain{attrs}})
+				}
+			}
+		})
+		defer server.Close()
+
+		c, err := newDefaultClient(server.URL)
+		Expect(err).ShouldNot(HaveOccurred())
+		c.SetClient(server.Client())
+
+		resp, err := c.CreateTerraChain(&attrs)
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(resp.Data.Attributes.ChainID).Should(Equal(attrs.ChainID))
+	})
+
+	// Mocks the creation, read cycle for nodes
 	It("can create nodes", func() {
 		attrs := TerraNodeAttributes{
 			Name:          "name",
