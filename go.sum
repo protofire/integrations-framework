@@ -1823,8 +1823,8 @@ github.com/smartcontractkit/chainlink v0.9.5-0.20201207211610-6c7fee37d5b7/go.mo
 github.com/smartcontractkit/helmenv v1.0.37-0.20220301192532-c2a108e9864b h1:YspuJF/nVAI7eCEtSK+G2Oxyk75Ukz63aD/g2mZYNZE=
 github.com/smartcontractkit/helmenv v1.0.37-0.20220301192532-c2a108e9864b/go.mod h1:pkScfFRZM9UhMAqeG+Bfxyy7YjLWh8pY6vmNGdTpKJs=
 github.com/smartcontractkit/libocr v0.0.0-20201203233047-5d9b24f0cbb5/go.mod h1:bfdSuLnBWCkafDvPGsQ1V6nrXhg046gh227MKi4zkpc=
-github.com/smartcontractkit/libocr v0.0.0-20220125200954-5b957c834276 h1:sE+0R3qyCnZRiDoEoWT8St+Pmb1ZdRDhyq7xZPrwoZ0=
-github.com/smartcontractkit/libocr v0.0.0-20220125200954-5b957c834276/go.mod h1:nq3crM3wVqnyMlM/4ZydTuJ/WyCapAsOt7P94oRgSPg=
+github.com/smartcontractkit/libocr v0.0.0-20220121130134-5d2b1d5f424b h1:9xEvwk6fHqL9Fp/u8bLd7kbEQKrDSzwuDsH1ptHjE9g=
+github.com/smartcontractkit/libocr v0.0.0-20220121130134-5d2b1d5f424b/go.mod h1:nq3crM3wVqnyMlM/4ZydTuJ/WyCapAsOt7P94oRgSPg=
 github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d/go.mod h1:OnSkiWE9lh6wB0YB77sQom3nweQdgAjqCqsofrRNTgc=
 github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=

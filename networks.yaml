@@ -163,7 +163,7 @@ networks:
     alfajores_celo_test:
         name: "Celo testnet"
         chain_id: 44787
-        type: eth_multinode
+        type: eth_testnet
         secret_private_keys: false
         secret_private_url: false
         urls:
@@ -177,7 +177,7 @@ networks:
     private_celo_test:
         name: "Private Celo testnet"
         chain_id: 15
-        type: eth_multinode
+        type: eth_testnet
         secret_private_keys: false
         secret_private_url: false
         urls:

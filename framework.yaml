@@ -22,7 +22,7 @@ geth_args:
 
 # Experimental: Let the remote test runner pass a message to a slack webhook when the test is done
 # See https://slack.com/help/articles/115005265063-Incoming-webhooks-for-Slack
-remote_slack_webhook: https://hooks.slack.com/services/XXX
+remote_slack_webhook: https://hooks.slack.com/services/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
 
 # Setting an environment file allows for persistent, not ephemeral environments on test execution
 #
