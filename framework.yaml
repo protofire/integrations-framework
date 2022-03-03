@@ -2,15 +2,18 @@
 #
 # All configuration can be set at runtime with environment variables, for example:
 # KEEP_ENVIRONMENTS=OnFail
-keep_environments: Never # Options: Always, OnFail, Never
+keep_environments: Always # Options: Always, OnFail, Never
 logging:
     # panic=5, fatal=4, error=3, warn=2, info=1, debug=0, trace=-1
     level: 0
 
 # Specify the image and version of the chainlink image you want to run tests against. Leave blank for default.
-chainlink_image: public.ecr.aws/chainlink/chainlink
-chainlink_version: 1.1.0
+chainlink_image: drewhyte/celo-chainlink
+chainlink_version: v1.1.0
 chainlink_env_values:
+    eth_url: wss://alfajores-forno.celo-testnet.org/ws
+    eth_chain_id: 44787
+    eth_min_gas_price_wei: 100000000
 
 # Specify the image and version of the simulated geth image you want to run tests against. Leave blank for default.
 # Has no effect when running tests on networks other than the simulated geth instances.
@@ -20,7 +23,7 @@ geth_args:
 
 # Experimental: Let the remote test runner pass a message to a slack webhook when the test is done
 # See https://slack.com/help/articles/115005265063-Incoming-webhooks-for-Slack
-remote_slack_webhook: https://hooks.slack.com/services/XXX
+remote_slack_webhook: https://hooks.slack.com/services/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
 
 # Setting an environment file allows for persistent, not ephemeral environments on test execution
 #

@@ -122,7 +122,7 @@ for version in solc_versions:
                     # Replace package name in file, abigen doesn't let you specify differently
                     with open(go_file_name, 'r+') as f:
                         text = f.read()
-                        text = re.sub("package " + contract_name, "package ethereum", text)
+                        text = re.sub("package " + contract_name, "package celo ", text)
                         f.seek(0)
                         f.write(text)
                         f.truncate()

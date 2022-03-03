@@ -22,7 +22,8 @@ func TestSoakOCR(t *testing.T) {
 
 	env, err := environment.DeployLongTestEnvironment(
 		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
-		"git://github.com/smartcontractkit/integrations-framework.git", // The repo to pull your tests from
+		// "git://github.com/smartcontractkit/integrations-framework.git", // The repo to pull your tests from
+		"git@github.com:protofire/integrations-framework.git", // The repo to pull your tests from
 		"main",               // The branch of the above repo to pull tests from
 		"./suite/soak/tests", // The path of test files
 		"@soak-ocr",          // REGEX name of the specific test you want to run

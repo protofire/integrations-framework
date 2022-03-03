@@ -22,7 +22,7 @@ private_keys: &private_keys
         - df57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e
 
 selected_networks: # Selected network(s) for test execution
-    - "geth"
+    - "alfajores_celo_test"
 
 networks:
     geth: &common_ethereum
@@ -160,3 +160,17 @@ networks:
         type: eth_multinode
         transaction_timeout: 10m
         gas_estimation_buffer: 0
+    alfajores_celo_test:
+        name: "Celo testnet"
+        chain_id: 44787
+        type: eth_simulated
+        secret_private_keys: false
+        secret_private_url: false
+        urls:
+            - wss://alfajores-forno.celo-testnet.org/ws
+        private_keys:
+            - 5eec8ff6873deb4c525c2d3c53cef4390d4bfe4bb2b60fe6293301ed9a6de727
+        chainlink_transaction_limit: 7667850
+        transaction_timeout: 5m
+        minimum_confirmations: 1
+        gas_estimation_buffer: 10000
