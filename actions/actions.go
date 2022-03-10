@@ -12,7 +12,6 @@ import (
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
-	"github.com/pkg/errors"
 	"github.com/smartcontractkit/helmenv/environment"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 
