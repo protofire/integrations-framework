@@ -10,6 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/helmenv/environment"
 	"github.com/smartcontractkit/helmenv/tools"
+
+	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/testsetups"
 )
 
@@ -49,7 +51,9 @@ var _ = Describe("OCR Soak Test @soak-ocr", func() {
 	})
 
 	AfterEach(func() {
-		ocrSoakTest.TestReporter.WriteReport(env.Namespace)
+		if err = actions.TeardownRemoteSuite(env, &ocrSoakTest.TestReporter); err != nil {
+			log.Error().Err(err).Msg("Error when tearing down remote suite")
+		}
 		log.Info().Msg("Soak Test Concluded")
 	})
 })

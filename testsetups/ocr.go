@@ -3,7 +3,7 @@ package testsetups
 //revive:disable:dot-imports
 import (
 	"context"
-	"fmt"
+
 	"math/big"
 	"sync"
 	"time"
@@ -22,7 +22,8 @@ import (
 type OCRSoakTest struct {
 	Inputs *OCRSoakTestInputs
 
-	TestReporter   *testreporters.OCRSoakTestReporter
+
+	TestReporter   testreporters.OCRSoakTestReporter
 	ocrInstances   []contracts.OffchainAggregator
 	chainlinkNodes []client.Chainlink
 	mockServer     *client.MockserverClient
@@ -45,7 +46,8 @@ func NewOCRSoakTest(inputs *OCRSoakTestInputs) *OCRSoakTest {
 	}
 	return &OCRSoakTest{
 		Inputs: inputs,
-		TestReporter: &testreporters.OCRSoakTestReporter{
+
+		TestReporter: testreporters.OCRSoakTestReporter{
 			Reports: make(map[string]*testreporters.OCRSoakTestReport),
 		},
 	}
@@ -102,8 +104,8 @@ func (t *OCRSoakTest) Run() {
 	By("Creating OCR jobs", actions.CreateOCRJobs(t.ocrInstances, t.chainlinkNodes, t.mockServer))
 
 	log.Info().
-		Str("Test Duration", fmt.Sprintf("%s", t.Inputs.TestDuration)).
-		Str("Round Timeout", fmt.Sprintf("%s", t.Inputs.RoundTimeout)).
+		Str("Test Duration", t.Inputs.TestDuration.Truncate(time.Second).String()).
+		Str("Round Timeout", t.Inputs.RoundTimeout.String()).
 		Int("Number of OCR Contracts", len(t.ocrInstances)).
 		Msg("Starting OCR Soak Test")
 

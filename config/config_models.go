@@ -108,3 +108,13 @@ type ChainlinkImage struct {
 	Image   string `json:"image,omitempty" yaml:"chainlink_image"`
 	Version string `json:"version,omitempty" yaml:"chainlink_version"`
 }
+
+// RemoteRunnerConfig reads the config file for remote test runs
+type RemoteRunnerConfig struct {
+	TestRegex       string `mapstructure:"test_regex" yaml:"test_regex"`
+	TestDirectory   string `mapstructure:"test_directory" yaml:"test_directory"`
+	SlackWebhookURL string `mapstructure:"slack_webhook_url" yaml:"slack_webhook_url"`
+	SlackAPIKey     string `mapstructure:"slack_api_key" yaml:"slack_api_key"`
+	SlackChannel    string `mapstructure:"slack_channel" yaml:"slack_channel"`
+	SlackUserID     string `mapstructure:"slack_user_id" yaml:"slack_user_id"`
+}

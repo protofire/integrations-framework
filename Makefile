@@ -17,7 +17,7 @@ compile_contracts:
 	python3 ./utils/compile_contracts.py
 
 test_unit:
-	ginkgo -r --junit-report=tests-unit-report.xml --keep-going --trace --randomize-all --randomize-suites --progress -cover -covermode=count -coverprofile=unit-test-coverage.out -nodes=10 ./client ./config ./gauntlet
+	ginkgo -r --junit-report=tests-unit-report.xml --keep-going --trace --randomize-all --randomize-suites --progress -cover -covermode=count -coverprofile=unit-test-coverage.out -nodes=10 ./client ./config ./gauntlet ./testreporters
 
 test_soak:
 	go test -v ./suite/soak/soak_runner_test.go

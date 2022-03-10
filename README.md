@@ -42,6 +42,9 @@ geth_args:    # List of CLI arguments to pass to simulated geth image. WARNING
 remote_runner_email_server: smtp.gmail.com # Example if you use GMAIL
 remote_runner_email_address: # Username or email address to use
 remote_runner_email_pass: # Password to email account. REMEMBER TO DELETE
+# Experimental: Let the remote test runner pass a message to a slack webhook when the test is done
+# See https://slack.com/help/articles/115005265063-Incoming-webhooks-for-Slack
+remote_slack_webhook: https://hooks.slack.com/services/XXX
 ```
 
 ### WARNING
