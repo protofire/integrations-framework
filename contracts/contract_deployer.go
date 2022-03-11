@@ -9,12 +9,12 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/client"
-	"github.com/smartcontractkit/integrations-framework/contracts/ethereum"
+	"github.com/smartcontractkit/integrations-framework/contracts/celo"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
+	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/core/types"
+	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
 )
 
 // ContractDeployer is an interface for abstracting the contract deployment methods across network implementations
@@ -83,14 +83,14 @@ func (e *EthereumContractDeployer) DeployReadAccessController() (ReadAccessContr
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeploySimpleReadAccessController(auth, backend)
+		return celo.DeploySimpleReadAccessController(auth, backend)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumReadAccessController{
 		client:  e.eth,
-		rac:     instance.(*ethereum.SimpleReadAccessController),
+		rac:     instance.(*celo.SimpleReadAccessController),
 		address: address,
 	}, nil
 }
@@ -104,14 +104,14 @@ func (e *EthereumContractDeployer) DeployFlags(
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
 		racAddr := common.HexToAddress(rac)
-		return ethereum.DeployFlags(auth, backend, racAddr)
+		return celo.DeployFlags(auth, backend, racAddr)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumFlags{
 		client:  e.eth,
-		flags:   instance.(*ethereum.Flags),
+		flags:   instance.(*celo.Flags),
 		address: address,
 	}, nil
 }
@@ -126,14 +126,14 @@ func (e *EthereumContractDeployer) DeployDeviationFlaggingValidator(
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
 		flagAddr := common.HexToAddress(flags)
-		return ethereum.DeployDeviationFlaggingValidator(auth, backend, flagAddr, flaggingThreshold)
+		return celo.DeployDeviationFlaggingValidator(auth, backend, flagAddr, flaggingThreshold)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumDeviationFlaggingValidator{
 		client:  e.eth,
-		dfv:     instance.(*ethereum.DeviationFlaggingValidator),
+		dfv:     instance.(*celo.DeviationFlaggingValidator),
 		address: address,
 	}, nil
 }
@@ -148,7 +148,7 @@ func (e *EthereumContractDeployer) DeployFluxAggregatorContract(
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
 		la := common.HexToAddress(linkAddr)
-		return ethereum.DeployFluxAggregator(auth,
+		return celo.DeployFluxAggregator(auth,
 			backend,
 			la,
 			fluxOptions.PaymentAmount,
@@ -164,7 +164,7 @@ func (e *EthereumContractDeployer) DeployFluxAggregatorContract(
 	}
 	return &EthereumFluxAggregator{
 		client:         e.eth,
-		fluxAggregator: instance.(*ethereum.FluxAggregator),
+		fluxAggregator: instance.(*celo.FluxAggregator),
 		address:        address,
 	}, nil
 }
@@ -175,7 +175,7 @@ func (e *EthereumContractDeployer) DeployLinkTokenContract() (LinkToken, error) 
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployLinkToken(auth, backend)
+		return celo.DeployLinkToken(auth, backend)
 	})
 	if err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func (e *EthereumContractDeployer) DeployLinkTokenContract() (LinkToken, error) 
 
 	return &EthereumLinkToken{
 		client:   e.eth,
-		instance: instance.(*ethereum.LinkToken),
+		instance: instance.(*celo.LinkToken),
 		address:  *linkTokenAddress,
 	}, err
 }
@@ -243,7 +243,7 @@ func (e *EthereumContractDeployer) DeployOffChainAggregator(
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
 		la := common.HexToAddress(linkAddr)
-		return ethereum.DeployOffchainAggregator(auth,
+		return celo.DeployOffchainAggregator(auth,
 			backend,
 			offchainOptions.MaximumGasPrice,
 			offchainOptions.ReasonableGasPrice,
@@ -263,7 +263,7 @@ func (e *EthereumContractDeployer) DeployOffChainAggregator(
 	}
 	return &EthereumOffchainAggregator{
 		client:  e.eth,
-		ocr:     instance.(*ethereum.OffchainAggregator),
+		ocr:     instance.(*celo.OffchainAggregator),
 		address: address,
 	}, err
 }
@@ -284,14 +284,14 @@ func (e *EthereumContractDeployer) DeployStorageContract() (Storage, error) {
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployStore(auth, backend)
+		return celo.DeployStore(auth, backend)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumStorage{
 		client: e.eth,
-		store:  instance.(*ethereum.Store),
+		store:  instance.(*celo.Store),
 	}, err
 }
 
@@ -301,7 +301,7 @@ func (e *EthereumContractDeployer) DeployAPIConsumer(linkAddr string) (APIConsum
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployAPIConsumer(auth, backend, common.HexToAddress(linkAddr))
+		return celo.DeployAPIConsumer(auth, backend, common.HexToAddress(linkAddr))
 	})
 	if err != nil {
 		return nil, err
@@ -309,7 +309,7 @@ func (e *EthereumContractDeployer) DeployAPIConsumer(linkAddr string) (APIConsum
 	return &EthereumAPIConsumer{
 		address:  addr,
 		client:   e.eth,
-		consumer: instance.(*ethereum.APIConsumer),
+		consumer: instance.(*celo.APIConsumer),
 	}, err
 }
 
@@ -319,7 +319,7 @@ func (e *EthereumContractDeployer) DeployOracle(linkAddr string) (Oracle, error)
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployOracle(auth, backend, common.HexToAddress(linkAddr))
+		return celo.DeployOracle(auth, backend, common.HexToAddress(linkAddr))
 	})
 	if err != nil {
 		return nil, err
@@ -327,7 +327,7 @@ func (e *EthereumContractDeployer) DeployOracle(linkAddr string) (Oracle, error)
 	return &EthereumOracle{
 		address: addr,
 		client:  e.eth,
-		oracle:  instance.(*ethereum.Oracle),
+		oracle:  instance.(*celo.Oracle),
 	}, err
 }
 
@@ -337,14 +337,14 @@ func (e *EthereumContractDeployer) DeployVRFContract() (VRF, error) {
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployVRF(auth, backend)
+		return celo.DeployVRF(auth, backend)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumVRF{
 		client:  e.eth,
-		vrf:     instance.(*ethereum.VRF),
+		vrf:     instance.(*celo.VRF),
 		address: address,
 	}, err
 }
@@ -354,14 +354,14 @@ func (e *EthereumContractDeployer) DeployMockETHLINKFeed(answer *big.Int) (MockE
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployMockETHLINKAggregator(auth, backend, answer)
+		return celo.DeployMockETHLINKAggregator(auth, backend, answer)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumMockETHLINKFeed{
 		client:  e.eth,
-		feed:    instance.(*ethereum.MockETHLINKAggregator),
+		feed:    instance.(*celo.MockETHLINKAggregator),
 		address: address,
 	}, err
 }
@@ -371,14 +371,14 @@ func (e *EthereumContractDeployer) DeployMockGasFeed(answer *big.Int) (MockGasFe
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployMockGASAggregator(auth, backend, answer)
+		return celo.DeployMockGASAggregator(auth, backend, answer)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumMockGASFeed{
 		client:  e.eth,
-		feed:    instance.(*ethereum.MockGASAggregator),
+		feed:    instance.(*celo.MockGASAggregator),
 		address: address,
 	}, err
 }
@@ -388,14 +388,14 @@ func (e *EthereumContractDeployer) DeployUpkeepRegistrationRequests(linkAddr str
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployUpkeepRegistrationRequests(auth, backend, common.HexToAddress(linkAddr), minLinkJuels)
+		return celo.DeployUpkeepRegistrationRequests(auth, backend, common.HexToAddress(linkAddr), minLinkJuels)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumUpkeepRegistrationRequests{
 		client:    e.eth,
-		registrar: instance.(*ethereum.UpkeepRegistrationRequests),
+		registrar: instance.(*celo.UpkeepRegistrationRequests),
 		address:   address,
 	}, err
 }
@@ -407,7 +407,7 @@ func (e *EthereumContractDeployer) DeployKeeperRegistry(
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployKeeperRegistry(
+		return celo.DeployKeeperRegistry(
 			auth,
 			backend,
 			common.HexToAddress(opts.LinkAddr),
@@ -428,7 +428,7 @@ func (e *EthereumContractDeployer) DeployKeeperRegistry(
 	}
 	return &EthereumKeeperRegistry{
 		client:   e.eth,
-		registry: instance.(*ethereum.KeeperRegistry),
+		registry: instance.(*celo.KeeperRegistry),
 		address:  address,
 	}, err
 }
@@ -438,14 +438,14 @@ func (e *EthereumContractDeployer) DeployKeeperConsumer(updateInterval *big.Int)
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployKeeperConsumer(auth, backend, updateInterval)
+		return celo.DeployKeeperConsumer(auth, backend, updateInterval)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumKeeperConsumer{
 		client:   e.eth,
-		consumer: instance.(*ethereum.KeeperConsumer),
+		consumer: instance.(*celo.KeeperConsumer),
 		address:  address,
 	}, err
 }
@@ -455,14 +455,14 @@ func (e *EthereumContractDeployer) DeployKeeperConsumerPerformance(testBlockRang
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployKeeperConsumerPerformance(auth, backend, testBlockRange, averageCadence)
+		return celo.DeployKeeperConsumerPerformance(auth, backend, testBlockRange, averageCadence)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumKeeperConsumerPerformance{
 		client:   e.eth,
-		consumer: instance.(*ethereum.KeeperConsumerPerformance),
+		consumer: instance.(*celo.KeeperConsumerPerformance),
 		address:  address,
 	}, err
 }
@@ -473,14 +473,14 @@ func (e *EthereumContractDeployer) DeployBlockhashStore() (BlockHashStore, error
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployBlockhashStore(auth, backend)
+		return celo.DeployBlockhashStore(auth, backend)
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumBlockhashStore{
 		client:         e.eth,
-		blockHashStore: instance.(*ethereum.BlockhashStore),
+		blockHashStore: instance.(*celo.BlockhashStore),
 		address:        address,
 	}, err
 }
@@ -491,14 +491,14 @@ func (e *EthereumContractDeployer) DeployVRFCoordinator(linkAddr string, bhsAddr
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployVRFCoordinator(auth, backend, common.HexToAddress(linkAddr), common.HexToAddress(bhsAddr))
+		return celo.DeployVRFCoordinator(auth, backend, common.HexToAddress(linkAddr), common.HexToAddress(bhsAddr))
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumVRFCoordinator{
 		client:      e.eth,
-		coordinator: instance.(*ethereum.VRFCoordinator),
+		coordinator: instance.(*celo.VRFCoordinator),
 		address:     address,
 	}, err
 }
@@ -509,14 +509,14 @@ func (e *EthereumContractDeployer) DeployVRFConsumer(linkAddr string, coordinato
 		auth *bind.TransactOpts,
 		backend bind.ContractBackend,
 	) (common.Address, *types.Transaction, interface{}, error) {
-		return ethereum.DeployVRFConsumer(auth, backend, common.HexToAddress(coordinatorAddr), common.HexToAddress(linkAddr))
+		return celo.DeployVRFConsumer(auth, backend, common.HexToAddress(coordinatorAddr), common.HexToAddress(linkAddr))
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &EthereumVRFConsumer{
 		client:   e.eth,
-		consumer: instance.(*ethereum.VRFConsumer),
+		consumer: instance.(*celo.VRFConsumer),
 		address:  address,
 	}, err
 }

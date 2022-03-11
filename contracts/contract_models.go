@@ -8,9 +8,9 @@ import (
 
 	"github.com/smartcontractkit/integrations-framework/client"
 
-	"github.com/ethereum/go-ethereum/common"
-	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
-	ocrConfigHelper2 "github.com/smartcontractkit/libocr/offchainreporting2/confighelper"
+	"github.com/celo-org/celo-blockchain/common"
+	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
+	ocrConfigHelper2 "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/confighelper"
 )
 
 type FluxAggregatorOptions struct {
