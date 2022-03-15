@@ -14,6 +14,7 @@ import (
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/config"
 	"github.com/smartcontractkit/integrations-framework/utils"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,14 +24,18 @@ func TestSoakOCR(t *testing.T) {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	exePath, remoteConfig := buildGoTests(t)
 
+	config := environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak")
+
+	envconfig.Process("", config)
+
 	env, err := environment.DeployLongTestEnvironment(
-		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
+		config,
 		tools.ChartsRoot,
-		remoteConfig.TestRegex,                             // Name of the test to run
-		remoteConfig.SlackWebhookURL,                       // Slack Webhook to hit when test finished
-		remoteConfig.SlackAPIKey,                           // API key to use to upload artifacts to slack
-		remoteConfig.SlackChannel,                          // Slack Channel to upload test artifacts to
-		remoteConfig.SlackUserID,                           // Slack user to notify on completion
+		remoteConfig.TestRegex,       // Name of the test to run
+		remoteConfig.SlackWebhookURL, // Slack Webhook to hit when test finished
+		remoteConfig.SlackAPIKey,     // API key to use to upload artifacts to slack
+		remoteConfig.SlackChannel,    // Slack Channel to upload test artifacts to
+		remoteConfig.SlackUserID,     // Slack user to notify on completion
 		filepath.Join(utils.ProjectRoot, "framework.yaml"), // Path of the framework config
 		filepath.Join(utils.ProjectRoot, "networks.yaml"),  // Path to the networks config
 		exePath, // Path to the executable test file
