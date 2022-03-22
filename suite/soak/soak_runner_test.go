@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/rs/zerolog"
@@ -24,6 +25,11 @@ func TestSoakOCR(t *testing.T) {
 	actions.LoadConfigs(utils.ProjectRoot)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	exePath, remoteConfig := buildGoTests(t)
+
+	log.Info().
+		Str("Exe Path", exePath).
+		Fields( remoteConfig).
+		Msg("Remote Test Details on Deployer Machine")
 
 	env, err := environment.DeployLongTestEnvironment(
 		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
@@ -51,7 +57,7 @@ func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	require.NoError(t, err)
 	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
 	//compileCmd.Env = os.Environ()
-	//compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", fmt.Sprintf("GOOS=%s",runtime.GOOS), fmt.Sprintf("GOARCH=%s",runtime.GOARCH))
+	compileCmd.Env = append([]string{}, "CGO_ENABLED=0", fmt.Sprintf("GOOS=%s",runtime.GOOS), fmt.Sprintf("GOARCH=%s",runtime.GOARCH))
 
 	log.Info().Str("Test Directory", remoteConfig.TestDirectory).Msg("Compiling tests")
 	compileOut, err := compileCmd.Output()
