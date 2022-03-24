@@ -3,7 +3,8 @@ module github.com/smartcontractkit/integrations-framework
 go 1.17
 
 require (
-	github.com/celo-org/celo-blockchain v0.0.0-20211207011603-8830ed5d90d8
+	github.com/celo-org/celo-blockchain v1.5.5
+	github.com/drewhyte/helmenv v1.0.42-0.20220324103850-69e8a090adb5
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/onsi/ginkgo/v2 v2.1.2
@@ -13,10 +14,9 @@ require (
 	github.com/prometheus/common v0.32.1
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/smartcontractkit/helmenv v1.0.41
 	github.com/smartcontractkit/libocr v0.0.0-20220121130134-5d2b1d5f424b
 	github.com/spf13/viper v1.10.1
-	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
+	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/guregu/null.v4 v4.0.0
@@ -48,11 +48,6 @@ require (
 
 require (
 	github.com/buraksezer/consistent v0.0.0-20191006190839-693edf70fd72 // indirect
-	github.com/celo-org/celo-bls-go-android v0.3.0 // indirect
-	github.com/celo-org/celo-bls-go-ios v0.3.0 // indirect
-	github.com/celo-org/celo-bls-go-linux v0.3.0 // indirect
-	github.com/celo-org/celo-bls-go-macos v0.3.0 // indirect
-	github.com/celo-org/celo-bls-go-other v0.3.0 // indirect
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/graph-gophers/graphql-go v1.3.0 // indirect
@@ -86,7 +81,7 @@ require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/btcsuite/btcd v0.22.0-beta // indirect
-	github.com/celo-org/celo-bls-go v0.3.0 // indirect
+	github.com/celo-org/celo-bls-go v0.2.4 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/containerd/containerd v1.5.9 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
@@ -190,7 +185,7 @@ require (
 	go.starlark.net v0.0.0-20211013185944-b0039bd2cfe3 // indirect
 	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect

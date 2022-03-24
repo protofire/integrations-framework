@@ -10,7 +10,7 @@ import (
 	"net/url"
 
 	"github.com/celo-org/celo-blockchain/core/types"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/drewhyte/helmenv/environment"
 	"gopkg.in/yaml.v2"
 
 	"github.com/smartcontractkit/integrations-framework/config"

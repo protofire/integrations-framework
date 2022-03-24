@@ -12,7 +12,7 @@ import (
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/drewhyte/helmenv/environment"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/rs/zerolog"
