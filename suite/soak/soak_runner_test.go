@@ -5,15 +5,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/config"
+	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/utils"
 	"github.com/stretchr/testify/require"
 )
@@ -58,8 +59,13 @@ func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
 	compileCmd.Env = os.Environ()
 	// compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
-	compileCmd.Env = append(compileCmd.Env, "GOOS=darwin", "GOARCH=amd64")
-	
+	compileCmd.Env = append(
+		compileCmd.Env,
+		"CGO_ENABLED=0",
+		fmt.Sprintf("GOOS=%s", runtime.GOOS),
+		fmt.Sprintf("GOARCH=%s", runtime.GOARCH),
+	)
+
 	log.Info().Str("Test Directory", remoteConfig.TestDirectory).Msg("Compiling tests")
 	compileOut, err := compileCmd.Output()
 	log.Debug().

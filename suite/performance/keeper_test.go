@@ -6,11 +6,11 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts"
+	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/testsetups"
 	"github.com/smartcontractkit/integrations-framework/utils"
 )
