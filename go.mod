@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/celo-org/celo-blockchain v1.5.5
-	github.com/drewhyte/helmenv v1.0.42-0.20220324103850-69e8a090adb5
+	github.com/drewhyte/helmenv v1.0.42-0.20220325140937-bac702a01ff1
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/onsi/ginkgo/v2 v2.1.2
