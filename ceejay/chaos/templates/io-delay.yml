@@ -1,0 +1,16 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: {{ .Base.Name }}
+  namespace: {{ .Base.Namespace }}
+spec:
+  action: latency
+  mode: {{ .Mode }}
+  selector:
+    labelSelectors:
+      '{{ .LabelKey }}': '{{ .LabelValue }}'
+  volumePath: {{ .VolumePath }}
+  path: {{ .Path }}
+  delay: {{ .Delay }}
+  percent: {{ .Percent }}
+  duration: {{ .Duration }}

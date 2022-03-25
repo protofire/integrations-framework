@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geth
+spec:
+  selector:
+    matchLabels:
+      app: geth
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: geth
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: geth-cm
+      containers:
+        - name: geth-network
+          image: {{ .Values.geth.image.image }}:{{ .Values.geth.image.version }}
+          command: [ "sh", "./root/init.sh" ]
+          volumeMounts:
+            - name : configmap-volume
+              mountPath: /root/init.sh
+              subPath: init.sh
+            - name: configmap-volume
+              mountPath: /root/config
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key1
+              subPath: key1
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key2
+              subPath: key2
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key3
+              subPath: key3
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key4
+              subPath: key4
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key5
+              subPath: key5
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key6
+              subPath: key6
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key7
+              subPath: key7
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key8
+              subPath: key8
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key9
+              subPath: key9
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key10
+              subPath: key10
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key11
+              subPath: key11
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key12
+              subPath: key12
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key13
+              subPath: key13
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key14
+              subPath: key14
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key15
+              subPath: key15
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key16
+              subPath: key16
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key17
+              subPath: key17
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key18
+              subPath: key18
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key19
+              subPath: key19
+            - name: configmap-volume
+              mountPath: /root/.ethereum/devchain/keystore/key20
+              subPath: key20
+          args:
+          {{- range $arg := .Values.args }}
+            {{- if kindIs "string" $arg}}
+            - {{ $arg | quote}}
+              {{- else }}
+            - {{ $arg }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http-rpc
+              containerPort: 8544
+            - name: ws-rpc
+              containerPort: 8546
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+
