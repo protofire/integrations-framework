@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/pkg/errors"
-	"github.com/smartcontractkit/integrations-framework/helmenv/chaos"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/chaos"
 	"golang.org/x/sync/errgroup"
 	"helm.sh/helm/v3/pkg/cli"
 	v1 "k8s.io/api/core/v1"

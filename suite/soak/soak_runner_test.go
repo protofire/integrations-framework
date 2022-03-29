@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/kelseyhightower/envconfig"
@@ -13,9 +12,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/config"
-	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
-	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/utils"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/tools"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,9 +22,7 @@ func TestSoakOCR(t *testing.T) {
 	t.Parallel()
 	actions.LoadConfigs(utils.ProjectRoot)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	t.Log("******** Raeched here ********")
 	exePath, remoteConfig := buildGoTests(t)
-	t.Log("******** Raeched here *** After ********")
 
 	config := environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak")
 
@@ -58,13 +55,8 @@ func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	require.NoError(t, err)
 	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
 	compileCmd.Env = os.Environ()
-	// compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
-	compileCmd.Env = append(
-		compileCmd.Env,
-		"CGO_ENABLED=0",
-		fmt.Sprintf("GOOS=%s", runtime.GOOS),
-		fmt.Sprintf("GOARCH=%s", runtime.GOARCH),
-	)
+	compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
+	// compileCmd.Env = append(compileCmd.Env, "GOOS=darwin", "GOARCH=amd64")
 
 	log.Info().Str("Test Directory", remoteConfig.TestDirectory).Msg("Compiling tests")
 	compileOut, err := compileCmd.Output()

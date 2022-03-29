@@ -244,8 +244,8 @@ github.com/buraksezer/consistent v0.0.0-20191006190839-693edf70fd72/go.mod h1:OE
 github.com/c-bata/go-prompt v0.2.2/go.mod h1:VzqtzE2ksDBcdln8G7mk2RX9QyGjH+OVqOCSiVIqS34=
 github.com/cavaliercoder/grab v2.0.0+incompatible h1:wZHbBQx56+Yxjx2TCGDcenhh3cJn7cCLMfkEPmySTSE=
 github.com/cavaliercoder/grab v2.0.0+incompatible/go.mod h1:tTBkfNqSBfuMmMBFaO2phgyhdYhiZQ/+iXCZDzcDsMI=
-github.com/celo-org/celo-blockchain v1.5.4 h1:FUdTkegJZx5MwK4juMgDodpA1OOirey8HvUsqS7A6mA=
-github.com/celo-org/celo-blockchain v1.5.4/go.mod h1:j18Hg9JZeOg6d5pbFC8Y5ykt1NDs9lmHesyHd91r0PE=
+github.com/celo-org/celo-blockchain v1.5.5 h1:jFoVv2SX6d6nbnOylLBMnkUJLk0wXyS6PANn4ZXARIc=
+github.com/celo-org/celo-blockchain v1.5.5/go.mod h1:j18Hg9JZeOg6d5pbFC8Y5ykt1NDs9lmHesyHd91r0PE=
 github.com/celo-org/celo-bls-go v0.2.4 h1:V1y92kM5IRJWQZ6DCwqiKLW7swmUA5y/dPJ9YbU4HfA=
 github.com/celo-org/celo-bls-go v0.2.4/go.mod h1:eXUCLXu5F1yfd3M+3VaUk5ZUXaA0sLK2rWdLC1Cfaqo=
 github.com/cenkalti/backoff/v4 v4.1.1/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=

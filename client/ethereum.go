@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/smartcontractkit/integrations-framework/config"
-	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
 
 	"golang.org/x/sync/errgroup"
 

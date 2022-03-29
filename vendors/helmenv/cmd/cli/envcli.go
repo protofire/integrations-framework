@@ -7,8 +7,8 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
-	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/tools"
 	"github.com/urfave/cli/v2"
 )
 

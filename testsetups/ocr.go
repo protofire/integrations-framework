@@ -13,8 +13,8 @@ import (
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts"
-	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
 	"github.com/smartcontractkit/integrations-framework/testreporters"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
 )
 
 // OCRSoakTest defines a typical OCR soak test

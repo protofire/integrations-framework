@@ -9,9 +9,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/client"
-	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
-	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/utils"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/tools"
 )
 
 var _ = Describe("Cronjob suite @cron", func() {

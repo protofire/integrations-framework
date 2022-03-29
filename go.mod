@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cavaliercoder/grab v2.0.0+incompatible
-	github.com/celo-org/celo-blockchain v1.5.4
+	github.com/celo-org/celo-blockchain v1.5.5
 	github.com/ghodss/yaml v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mr-tron/base58 v1.2.0

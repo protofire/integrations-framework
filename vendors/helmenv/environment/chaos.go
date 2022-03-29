@@ -1,6 +1,6 @@
 package environment
 
-import "github.com/smartcontractkit/integrations-framework/helmenv/chaos"
+import "github.com/smartcontractkit/integrations-framework/vendors/helmenv/chaos"
 
 // ClearAllChaosStandaloneExperiments remove all chaos experiments from a standalone env
 func (k *Environment) ClearAllChaosStandaloneExperiments(expInfos map[string]*chaos.ExperimentInfo) error {

@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/smartcontractkit/integrations-framework/helmenv/chaos/experiments"
-	"github.com/smartcontractkit/integrations-framework/helmenv/tools"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/chaos/experiments"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/tools"
 
 	"github.com/ghodss/yaml"
 	"github.com/rs/zerolog/log"

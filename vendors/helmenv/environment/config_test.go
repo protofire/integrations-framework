@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/smartcontractkit/integrations-framework/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
 	"github.com/stretchr/testify/require"
 )
 
