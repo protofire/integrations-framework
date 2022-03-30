@@ -86,7 +86,7 @@ require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/btcsuite/btcd v0.22.0-beta // indirect
-	github.com/celo-org/celo-bls-go v0.3.0 // indirect
+	github.com/celo-org/celo-bls-go v0.2.7-0.20210807150433-c0f37c3a9a6c // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/containerd/containerd v1.5.9 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
