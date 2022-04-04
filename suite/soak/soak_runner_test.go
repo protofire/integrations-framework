@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/helmenv/environment"
@@ -23,8 +24,12 @@ func TestSoakOCR(t *testing.T) {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	exePath, remoteConfig := buildGoTests(t)
 
+	config := environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak")
+
+	envconfig.Process("", config)
+
 	env, err := environment.DeployLongTestEnvironment(
-		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
+		config,
 		tools.ChartsRoot,
 		remoteConfig.TestRegex, // Name of the test to run
 		// remoteConfig.SlackWebhookURL,                       // Slack Webhook to hit when test finished
