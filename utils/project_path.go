@@ -13,8 +13,8 @@ var (
 	PresetRoot = filepath.Join(ProjectRoot, "preset")
 	// ContractsDir path to our contracts
 	ContractsDir = filepath.Join(ProjectRoot, "contracts")
-	// EthereumContractsDir path to our ethereum contracts
-	EthereumContractsDir = filepath.Join(ContractsDir, "ethereum")
+	// EthereumContractsDir path to our celo contracts
+	EthereumContractsDir = filepath.Join(ContractsDir, "celo")
 	// RemoteRunnerConfigLocation is the path to the remote runner config
 	RemoteRunnerConfigLocation = filepath.Join(ProjectRoot, "remote_runner_config.yaml")
 )

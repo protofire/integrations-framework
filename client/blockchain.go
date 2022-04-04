@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/celo-org/celo-blockchain/core/types"
 	"github.com/smartcontractkit/helmenv/environment"
 	"gopkg.in/yaml.v2"
 

@@ -8,20 +8,20 @@ import (
 	"sync"
 	"time"
 
+	"github.com/celo-org/celo-blockchain"
 	"github.com/smartcontractkit/helmenv/environment"
 	"github.com/smartcontractkit/integrations-framework/config"
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/celo-org/celo-blockchain/accounts/abi"
 	"github.com/pkg/errors"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/core/types"
+	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/celo-org/celo-blockchain/ethclient"
 	"github.com/rs/zerolog/log"
 )
 
@@ -750,7 +750,7 @@ func (e *EthereumClient) isTxConfirmed(txHash common.Hash) (bool, error) {
 
 // errorReason decodes tx revert reason
 func (e *EthereumClient) errorReason(
-	b ethereum.ContractCaller,
+	b celo.ContractCaller,
 	tx *types.Transaction,
 	receipt *types.Receipt,
 ) (string, error) {
@@ -762,7 +762,7 @@ func (e *EthereumClient) errorReason(
 	if err != nil {
 		return "", err
 	}
-	callMsg := ethereum.CallMsg{
+	callMsg := celo.CallMsg{
 		From:     msg.From(),
 		To:       tx.To(),
 		Gas:      tx.Gas(),

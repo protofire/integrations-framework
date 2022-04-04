@@ -3,7 +3,6 @@ module github.com/smartcontractkit/integrations-framework
 go 1.17
 
 require (
-	github.com/ethereum/go-ethereum v1.10.15
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/onsi/ginkgo/v2 v2.1.2
 	github.com/onsi/gomega v1.18.1
