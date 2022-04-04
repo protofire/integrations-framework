@@ -26,8 +26,8 @@ func TestSoakOCR(t *testing.T) {
 	env, err := environment.DeployLongTestEnvironment(
 		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
 		tools.ChartsRoot,
-		remoteConfig.TestRegex,                             // Name of the test to run
-		remoteConfig.SlackWebhookURL,                       // Slack Webhook to hit when test finished
+		remoteConfig.TestRegex, // Name of the test to run
+		// remoteConfig.SlackWebhookURL,                       // Slack Webhook to hit when test finished
 		remoteConfig.SlackAPIKey,                           // API key to use to upload artifacts to slack
 		remoteConfig.SlackChannel,                          // Slack Channel to upload test artifacts to
 		remoteConfig.SlackUserID,                           // Slack user to notify on completion
@@ -47,9 +47,9 @@ func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	exePath := filepath.Join(utils.ProjectRoot, "remote.test")
 	remoteConfig, err := config.ReadWriteRemoteRunnerConfig()
 	require.NoError(t, err)
-	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
+	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath, "GOOS=linux", "GOARCH=amd64") // #nosec G204
 	compileCmd.Env = os.Environ()
-	compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
+	// compileCmd.Env = append(compileCmd.Env)
 
 	log.Info().Str("Test Directory", remoteConfig.TestDirectory).Msg("Compiling tests")
 	compileOut, err := compileCmd.Output()
