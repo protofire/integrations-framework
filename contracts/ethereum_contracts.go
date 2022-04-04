@@ -16,9 +16,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts/celo"
+	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
+	ocrTypes "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
 	"github.com/smartcontractkit/integrations-framework/testreporters"
-	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
-	ocrTypes "github.com/smartcontractkit/libocr/offchainreporting/types"
 )
 
 // EthereumOracle oracle for "directrequest" job tests
