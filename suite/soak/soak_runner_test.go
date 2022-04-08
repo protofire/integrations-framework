@@ -52,9 +52,9 @@ func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	exePath := filepath.Join(utils.ProjectRoot, "remote.test")
 	remoteConfig, err := config.ReadWriteRemoteRunnerConfig()
 	require.NoError(t, err)
-	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath, "GOOS=linux", "GOARCH=amd64") // #nosec G204
-	compileCmd.Env = os.Environ()
-	// compileCmd.Env = append(compileCmd.Env)
+	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath /* "CGO_ENABLED=0", */, "GOOS=linux", "GOARCH=amd64") // #nosec G204
+	// compileCmd.Env = os.Environ()
+	// compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
 
 	log.Info().Str("Test Directory", remoteConfig.TestDirectory).Msg("Compiling tests")
 	compileOut, err := compileCmd.Output()
