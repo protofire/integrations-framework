@@ -11,12 +11,12 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
-	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts"
 	"github.com/smartcontractkit/integrations-framework/utils"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/tools"
 )
 
 var _ = Describe("Direct request suite @runlog", func() {

@@ -8,10 +8,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/testsetups"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/tools"
 )
 
 var _ = Describe("OCR Soak Test @soak-ocr", func() {

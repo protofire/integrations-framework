@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: remote-test-runner
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: configmap-volume
+      configMap:
+        name: remote-test-runner-cm
+  containers:
+    - name: remote-test-runner
+      image: alpine
+      command: ["sh", "/root/init.sh"]
+      volumeMounts:
+        - name : configmap-volume
+          mountPath: /root/test-env.json
+          subPath: test-env.json
+        - name : configmap-volume
+          mountPath: /root/init.sh
+          subPath: init.sh
+      env:
+        - name: ENVIRONMENT_FILE
+          value: /root/test-env.json
+        - name: SLACK_WEBHOOK
+          value: {{ .Values.remote_test_runner.slack_webhook }}
+        - name: SLACK_API
+          value: {{ .Values.remote_test_runner.slack_api }}
+        - name: SLACK_CHANNEL
+          value: {{ .Values.remote_test_runner.slack_channel }}
+        - name: SLACK_USER_ID
+          value: {{ .Values.remote_test_runner.slack_user_id }}
+        - name: "GOOS"
+          value: "linux"
+        - name: "GOARCH"
+          value: "amd64"
+        - name: "FRAMEWORK_CONFIG_FILE"
+          value: /root/framework.yaml
+        - name: "NETWORKS_CONFIG_FILE"
+          value: /root/networks.yaml
+        - name: "TEST_FILE"
+          value: "/root/remote.test"
+        - name: "TEST_FILE_SIZE"
+          value: "{{ .Values.remote_test_runner.test_file_size }}"
+      resources:
+        requests:
+          memory: {{ .Values.resources.requests.memory }}
+          cpu: {{ .Values.resources.requests.cpu }}
+        limits:
+          memory: {{ .Values.resources.limits.memory }}
+          cpu: {{ .Values.resources.limits.cpu }}

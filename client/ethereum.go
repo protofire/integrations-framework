@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/celo-org/celo-blockchain"
-	"github.com/smartcontractkit/helmenv/environment"
 	"github.com/smartcontractkit/integrations-framework/config"
+	"github.com/smartcontractkit/integrations-framework/vendors/helmenv/environment"
 
 	"golang.org/x/sync/errgroup"
 

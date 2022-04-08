@@ -3,7 +3,9 @@ module github.com/smartcontractkit/integrations-framework
 go 1.17
 
 require (
+	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/celo-org/celo-blockchain v1.5.5
+	github.com/ghodss/yaml v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mr-tron/base58 v1.2.0
 	github.com/onsi/ginkgo/v2 v2.1.2
@@ -14,12 +16,15 @@ require (
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
-	github.com/smartcontractkit/helmenv v1.0.52
 	github.com/spf13/viper v1.10.1
+	github.com/urfave/cli/v2 v2.3.0
 	go.uber.org/multierr v1.6.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/guregu/null.v4 v4.0.0
+	helm.sh/helm/v3 v3.8.1
+	k8s.io/api v0.23.5
 	k8s.io/apimachinery v0.23.5
+	k8s.io/client-go v0.23.5
 )
 
 require (
@@ -33,13 +38,12 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/VictoriaMetrics/fastcache v1.6.0 // indirect
 	github.com/buraksezer/consistent v0.0.0-20191006190839-693edf70fd72 // indirect
-	github.com/cavaliercoder/grab v2.0.0+incompatible // indirect
 	github.com/celo-org/celo-bls-go v0.2.4 // indirect
 	github.com/chai2010/gettext-go v0.0.0-20160711120539-c6fed771bfd5 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5 // indirect
 	github.com/fvbommel/sortorder v1.0.1 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/graph-gophers/graphql-go v0.0.0-20201113091052-beb923fada29 // indirect
@@ -56,13 +60,11 @@ require (
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7 // indirect
 	github.com/prometheus/tsdb v0.7.1 // indirect
 	github.com/rs/cors v1.7.0 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210305035536-64b5b1c73954 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6 // indirect
 	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
-	helm.sh/helm/v3 v3.8.1 // indirect
-	k8s.io/api v0.23.5 // indirect
-	k8s.io/client-go v0.23.5 // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 )
 
@@ -195,11 +197,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/apiextensions-apiserver v0.23.4 // indirect
 	k8s.io/apiserver v0.23.4 // indirect
-	k8s.io/cli-runtime v0.23.5 // indirect
+	k8s.io/cli-runtime v0.23.5
 	k8s.io/component-base v0.23.5 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
-	k8s.io/kubectl v0.23.5 // indirect
+	k8s.io/kubectl v0.23.5
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	// HELM Requires this old oras version, ticket to update https://github.com/helm/helm/issues/10263
 	oras.land/oras-go v1.1.0 // indirect

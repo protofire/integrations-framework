@@ -1,0 +1,14 @@
+replicas: 1
+
+sol:
+  image:
+    image: solanalabs/solana
+    version: v1.9.14
+
+resources:
+  requests:
+    cpu: 800m
+    memory: 2000Mi
+  limits:
+    cpu: 1600m
+    memory: 4000Mi

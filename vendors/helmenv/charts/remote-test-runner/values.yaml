@@ -1,0 +1,16 @@
+# These values are auto-generated and set by the calling integration framework
+remote_test_runner:
+  test_name: "@soak-ocr"
+  config_file_contents: should be auto generated
+  slack_api: default
+  slack_channel: default
+  slack_user_id: default
+  remote_test_size: 0
+
+resources:
+  requests:
+    cpu: 2
+    memory: 2048Mi
+  limits:
+    cpu: 2
+    memory: 2048Mi
