@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/common v0.32.1
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/smartcontractkit/helmenv v1.0.49
+	github.com/smartcontractkit/helmenv v1.0.52
 	github.com/smartcontractkit/libocr v0.0.0-20220121130134-5d2b1d5f424b
 	github.com/spf13/viper v1.10.1
 	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
@@ -56,6 +56,7 @@ require (
 	github.com/huin/goupnp v1.0.2 // indirect
 	github.com/influxdata/influxdb v1.8.3 // indirect
 	github.com/jackpal/go-nat-pmp v1.0.2 // indirect
+	github.com/karalabe/xgo v0.0.0-20191115072854-c5ccff8648a7 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7 // indirect
 	github.com/rs/cors v1.7.0 // indirect

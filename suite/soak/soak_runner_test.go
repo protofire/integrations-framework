@@ -2,10 +2,10 @@ package soak_runner
 
 import (
 	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/rs/zerolog"
@@ -31,16 +31,25 @@ func TestSoakOCR(t *testing.T) {
 		Fields( remoteConfig).
 		Msg("Remote Test Details on Deployer Machine")
 
+	_config := environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak")
+
+	err := envconfig.Process("", _config)
+	if err != nil {
+		panic(err)
+	}
+
 	env, err := environment.DeployLongTestEnvironment(
-		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
+		_config,
+		//environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
 		tools.ChartsRoot,
 		remoteConfig.TestRegex,                             // Name of the test to run
+		//remoteConfig.SlackWebhookURL,                     // Name of the test to run
 		remoteConfig.SlackAPIKey,                           // API key to use to upload artifacts to slack
 		remoteConfig.SlackChannel,                          // Slack Channel to upload test artifacts to
 		remoteConfig.SlackUserID,                           // Slack user to notify on completion
 		filepath.Join(utils.ProjectRoot, "framework.yaml"), // Path of the framework config
 		filepath.Join(utils.ProjectRoot, "networks.yaml"),  // Path to the networks config
-		exePath, // Path to the executable test file
+		exePath, 											// Path to the executable test file
 	)
 	require.NoError(t, err)
 	require.NotNil(t, env)
@@ -49,14 +58,15 @@ func TestSoakOCR(t *testing.T) {
 		Msg("Soak Test Successfully Launched. Save the environment file to collect logs when test is done.")
 }
 
+
 // Builds the go tests to run, and returns a path to it, along with remote config options
 func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	exePath := filepath.Join(utils.ProjectRoot, "remote.test")
 	remoteConfig, err := config.ReadWriteRemoteRunnerConfig()
 	require.NoError(t, err)
-	compileCmd := exec.Command("/usr/local/go/bin/go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
+	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
 	compileCmd.Env = os.Environ()
-	compileCmd.Env = append(compileCmd.Env, fmt.Sprintf("GOOS=%s",runtime.GOOS), fmt.Sprintf("GOARCH=%s",runtime.GOARCH))
+	compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
 
 	log.Info().Str("Test Directory", remoteConfig.TestDirectory).Msg("Compiling tests")
 	compileOut, err := compileCmd.Output()
