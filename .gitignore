@@ -42,6 +42,7 @@ suite/soak/*.json
 suite/soak/*.yaml
 
 # File generated when looking to run remote tests
+remote.test
 remote_runner_config.yaml
 
 # Common report file format

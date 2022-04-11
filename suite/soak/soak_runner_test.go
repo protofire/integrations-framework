@@ -2,7 +2,6 @@ package soak_runner
 
 import (
 	"fmt"
-	"github.com/kelseyhightower/envconfig"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,16 +30,8 @@ func TestSoakOCR(t *testing.T) {
 		Fields( remoteConfig).
 		Msg("Remote Test Details on Deployer Machine")
 
-	_config := environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak")
-
-	err := envconfig.Process("", _config)
-	if err != nil {
-		panic(err)
-	}
-
 	env, err := environment.DeployLongTestEnvironment(
-		_config,
-		//environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
+		environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil), "chainlink-soak"),
 		tools.ChartsRoot,
 		remoteConfig.TestRegex,                             // Name of the test to run
 		//remoteConfig.SlackWebhookURL,                     // Name of the test to run
@@ -63,6 +54,10 @@ func TestSoakOCR(t *testing.T) {
 func buildGoTests(t *testing.T) (string, *config.RemoteRunnerConfig) {
 	exePath := filepath.Join(utils.ProjectRoot, "remote.test")
 	remoteConfig, err := config.ReadWriteRemoteRunnerConfig()
+
+	if err != nil {
+		panic(err)
+	}
 	require.NoError(t, err)
 	compileCmd := exec.Command("go", "test", "-c", remoteConfig.TestDirectory, "-o", exePath) // #nosec G204
 	compileCmd.Env = os.Environ()
