@@ -12,14 +12,8 @@ chainlink_image: drewhyte/celo-chainlink
 chainlink_version: v1.1.0
 chainlink_env_values:
     eth_url: wss://alfajores-forno.celo-testnet.org/ws
-    eth_chain_id: 44787
-    eth_min_gas_price_wei: 100000000
-
-# Specify the image and version of the simulated geth image you want to run tests against. Leave blank for default.
-# Has no effect when running tests on networks other than the simulated geth instances.
-geth_image:
-geth_version: 
-geth_args:
+    eth_chain_id: "44787"
+    eth_min_gas_price_wei: "100000000"
 
 # Setting an environment file allows for persistent, not ephemeral environments on test execution
 #
