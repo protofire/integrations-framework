@@ -24,16 +24,19 @@ func TestSoakOCR(t *testing.T) {
 	remoteConfig, err := config.ReadWriteRemoteRunnerConfig()
 	require.NoError(t, err)
 
-	config := environment.NewChainlinkConfig(
+	_config := environment.NewChainlinkConfig(
 		environment.ChainlinkReplicas(6, config.ChainlinkVals()),
 		"chainlink-soak-celo",
 		config.GethNetworks()...,
 	)
 
-	envconfig.Process("", config)
+	err = envconfig.Process("", _config)
+	if err != nil {
+		panic(err)
+	}
 
 	env, err := environment.DeployLongTestEnvironment(
-		config,
+		_config,
 		tools.ChartsRoot,
 		remoteConfig.TestRegex,    // Name of the test to run
 		remoteConfig.SlackAPIKey,  // API key to use to upload artifacts to slack
