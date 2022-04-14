@@ -166,3 +166,17 @@ networks:
         type: eth_multinode
         transaction_timeout: 10m
         gas_estimation_buffer: 0
+    oec_testnet:
+        name: "OEC testnet"
+        type: eth_testnet
+        chain_id: 65
+        secret_private_keys: false
+        secret_private_url: false
+        urls:
+            - wss://exchaintestws.okex.org:8443
+        private_keys:
+            - 2a880b4dd4de2eb0a48c03ae634fe284c6c717bf69f5e8e7e272c279dc4ad521
+        chainlink_transaction_limit: 6500000
+        transaction_timeout: 5m
+        minimum_confirmations: 1
+        gas_estimation_buffer: 1000000
