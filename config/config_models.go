@@ -4,15 +4,13 @@ import "time"
 
 // FrameworkConfig common framework config
 type FrameworkConfig struct {
-	KeepEnvironments   string            `mapstructure:"keep_environments" yaml:"keep_environments"`
-	Logging            *LoggingConfig    `mapstructure:"logging" yaml:"logging"`
-	EnvironmentFile    string            `mapstructure:"environment_file" yaml:"environment_file"`
-	ChainlinkImage     string            `mapstructure:"chainlink_image" yaml:"chainlink_image"`
-	ChainlinkVersion   string            `mapstructure:"chainlink_version" yaml:"chainlink_version"`
-	ChainlinkEnvValues map[string]string `mapstructure:"chainlink_env_values" yaml:"chainlink_env_values"`
-	GethImage          string            `mapstructure:"geth_image" yaml:"geth_image"`
-	GethVersion        string            `mapstructure:"geth_version" yaml:"geth_version"`
-	GethArgs           []interface{}     `mapstructure:"geth_args" yaml:"geth_args"`
+	KeepEnvironments string         `mapstructure:"keep_environments" yaml:"keep_environments"`
+	Logging          *LoggingConfig `mapstructure:"logging" yaml:"logging"`
+	EnvironmentFile  string         `mapstructure:"environment_file" yaml:"environment_file"`
+	ChainlinkImage   string         `mapstructure:"chainlink_image" yaml:"chainlink_image"`
+	ChainlinkVersion string         `mapstructure:"chainlink_version" yaml:"chainlink_version"`
+	// ChainlinkEnvValues uses interface{} as the value because it's needed for proper helmchart merges
+	ChainlinkEnvValues map[string]interface{} `mapstructure:"chainlink_env_values" yaml:"chainlink_env_values"`
 }
 
 // ETHNetwork data to configure fully ETH compatible network
@@ -55,7 +53,8 @@ type NetworksConfig struct {
 
 // LoggingConfig for logging
 type LoggingConfig struct {
-	Level int8 `mapstructure:"level" yaml:"logging"`
+	WritePodLogs string `mapstructure:"write_pod_logs" yaml:"write_pod_logs"`
+	Level        int8   `mapstructure:"level" yaml:"level"`
 }
 
 // ChartOverrides enables building json styled chart overrides for the deployed chart values and environment variables
@@ -75,13 +74,15 @@ type GethValuesWrapper struct {
 	Args     []interface{} `json:"args,omitempty"`
 }
 
+// GethValues wraps all values
 type GethValues struct {
 	Image *GethImage `json:"image,omitempty"`
 }
 
+// GethImage defines geth image and version
 type GethImage struct {
 	Image   string `json:"image,omitempty" yaml:"geth_image"`
-	Version string `json:"version,omitempty" yaml:"get_version"`
+	Version string `json:"version,omitempty" yaml:"geth_version"`
 }
 
 // ChainlinkChart holds the overall geth chart values
@@ -95,11 +96,22 @@ type ChainlinkValuesWrapper struct {
 	EnvironmentVariables map[string]string `json:"env,omitempty" yaml:"chainlink_env_values"`
 }
 
+// ChainlinkValues wraps all values
 type ChainlinkValues struct {
 	Image *ChainlinkImage `json:"image,omitempty"`
 }
 
+// ChainlinkImage defines chainlink image and version
 type ChainlinkImage struct {
 	Image   string `json:"image,omitempty" yaml:"chainlink_image"`
 	Version string `json:"version,omitempty" yaml:"chainlink_version"`
+}
+
+// RemoteRunnerConfig reads the config file for remote test runs
+type RemoteRunnerConfig struct {
+	TestRegex     string `mapstructure:"test_regex" yaml:"test_regex"`
+	TestDirectory string `mapstructure:"test_directory" yaml:"test_directory"`
+	SlackAPIKey   string `mapstructure:"slack_api_key" yaml:"slack_api_key"`
+	SlackChannel  string `mapstructure:"slack_channel" yaml:"slack_channel"`
+	SlackUserID   string `mapstructure:"slack_user_id" yaml:"slack_user_id"`
 }

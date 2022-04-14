@@ -47,11 +47,16 @@ type Chainlink interface {
 	DeleteP2PKey(id int) error
 
 	ReadETHKeys() (*ETHKeys, error)
+	ReadPrimaryETHKey() (*ETHKeyData, error)
 	PrimaryEthAddress() (string, error)
 
 	CreateTxKey(chain string) (*TxKey, error)
 	ReadTxKeys(chain string) (*TxKeys, error)
 	DeleteTxKey(chain, id string) error
+
+	ReadTransactionAttempts() (*TransactionsData, error)
+	ReadTransactions() (*TransactionsData, error)
+	SendNativeToken(amount *big.Int, fromAddress, toAddress string) (TransactionData, error)
 
 	CreateVRFKey() (*VRFKey, error)
 	ReadVRFKeys() (*VRFKeys, error)
@@ -65,6 +70,9 @@ type Chainlink interface {
 
 	CreateTerraChain(node *TerraChainAttributes) (*TerraChainCreate, error)
 	CreateTerraNode(node *TerraNodeAttributes) (*TerraNodeCreate, error)
+
+	CreateSolanaChain(node *SolanaChainAttributes) (*SolanaChainCreate, error)
+	CreateSolanaNode(node *SolanaNodeAttributes) (*SolanaNodeCreate, error)
 
 	RemoteIP() string
 	SetSessionCookie() error
@@ -294,7 +302,31 @@ func (c *chainlink) ReadETHKeys() (*ETHKeys, error) {
 	return ethKeys, err
 }
 
-// CreateOCR2Key creates an OCR2Key on the Chainlink node
+// ReadPrimaryETHKey reads updated information about the chainlink's primary ETH key
+func (c *chainlink) ReadPrimaryETHKey() (*ETHKeyData, error) {
+	ethKeys, err := c.ReadETHKeys()
+	if err != nil {
+		return nil, err
+	}
+	if len(ethKeys.Data) == 0 {
+		return nil, fmt.Errorf("Error retrieving primary eth key on node %s: No ETH keys present", c.URL())
+	}
+	return &ethKeys.Data[0], nil
+}
+
+// PrimaryEthAddress returns the primary ETH address for the chainlink node
+func (c *chainlink) PrimaryEthAddress() (string, error) {
+	if c.primaryEthAddress == "" {
+		ethKeys, err := c.ReadETHKeys()
+		if err != nil {
+			return "", err
+		}
+		c.primaryEthAddress = ethKeys.Data[0].Attributes.Address
+	}
+	return c.primaryEthAddress, nil
+}
+
+// CreateTxKey creates a tx key on the Chainlink node
 func (c *chainlink) CreateTxKey(chain string) (*TxKey, error) {
 	txKey := &TxKey{}
 	log.Info().Str("Node URL", c.Config.URL).Msg("Creating Tx Key")
@@ -302,7 +334,7 @@ func (c *chainlink) CreateTxKey(chain string) (*TxKey, error) {
 	return txKey, err
 }
 
-// ReadOCR2Keys reads all OCR2Keys from the Chainlink node
+// ReadTxKeys reads all tx keys from the Chainlink node
 func (c *chainlink) ReadTxKeys(chain string) (*TxKeys, error) {
 	txKeys := &TxKeys{}
 	log.Info().Str("Node URL", c.Config.URL).Msg("Reading Tx Keys")
@@ -310,11 +342,47 @@ func (c *chainlink) ReadTxKeys(chain string) (*TxKeys, error) {
 	return txKeys, err
 }
 
-// DeleteOCR2Key deletes an OCR2Key based on the provided ID
+// DeleteTxKey deletes an tx key based on the provided ID
 func (c *chainlink) DeleteTxKey(chain string, id string) error {
 	log.Info().Str("Node URL", c.Config.URL).Str("ID", id).Msg("Deleting Tx Key")
 	_, err := c.do(http.MethodDelete, fmt.Sprintf("/v2/keys/%s/%s", chain, id), nil, nil, http.StatusOK)
 	return err
+}
+
+// ReadTransactionAttempts reads all transaction attempts on the chainlink node
+func (c *chainlink) ReadTransactionAttempts() (*TransactionsData, error) {
+	txsData := &TransactionsData{}
+	log.Info().Str("Node URL", c.Config.URL).Msg("Reading Transaction Attempts")
+	_, err := c.do(http.MethodGet, "/v2/tx_attempts", nil, txsData, http.StatusOK)
+	return txsData, err
+}
+
+// ReadTransactions reads all transactions made by the chainlink node
+func (c *chainlink) ReadTransactions() (*TransactionsData, error) {
+	txsData := &TransactionsData{}
+	log.Info().Str("Node URL", c.Config.URL).Msg("Reading Transactions")
+	_, err := c.do(http.MethodGet, "/v2/transactions", nil, txsData, http.StatusOK)
+	return txsData, err
+}
+
+// SendNativeToken sends native token (ETH usually) of a specified amount from one of its addresses to the target address
+// WARNING: The txdata object that chainlink sends back is almost always blank.
+func (c *chainlink) SendNativeToken(amount *big.Int, fromAddress, toAddress string) (TransactionData, error) {
+	request := SendEtherRequest{
+		DestinationAddress: toAddress,
+		FromAddress:        fromAddress,
+		Amount:             amount.String(),
+		AllowHigherAmounts: true,
+	}
+	txData := SingleTransactionDataWrapper{}
+	_, err := c.do(http.MethodPost, "/v2/transfers", request, txData, http.StatusOK)
+	log.Info().
+		Str("Node URL", c.Config.URL).
+		Str("From", fromAddress).
+		Str("To", toAddress).
+		Str("Amount", amount.String()).
+		Msg("Sending Native Token")
+	return txData.Data, err
 }
 
 // ReadVRFKeys reads all VRF keys from the Chainlink node
@@ -355,18 +423,6 @@ func (c *chainlink) ReadCSAKeys() (*CSAKeys, error) {
 	return csaKeys, err
 }
 
-// PrimaryEthAddress returns the primary ETH address for the chainlink node
-func (c *chainlink) PrimaryEthAddress() (string, error) {
-	if c.primaryEthAddress == "" {
-		ethKeys, err := c.ReadETHKeys()
-		if err != nil {
-			return "", err
-		}
-		c.primaryEthAddress = ethKeys.Data[0].Attributes.Address
-	}
-	return c.primaryEthAddress, nil
-}
-
 // CreateEI creates an EI on the Chainlink node based on the provided attributes and returns the respective secrets
 func (c *chainlink) CreateEI(eia *EIAttributes) (*EIKeyCreate, error) {
 	ei := EIKeyCreate{}
@@ -403,6 +459,22 @@ func (c *chainlink) CreateTerraNode(node *TerraNodeAttributes) (*TerraNodeCreate
 	response := TerraNodeCreate{}
 	log.Info().Str("Node URL", c.Config.URL).Str("Name", node.Name).Msg("Creating Terra Node")
 	_, err := c.do(http.MethodPost, "/v2/nodes/terra", node, &response, http.StatusOK)
+	return &response, err
+}
+
+// CreateSolana creates a solana chain
+func (c *chainlink) CreateSolanaChain(chain *SolanaChainAttributes) (*SolanaChainCreate, error) {
+	response := SolanaChainCreate{}
+	log.Info().Str("Node URL", c.Config.URL).Str("Chain ID", chain.ChainID).Msg("Creating Solana Chain")
+	_, err := c.do(http.MethodPost, "/v2/chains/solana", chain, &response, http.StatusCreated)
+	return &response, err
+}
+
+// CreateSolanaNode creates a solana node
+func (c *chainlink) CreateSolanaNode(node *SolanaNodeAttributes) (*SolanaNodeCreate, error) {
+	response := SolanaNodeCreate{}
+	log.Info().Str("Node URL", c.Config.URL).Str("Name", node.Name).Msg("Creating Solana Node")
+	_, err := c.do(http.MethodPost, "/v2/nodes/solana", node, &response, http.StatusOK)
 	return &response, err
 }
 

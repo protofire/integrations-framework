@@ -42,8 +42,10 @@ type BlockchainClient interface {
 	ContractsDeployed() bool
 	LoadWallets(ns interface{}) error
 	SetWallet(num int) error
+	GetDefaultWallet() *EthereumWallet
 
 	EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error)
+	EstimateTransactionGasCost() (*big.Int, error)
 
 	Get() interface{}
 	GetNetworkName() string
@@ -84,7 +86,7 @@ func (b *Networks) Teardown() error {
 
 // SetDefault chooses default client
 func (b *Networks) SetDefault(index int) error {
-	if len(b.clients) >= index {
+	if index > len(b.clients) {
 		return fmt.Errorf("index of %d is out of bounds", index)
 	}
 	b.Default = b.clients[index]
@@ -93,10 +95,15 @@ func (b *Networks) SetDefault(index int) error {
 
 // Get gets blockchain network (client) by name
 func (b *Networks) Get(index int) (BlockchainClient, error) {
-	if len(b.clients) >= index {
+	if index > len(b.clients) {
 		return nil, fmt.Errorf("index of %d is out of bounds", index)
 	}
 	return b.clients[index], nil
+}
+
+// AllNetworks returns all the network clients
+func (b *Networks) AllNetworks() []BlockchainClient {
+	return b.clients
 }
 
 // ConnectMockServer creates a connection to a deployed mockserver in the environment
@@ -116,6 +123,19 @@ func ConnectMockServer(e *environment.Environment) (*MockserverClient, error) {
 	return c, nil
 }
 
+// ConnectMockServerSoak creates a connection to a deployed mockserver, assuming runner is in a soak test runner
+func ConnectMockServerSoak(e *environment.Environment) (*MockserverClient, error) {
+	remoteURL, err := e.Config.Charts.Connections("mockserver").RemoteURLByPort("serviceport", environment.HTTP)
+	if err != nil {
+		return nil, err
+	}
+	c := NewMockserverClient(&MockserverConfig{
+		LocalURL:   remoteURL.String(),
+		ClusterURL: remoteURL.String(),
+	})
+	return c, nil
+}
+
 // NetworkRegistry holds all the registered network types that can be initialized, allowing
 // external libraries to register alternative network types to use
 type NetworkRegistry struct {
@@ -127,13 +147,29 @@ type registeredNetwork struct {
 	blockchainClientURLFn BlockchainClientURLFn
 }
 
-// NewNetworkRegistry returns an instance of the network registry with the default supported networks registered
-func NewNetworkRegistry() *NetworkRegistry {
+// NewDefaultNetworkRegistry returns an instance of the network registry with the default supported networks registered
+func NewDefaultNetworkRegistry() *NetworkRegistry {
 	return &NetworkRegistry{
 		registeredNetworks: map[string]registeredNetwork{
 			SimulatedEthNetwork: {
 				newBlockchainClientFn: NewEthereumMultiNodeClient,
 				blockchainClientURLFn: SimulatedEthereumURLs,
+			},
+			LiveEthTestNetwork: {
+				newBlockchainClientFn: NewEthereumMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+		},
+	}
+}
+
+// NewSoakNetworkRegistry retrieves a network registry for use in soak tests
+func NewSoakNetworkRegistry() *NetworkRegistry {
+	return &NetworkRegistry{
+		registeredNetworks: map[string]registeredNetwork{
+			SimulatedEthNetwork: {
+				newBlockchainClientFn: NewEthereumMultiNodeClient,
+				blockchainClientURLFn: SimulatedSoakEthereumURLs,
 			},
 			LiveEthTestNetwork: {
 				newBlockchainClientFn: NewEthereumMultiNodeClient,
@@ -179,10 +215,8 @@ func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, 
 		clients = append(clients, client)
 	}
 	var defaultClient BlockchainClient
-	if len(clients) == 1 {
-		for _, c := range clients {
-			defaultClient = c
-		}
+	if len(clients) >= 1 {
+		defaultClient = clients[0]
 	}
 	return &Networks{
 		clients: clients,
@@ -193,6 +227,35 @@ func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, 
 // ConnectChainlinkNodes creates new chainlink clients
 func ConnectChainlinkNodes(e *environment.Environment) ([]Chainlink, error) {
 	return ConnectChainlinkNodesByCharts(e, []string{"chainlink"})
+}
+
+func ConnectChainlinkDBs(e *environment.Environment) ([]*PostgresConnector, error) {
+	return ConnectChainlinkDBByCharts(e, []string{"chainlink"})
+}
+
+// ConnectChainlinkDBByCharts creates new chainlink DBs clients by charts
+func ConnectChainlinkDBByCharts(e *environment.Environment, charts []string) ([]*PostgresConnector, error) {
+	var dbs []*PostgresConnector
+	for _, chart := range charts {
+		pgUrls, err := e.Charts.Connections(chart).LocalURLsByPort("postgres", environment.HTTP)
+		if err != nil {
+			return nil, err
+		}
+		for _, u := range pgUrls {
+			c, err := NewPostgresConnector(&PostgresConfig{
+				Host:     "localhost",
+				Port:     u.Port(),
+				User:     "postgres",
+				Password: "node",
+				DBName:   "chainlink",
+			})
+			dbs = append(dbs, c)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return dbs, nil
 }
 
 // ConnectChainlinkNodesByCharts creates new chainlink clients by charts
@@ -219,6 +282,29 @@ func ConnectChainlinkNodesByCharts(e *environment.Environment, charts []string) 
 			if err != nil {
 				return nil, err
 			}
+		}
+	}
+	return clients, nil
+}
+
+// ConnectChainlinkNodesSoak assumes that the tests are being run from an internal soak test runner
+func ConnectChainlinkNodesSoak(e *environment.Environment) ([]Chainlink, error) {
+	var clients []Chainlink
+
+	remoteURLs, err := e.Charts.Connections("chainlink").RemoteURLsByPort("access", environment.HTTP)
+	if err != nil {
+		return nil, err
+	}
+	for urlIndex, localURL := range remoteURLs {
+		c, err := NewChainlink(&ChainlinkConfig{
+			URL:      localURL.String(),
+			Email:    "notreal@fakeemail.ch",
+			Password: "twochains",
+			RemoteIP: remoteURLs[urlIndex].Hostname(),
+		}, http.DefaultClient)
+		clients = append(clients, c)
+		if err != nil {
+			return nil, err
 		}
 	}
 	return clients, nil

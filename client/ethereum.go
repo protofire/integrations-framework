@@ -42,6 +42,10 @@ func (e *EthereumMultinodeClient) ContractsDeployed() bool {
 	return e.DefaultClient.ContractsDeployed()
 }
 
+func (e *EthereumMultinodeClient) EstimateTransactionGasCost() (*big.Int, error) {
+	return e.DefaultClient.EstimateTransactionGasCost()
+}
+
 // EstimateCostForChainlinkOperations calculates TXs cost as a dirty estimation based on transactionLimit for that network
 func (e *EthereumMultinodeClient) EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error) {
 	return e.DefaultClient.EstimateCostForChainlinkOperations(amountOfOperations)
@@ -71,6 +75,11 @@ func (e *EthereumMultinodeClient) SetWallet(num int) error {
 	}
 	e.DefaultClient.DefaultWallet = e.DefaultClient.Wallets[num]
 	return nil
+}
+
+// DefaultWallet returns the default wallet for the network
+func (e *EthereumMultinodeClient) GetDefaultWallet() *EthereumWallet {
+	return e.DefaultClient.DefaultWallet
 }
 
 // GetNetworkName gets the ID of the chain that the clients are connected to
@@ -206,6 +215,15 @@ type EthereumClient struct {
 
 func (e *EthereumClient) ContractsDeployed() bool {
 	return e.NetworkConfig.ContractsDeployed
+}
+
+// EstimateTransactionGasCost estimates the current total gas cost for a simple transaction
+func (e *EthereumClient) EstimateTransactionGasCost() (*big.Int, error) {
+	gasPrice, err := e.Client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return gasPrice.Mul(gasPrice, big.NewInt(21000)), err
 }
 
 // EstimateCostForChainlinkOperations calculates required amount of ETH for amountOfOperations Chainlink operations
@@ -382,14 +400,24 @@ func NewEthereumMultiNodeClient(
 	return ecl, nil
 }
 
-// EthereumMultiNodeURLs returns the websocket URLs for a deployed Ethereum multi-node setup
+// SimulatedEthereumURLs returns the websocket URLs for a simulated geth network
 func SimulatedEthereumURLs(e *environment.Environment) ([]*url.URL, error) {
 	return e.Charts.Connections("geth").LocalURLsByPort("ws-rpc", environment.WS)
+}
+
+// SimulatedEthereumURLs returns the websocket URLs for a simulated geth network
+func SimulatedSoakEthereumURLs(e *environment.Environment) ([]*url.URL, error) {
+	return e.Charts.Connections("geth").RemoteURLsByPort("ws-rpc", environment.WS)
 }
 
 // LiveEthTestnetURLs indicates that there are no urls to fetch, except from the network config
 func LiveEthTestnetURLs(e *environment.Environment) ([]*url.URL, error) {
 	return []*url.URL{}, nil
+}
+
+// DefaultWallet returns the default wallet for the network
+func (e *EthereumClient) GetDefaultWallet() *EthereumWallet {
+	return e.DefaultWallet
 }
 
 // GetNetworkName retrieves the ID of the network that the client interacts with
@@ -497,6 +525,9 @@ func (e *EthereumClient) SendTransaction(
 	if err != nil {
 		return common.Hash{}, err
 	}
+	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
+	suggestedGasPrice.Add(suggestedGasPrice, gasPriceBuffer)
+
 	nonce, err := e.GetNonce(context.Background(), common.HexToAddress(from.Address()))
 	if err != nil {
 		return common.Hash{}, err
@@ -515,6 +546,13 @@ func (e *EthereumClient) SendTransaction(
 	if err != nil {
 		return common.Hash{}, err
 	}
+	if e.NetworkConfig.GasEstimationBuffer > 0 {
+		log.Debug().
+			Uint64("Suggested Gas Price Wei", big.NewInt(0).Sub(suggestedGasPrice, gasPriceBuffer).Uint64()).
+			Uint64("Bumped Gas Price Wei", suggestedGasPrice.Uint64()).
+			Str("TX Hash", tx.Hash().Hex()).
+			Msg("Bumping Suggested Gas Price")
+	}
 	if err := e.Client.SendTransaction(context.Background(), tx); err != nil {
 		return common.Hash{}, err
 	}
@@ -532,7 +570,8 @@ func (e *EthereumClient) ProcessTransaction(tx *types.Transaction) error {
 
 	e.AddHeaderEventSubscription(tx.Hash().String(), txConfirmer)
 
-	if !e.queueTransactions || tx.Value().Cmp(big.NewInt(0)) == 0 { // For sequential transactions and contract calls
+	if !e.queueTransactions { // For sequential transactions
+		log.Debug().Str("Hash", tx.Hash().String()).Msg("Waiting for TX to confirm before moving on")
 		defer e.DeleteHeaderEventSubscription(tx.Hash().String())
 		return txConfirmer.Wait()
 	}
@@ -548,9 +587,22 @@ func (e *EthereumClient) DeployContract(
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	suggestedTipCap, err := e.Client.SuggestGasTipCap(context.Background())
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
+	opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
 	contractAddress, transaction, contractInstance, err := deployer(opts, e.Client)
 	if err != nil {
 		return nil, nil, nil, err
+	}
+	if e.NetworkConfig.GasEstimationBuffer > 0 {
+		log.Debug().
+			Uint64("Suggested Gas Tip Cap", big.NewInt(0).Sub(suggestedTipCap, gasPriceBuffer).Uint64()).
+			Uint64("Bumped Gas Price", suggestedTipCap.Uint64()).
+			Str("Contract Name", contractName).
+			Msg("Bumping Suggested Gas Price")
 	}
 	if err := e.ProcessTransaction(transaction); err != nil {
 		return nil, nil, nil, err
@@ -594,6 +646,7 @@ func (e *EthereumClient) TransactionOpts(from *EthereumWallet) (*bind.TransactOp
 
 // WaitForEvents is a blocking function that waits for all event subscriptions that have been queued within the client.
 func (e *EthereumClient) WaitForEvents() error {
+	log.Debug().Msg("Waiting for blockchain events to finish before continuing")
 	queuedEvents := e.GetHeaderSubscriptions()
 	g := errgroup.Group{}
 
@@ -638,8 +691,9 @@ func (e *EthereumClient) newHeadersLoop() {
 	for {
 		if err := e.subscribeToNewHeaders(); err != nil {
 			log.Error().
+				Err(err).
 				Str("NetworkName", e.NetworkConfig.Name).
-				Msgf("Error while subscribing to headers: %v", err.Error())
+				Msg("Error while subscribing to headers")
 			time.Sleep(time.Second)
 			continue
 		}

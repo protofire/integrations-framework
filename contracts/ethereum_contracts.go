@@ -3,6 +3,7 @@ package contracts
 import (
 	"context"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"math/big"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/integrations-framework/client"
 	"github.com/smartcontractkit/integrations-framework/contracts/ethereum"
+	"github.com/smartcontractkit/integrations-framework/testreporters"
 	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
 	ocrTypes "github.com/smartcontractkit/libocr/offchainreporting/types"
 )
@@ -542,6 +544,12 @@ func (l *EthereumLinkToken) Approve(to string, amount *big.Int) error {
 	if err != nil {
 		return err
 	}
+	log.Info().
+		Str("From", l.client.DefaultWallet.Address()).
+		Str("To", to).
+		Str("Amount", amount.String()).
+		Uint64("Nonce", opts.Nonce.Uint64()).
+		Msg("Approving LINK Transfer")
 	tx, err := l.instance.Approve(opts, common.HexToAddress(to), amount)
 	if err != nil {
 		return err
@@ -550,15 +558,16 @@ func (l *EthereumLinkToken) Approve(to string, amount *big.Int) error {
 }
 
 func (l *EthereumLinkToken) Transfer(to string, amount *big.Int) error {
-	log.Info().
-		Str("From", l.client.DefaultWallet.Address()).
-		Str("To", to).
-		Str("Amount", amount.String()).
-		Msg("Transferring LINK")
 	opts, err := l.client.TransactionOpts(l.client.DefaultWallet)
 	if err != nil {
 		return err
 	}
+	log.Info().
+		Str("From", l.client.DefaultWallet.Address()).
+		Str("To", to).
+		Str("Amount", amount.String()).
+		Uint64("Nonce", opts.Nonce.Uint64()).
+		Msg("Transferring LINK")
 	tx, err := l.instance.Transfer(opts, common.HexToAddress(to), amount)
 	if err != nil {
 		return err
@@ -571,6 +580,12 @@ func (l *EthereumLinkToken) TransferAndCall(to string, amount *big.Int, data []b
 	if err != nil {
 		return err
 	}
+	log.Info().
+		Str("From", l.client.DefaultWallet.Address()).
+		Str("To", to).
+		Str("Amount", amount.String()).
+		Uint64("Nonce", opts.Nonce.Uint64()).
+		Msg("Transferring and Calling LINK")
 	tx, err := l.instance.TransferAndCall(opts, common.HexToAddress(to), amount, data)
 	if err != nil {
 		return err
@@ -616,14 +631,19 @@ func (o *EthereumOffchainAggregator) SetPayees(
 	if err != nil {
 		return err
 	}
-	transmittersAddr := make([]common.Address, 0)
+	var transmittersAddr, payeesAddr []common.Address
 	for _, tr := range transmitters {
 		transmittersAddr = append(transmittersAddr, common.HexToAddress(tr))
 	}
-	payeesAddr := make([]common.Address, 0)
 	for _, p := range payees {
-		transmittersAddr = append(transmittersAddr, common.HexToAddress(p))
+		payeesAddr = append(payeesAddr, common.HexToAddress(p))
 	}
+
+	log.Info().
+		Str("Transmitters", fmt.Sprintf("%v", transmitters)).
+		Str("Payees", fmt.Sprintf("%v", payees)).
+		Str("OCR Address", o.Address()).
+		Msg("Setting OCR Payees")
 
 	tx, err := o.ocr.SetPayees(opts, transmittersAddr, payeesAddr)
 	if err != nil {
@@ -632,7 +652,7 @@ func (o *EthereumOffchainAggregator) SetPayees(
 	return o.client.ProcessTransaction(tx)
 }
 
-// SetConfig sets offchain reporting protocol configuration including participating oracles
+// SetConfig sets the payees and the offchain reporting protocol configuration
 func (o *EthereumOffchainAggregator) SetConfig(
 	chainlinkNodes []client.Chainlink,
 	ocrConfig OffChainAggregatorConfig,
@@ -702,25 +722,12 @@ func (o *EthereumOffchainAggregator) SetConfig(
 		return err
 	}
 
-	// Set Payees
+	// Set Config
 	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
 	if err != nil {
 		return err
 	}
-	tx, err := o.ocr.SetPayees(opts, transmitters, transmitters)
-	if err != nil {
-		return err
-	}
-	if err := o.client.ProcessTransaction(tx); err != nil {
-		return err
-	}
-
-	// Set Config
-	opts, err = o.client.TransactionOpts(o.client.DefaultWallet)
-	if err != nil {
-		return err
-	}
-	tx, err = o.ocr.SetConfig(opts, signers, transmitters, threshold, encodedConfigVersion, encodedConfig)
+	tx, err := o.ocr.SetConfig(opts, signers, transmitters, threshold, encodedConfigVersion, encodedConfig)
 	if err != nil {
 		return err
 	}
@@ -835,11 +842,13 @@ func (o *RunlogRoundConfirmer) Wait() error {
 
 // OffchainAggregatorRoundConfirmer is a header subscription that awaits for a certain OCR round to be completed
 type OffchainAggregatorRoundConfirmer struct {
-	ocrInstance OffchainAggregator
-	roundID     *big.Int
-	doneChan    chan struct{}
-	context     context.Context
-	cancel      context.CancelFunc
+	ocrInstance        OffchainAggregator
+	roundID            *big.Int
+	doneChan           chan struct{}
+	context            context.Context
+	cancel             context.CancelFunc
+	optionalTestReport *testreporters.OCRSoakTestReport
+	blocksSinceAnswer  uint
 }
 
 // NewOffchainAggregatorRoundConfirmer provides a new instance of a OffchainAggregatorRoundConfirmer
@@ -847,14 +856,16 @@ func NewOffchainAggregatorRoundConfirmer(
 	contract OffchainAggregator,
 	roundID *big.Int,
 	timeout time.Duration,
+	optionalTestReport *testreporters.OCRSoakTestReport,
 ) *OffchainAggregatorRoundConfirmer {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), timeout)
 	return &OffchainAggregatorRoundConfirmer{
-		ocrInstance: contract,
-		roundID:     roundID,
-		doneChan:    make(chan struct{}),
-		context:     ctx,
-		cancel:      ctxCancel,
+		ocrInstance:        contract,
+		roundID:            roundID,
+		doneChan:           make(chan struct{}),
+		context:            ctx,
+		cancel:             ctxCancel,
+		optionalTestReport: optionalTestReport,
 	}
 }
 
@@ -864,6 +875,7 @@ func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ client.NodeBlock) erro
 	if err != nil {
 		return err
 	}
+	o.blocksSinceAnswer++
 	currRound := lr.RoundId
 	ocrLog := log.Info().
 		Str("Contract Address", o.ocrInstance.Address()).
@@ -880,6 +892,12 @@ func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ client.NodeBlock) erro
 
 // Wait is a blocking function that will wait until the round has confirmed, and timeout if the deadline has passed
 func (o *OffchainAggregatorRoundConfirmer) Wait() error {
+	startTime := time.Now()
+	defer func() {
+		if o.optionalTestReport != nil {
+			o.optionalTestReport.UpdateReport(time.Since(startTime), o.blocksSinceAnswer)
+		}
+	}()
 	for {
 		select {
 		case <-o.doneChan:
@@ -946,6 +964,150 @@ func (o *KeeperConsumerRoundConfirmer) Wait() error {
 			return fmt.Errorf("timeout waiting for upkeeps to confirm: %d", o.upkeepsValue)
 		}
 	}
+}
+
+// KeeperConsumerPerformanceRoundConfirmer is a header subscription that awaits for a round of upkeeps
+type KeeperConsumerPerformanceRoundConfirmer struct {
+	instance KeeperConsumerPerformance
+	doneChan chan bool
+	context  context.Context
+	cancel   context.CancelFunc
+
+	blockCadence                int64   // How many blocks before an upkeep should happen
+	blockRange                  int64   // How many blocks to watch upkeeps for
+	blocksSinceSubscription     int64   // How many blocks have passed since subscribing
+	expectedUpkeepCount         int64   // The count of upkeeps expected next iteration
+	blocksSinceSuccessfulUpkeep int64   // How many blocks have come in since the last successful upkeep
+	allMissedUpkeeps            []int64 // Tracks the amount of blocks missed in each missed upkeep
+	totalSuccessfulUpkeeps      int64
+
+	metricsReporter *testreporters.KeeperBlockTimeTestReporter // Testreporter to track results
+}
+
+// NewKeeperConsumerPerformanceRoundConfirmer provides a new instance of a KeeperConsumerPerformanceRoundConfirmer
+// Used to track and log performance test results for keepers
+func NewKeeperConsumerPerformanceRoundConfirmer(
+	contract KeeperConsumerPerformance,
+	expectedBlockCadence int64, // Expected to upkeep every 5/10/20 blocks, for example
+	blockRange int64,
+	metricsReporter *testreporters.KeeperBlockTimeTestReporter,
+) *KeeperConsumerPerformanceRoundConfirmer {
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	return &KeeperConsumerPerformanceRoundConfirmer{
+		instance:                    contract,
+		doneChan:                    make(chan bool),
+		context:                     ctx,
+		cancel:                      cancelFunc,
+		blockCadence:                expectedBlockCadence,
+		blockRange:                  blockRange,
+		blocksSinceSubscription:     0,
+		blocksSinceSuccessfulUpkeep: 0,
+		expectedUpkeepCount:         1,
+		allMissedUpkeeps:            []int64{},
+		totalSuccessfulUpkeeps:      0,
+		metricsReporter:             metricsReporter,
+	}
+}
+
+// ReceiveBlock will query the latest Keeper round and check to see whether the round has confirmed
+func (o *KeeperConsumerPerformanceRoundConfirmer) ReceiveBlock(receivedBlock client.NodeBlock) error {
+	// Increment block counters
+	o.blocksSinceSubscription++
+	o.blocksSinceSuccessfulUpkeep++
+	upkeepCount, err := o.instance.GetUpkeepCount(context.Background())
+	if err != nil {
+		return err
+	}
+
+	isEligible, err := o.instance.CheckEligible(context.Background())
+	if err != nil {
+		return err
+	}
+	if isEligible {
+		log.Trace().
+			Str("Contract Address", o.instance.Address()).
+			Int64("Upkeeps Performed", upkeepCount.Int64()).
+			Msg("Upkeep Now Eligible")
+	}
+	if upkeepCount.Int64() >= o.expectedUpkeepCount { // Upkeep was successful
+		if o.blocksSinceSuccessfulUpkeep < o.blockCadence { // If there's an early upkeep, that's weird
+			log.Error().
+				Str("Contract Address", o.instance.Address()).
+				Int64("Upkeeps Performed", upkeepCount.Int64()).
+				Int64("Expected Cadence", o.blockCadence).
+				Int64("Actual Cadence", o.blocksSinceSuccessfulUpkeep).
+				Err(errors.New("Found an early Upkeep"))
+			return fmt.Errorf("Found an early Upkeep on contract %s", o.instance.Address())
+		} else if o.blocksSinceSuccessfulUpkeep == o.blockCadence { // Perfectly timed upkeep
+			log.Info().
+				Str("Contract Address", o.instance.Address()).
+				Int64("Upkeeps Performed", upkeepCount.Int64()).
+				Int64("Expected Cadence", o.blockCadence).
+				Int64("Actual Cadence", o.blocksSinceSuccessfulUpkeep).
+				Msg("Successful Upkeep on Expected Cadence")
+			o.totalSuccessfulUpkeeps++
+		} else { // Late upkeep
+			log.Warn().
+				Str("Contract Address", o.instance.Address()).
+				Int64("Upkeeps Performed", upkeepCount.Int64()).
+				Int64("Expected Cadence", o.blockCadence).
+				Int64("Actual Cadence", o.blocksSinceSuccessfulUpkeep).
+				Msg("Upkeep Completed Late")
+			o.allMissedUpkeeps = append(o.allMissedUpkeeps, o.blocksSinceSuccessfulUpkeep-o.blockCadence)
+		}
+		// Update upkeep tracking values
+		o.blocksSinceSuccessfulUpkeep = 0
+		o.expectedUpkeepCount++
+	}
+
+	if o.blocksSinceSubscription > o.blockRange {
+		if o.blocksSinceSuccessfulUpkeep > o.blockCadence {
+			log.Warn().
+				Str("Contract Address", o.instance.Address()).
+				Int64("Upkeeps Performed", upkeepCount.Int64()).
+				Int64("Expected Cadence", o.blockCadence).
+				Int64("Expected Upkeep Count", o.expectedUpkeepCount).
+				Int64("Blocks Waiting", o.blocksSinceSuccessfulUpkeep).
+				Int64("Total Blocks Watched", o.blocksSinceSubscription).
+				Msg("Finished Watching for Upkeeps While Waiting on a Late Upkeep")
+			o.allMissedUpkeeps = append(o.allMissedUpkeeps, o.blocksSinceSuccessfulUpkeep-o.blockCadence)
+		} else {
+			log.Info().
+				Str("Contract Address", o.instance.Address()).
+				Int64("Upkeeps Performed", upkeepCount.Int64()).
+				Int64("Total Blocks Watched", o.blocksSinceSubscription).
+				Msg("Finished Watching for Upkeeps")
+		}
+		o.doneChan <- true
+		return nil
+	}
+	return nil
+}
+
+// Wait is a blocking function that will wait until the round has confirmed, and timeout if the deadline has passed
+func (o *KeeperConsumerPerformanceRoundConfirmer) Wait() error {
+	for {
+		select {
+		case <-o.doneChan:
+			o.cancel()
+			o.logDetails()
+			return nil
+		case <-o.context.Done():
+			return fmt.Errorf("timeout waiting for expected upkeep count to confirm: %d", o.expectedUpkeepCount)
+		}
+	}
+}
+
+func (o *KeeperConsumerPerformanceRoundConfirmer) logDetails() {
+	report := testreporters.KeeperBlockTimeTestReport{
+		ContractAddress:        o.instance.Address(),
+		TotalExpectedUpkeeps:   o.blockRange / o.blockCadence,
+		TotalSuccessfulUpkeeps: o.totalSuccessfulUpkeeps,
+		AllMissedUpkeeps:       o.allMissedUpkeeps,
+	}
+	o.metricsReporter.ReportMutex.Lock()
+	o.metricsReporter.Reports = append(o.metricsReporter.Reports, report)
+	defer o.metricsReporter.ReportMutex.Unlock()
 }
 
 // EthereumStorage acts as a conduit for the ethereum version of the storage contract
@@ -1172,6 +1334,40 @@ func (v *EthereumKeeperConsumer) Counter(ctx context.Context) (*big.Int, error) 
 		return nil, err
 	}
 	return cnt, nil
+}
+
+// EthereumKeeperConsumerPerformance represents a more complicated keeper consumer contract, one intended only for
+// performance tests.
+type EthereumKeeperConsumerPerformance struct {
+	client   *client.EthereumClient
+	consumer *ethereum.KeeperConsumerPerformance
+	address  *common.Address
+}
+
+func (v *EthereumKeeperConsumerPerformance) Address() string {
+	return v.address.Hex()
+}
+
+func (v *EthereumKeeperConsumerPerformance) Fund(ethAmount *big.Float) error {
+	return v.client.Fund(v.address.Hex(), ethAmount)
+}
+
+func (v *EthereumKeeperConsumerPerformance) CheckEligible(ctx context.Context) (bool, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		Context: ctx,
+	}
+	eligible, err := v.consumer.CheckEligible(opts)
+	return eligible, err
+}
+
+func (v *EthereumKeeperConsumerPerformance) GetUpkeepCount(ctx context.Context) (*big.Int, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		Context: ctx,
+	}
+	eligible, err := v.consumer.GetCountPerforms(opts)
+	return eligible, err
 }
 
 // EthereumUpkeepRegistrationRequests keeper contract to register upkeeps

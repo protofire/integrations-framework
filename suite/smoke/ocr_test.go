@@ -11,6 +11,7 @@ import (
 	"github.com/smartcontractkit/helmenv/tools"
 	"github.com/smartcontractkit/integrations-framework/actions"
 	"github.com/smartcontractkit/integrations-framework/client"
+	"github.com/smartcontractkit/integrations-framework/config"
 	"github.com/smartcontractkit/integrations-framework/contracts"
 	"github.com/smartcontractkit/integrations-framework/utils"
 )
@@ -30,7 +31,11 @@ var _ = Describe("OCR Feed @ocr", func() {
 	BeforeEach(func() {
 		By("Deploying the environment", func() {
 			env, err = environment.DeployOrLoadEnvironment(
-				environment.NewChainlinkConfig(environment.ChainlinkReplicas(6, nil)),
+				environment.NewChainlinkConfig(
+					environment.ChainlinkReplicas(6, config.ChainlinkVals()),
+					"chainlink-ocr",
+					config.GethNetworks()...,
+				),
 				tools.ChartsRoot,
 			)
 			Expect(err).ShouldNot(HaveOccurred(), "Environment deployment shouldn't fail")
@@ -40,7 +45,7 @@ var _ = Describe("OCR Feed @ocr", func() {
 
 		By("Connecting to launched resources", func() {
 			// Load Networks
-			networkRegistry := client.NewNetworkRegistry()
+			networkRegistry := client.NewDefaultNetworkRegistry()
 			var err error
 			networks, err = networkRegistry.GetNetworks(env)
 			Expect(err).ShouldNot(HaveOccurred(), "Connecting to blockchain nodes shouldn't fail")
@@ -96,7 +101,7 @@ var _ = Describe("OCR Feed @ocr", func() {
 			networks.Default.GasStats().PrintStats()
 		})
 		By("Tearing down the environment", func() {
-			err = actions.TeardownSuite(env, networks, utils.ProjectRoot)
+			err = actions.TeardownSuite(env, networks, utils.ProjectRoot, chainlinkNodes, nil)
 			Expect(err).ShouldNot(HaveOccurred(), "Environment teardown shouldn't fail")
 		})
 	})

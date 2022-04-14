@@ -1,3 +1,4 @@
+// Package gauntlet enables the framework to interface with the chainlink gauntlet project
 package gauntlet
 
 import (
@@ -6,7 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -22,26 +23,16 @@ type Gauntlet struct {
 	NetworkConfig map[string]string
 }
 
-// GetOsVersion get the os version for the gauntlet yarn package
-func GetOsVersion() string {
-	log.Debug().Str("OS", runtime.GOOS).Msg("Runtime OS:")
-	version := "linux"
-	if runtime.GOOS == "darwin" {
-		version = "macos"
-	}
-	return version
-}
-
-// NewGauntlet Sets up a gauntlet struct and checks if the executable exists.
-func NewGauntlet(execPath string) (*Gauntlet, error) {
-	log.Debug().Str("PATH", execPath).Msg("Executable Path")
-	os.Setenv("SKIP_PROMPTS", "true")
-	_, err := exec.Command(execPath).Output()
+// NewGauntlet Sets up a gauntlet struct and checks if the yarn executable exists.
+func NewGauntlet() (*Gauntlet, error) {
+	yarn, err := exec.LookPath("yarn")
 	if err != nil {
-		return &Gauntlet{}, errors.New("gauntlet installation check failed")
+		return &Gauntlet{}, errors.New("'yarn' is not installed")
 	}
+	log.Debug().Str("PATH", yarn).Msg("Executable Path")
+	os.Setenv("SKIP_PROMPTS", "true")
 	g := &Gauntlet{
-		exec: execPath,
+		exec: yarn,
 	}
 	g.GenerateRandomNetwork()
 	return g, nil
@@ -60,13 +51,20 @@ func (g *Gauntlet) GenerateRandomNetwork() {
 	log.Debug().Str("Network", g.Network).Msg("Generated Network Name")
 }
 
+type ExecCommandOptions struct {
+	ErrHandling       []string
+	CheckErrorsInRead bool
+	RetryCount        int
+	RetryDelay        time.Duration
+}
+
 // ExecCommand Executes a gauntlet command with the provided arguements.
 //  It will also check for any errors you specify in the output via the errHandling slice.
-func (g *Gauntlet) ExecCommand(args, errHandling []string) (string, error) {
+func (g *Gauntlet) ExecCommand(args []string, options ExecCommandOptions) (string, error) {
 	output := ""
-	// append network to args since it is always needed
-	updatedArgs := args
-	updatedArgs = insertArg(updatedArgs, 1, g.Flag("network", g.Network))
+	// append gauntlet and network to args since it is always needed
+	updatedArgs := append([]string{"gauntlet"}, args...)
+	updatedArgs = insertArg(updatedArgs, 2, g.Flag("network", g.Network))
 	printArgs(updatedArgs)
 
 	cmd := exec.Command(g.exec, updatedArgs...) // #nosec G204
@@ -81,6 +79,12 @@ func (g *Gauntlet) ExecCommand(args, errHandling []string) (string, error) {
 	for err == nil {
 		log.Info().Str("stdout", line).Msg("Gauntlet")
 		output = fmt.Sprintf("%s%s", output, line)
+		if options.CheckErrorsInRead {
+			rerr := checkForErrors(options.ErrHandling, output)
+			if rerr != nil {
+				return output, rerr
+			}
+		}
 		line, err = reader.ReadString('\n')
 	}
 
@@ -89,10 +93,16 @@ func (g *Gauntlet) ExecCommand(args, errHandling []string) (string, error) {
 	for err == nil {
 		log.Info().Str("stderr", line).Msg("Gauntlet")
 		output = fmt.Sprintf("%s%s", output, line)
+		if options.CheckErrorsInRead {
+			rerr := checkForErrors(options.ErrHandling, output)
+			if rerr != nil {
+				return output, rerr
+			}
+		}
 		line, err = reader.ReadString('\n')
 	}
 
-	rerr := checkForErrors(errHandling, output)
+	rerr := checkForErrors(options.ErrHandling, output)
 	if rerr != nil {
 		return output, rerr
 	}
@@ -101,30 +111,37 @@ func (g *Gauntlet) ExecCommand(args, errHandling []string) (string, error) {
 		return output, err
 	}
 
-	log.Debug().Msg("Gauntlet command was successful!")
-	return output, nil
+	// catch any exit codes
+	err = cmd.Wait()
+
+	log.Debug().Msg("Gauntlet command Completed")
+	return output, err
 }
 
 // ExecCommandWithRetries Some commands are safe to retry and in ci this can be even more so needed.
-func (g *Gauntlet) ExecCommandWithRetries(args, errHandling []string, retryCount int) (string, error) {
+func (g *Gauntlet) ExecCommandWithRetries(args []string, options ExecCommandOptions) (string, error) {
 	var output string
 	var err error
+	if options.RetryDelay == 0 {
+		// default to 5 seconds
+		options.RetryDelay = time.Second * 5
+	}
 	err = retry.Do(
 		func() error {
-			output, err = g.ExecCommand(args, errHandling)
+			output, err = g.ExecCommand(args, options)
 			return err
 		},
-		retry.Delay(time.Second*5),
-		retry.MaxDelay(time.Second*5),
-		retry.Attempts(uint(retryCount)),
+		retry.Delay(options.RetryDelay),
+		retry.MaxDelay(options.RetryDelay),
+		retry.Attempts(uint(options.RetryCount)),
 	)
 
 	return output, err
 }
 
 // WriteNetworkConfigMap write a network config file for gauntlet testing.
-func (g *Gauntlet) WriteNetworkConfigMap() error {
-	file := fmt.Sprintf("networks/.env.%s", g.Network)
+func (g *Gauntlet) WriteNetworkConfigMap(networkDirPath string) error {
+	file := filepath.Join(networkDirPath, fmt.Sprintf(".env.%s", g.Network))
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
@@ -153,7 +170,7 @@ func checkForErrors(errHandling []string, line string) error {
 
 // insertArg inserts an argument into the args slice
 func insertArg(args []string, index int, valueToInsert string) []string {
-	if len(args) == index || len(args) == 0 { // nil or empty slice or after last element
+	if len(args) <= index { // nil or empty slice or after last element
 		return append(args, valueToInsert)
 	}
 	args = append(args[:index+1], args[index:]...) // index < len(a)
@@ -163,7 +180,7 @@ func insertArg(args []string, index int, valueToInsert string) []string {
 
 // printArgs prints all the gauntlet args being used in a call to gauntlet
 func printArgs(args []string) {
-	out := "gauntlet"
+	out := "yarn"
 	for _, arg := range args {
 		out = fmt.Sprintf("%s %s", out, arg)
 

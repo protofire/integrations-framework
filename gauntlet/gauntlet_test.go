@@ -8,37 +8,35 @@ import (
 )
 
 var _ = Describe("Gauntlet @unit", func() {
-	var ls string = "/usr/bin/ls"
-	BeforeEach(func() {
-		if gauntlet.GetOsVersion() == "macos" {
-			ls = "/bin/ls"
-		}
-	})
-	It("should fail to find the executable", func() {
-		_, err := gauntlet.NewGauntlet("/path/to/nothing")
-		Expect(err).Should(HaveOccurred(), "Successfully found an executable where one does not exist")
-	})
 	It("should create a new Gauntlet struct", func() {
-		g, err := gauntlet.NewGauntlet(ls)
+		g, err := gauntlet.NewGauntlet()
 		Expect(err).ShouldNot(HaveOccurred(), "Could not get a new gauntlet struct")
 		Expect(g.Network).Should(ContainSubstring("test"), "The network did not contain test")
 	})
 	It("should return a properly formatted flag", func() {
-		g, err := gauntlet.NewGauntlet(ls)
+		g, err := gauntlet.NewGauntlet()
 		Expect(err).ShouldNot(HaveOccurred(), "Could not get a new gauntlet struct")
 		Expect(g.Flag("flag", "value")).To(Equal("--flag=value"))
 	})
 	It("should execute a command correctly", func() {
-		g, err := gauntlet.NewGauntlet(ls)
+		g, err := gauntlet.NewGauntlet()
 		Expect(err).ShouldNot(HaveOccurred(), "Could not get a new gauntlet struct")
-		out, err := g.ExecCommand([]string{}, []string{})
-		Expect(err).ShouldNot(HaveOccurred(), "Failed to execute a command")
-		Expect(out).To(ContainSubstring("unrecognized option"))
+		options := gauntlet.ExecCommandOptions{
+			ErrHandling:       []string{},
+			CheckErrorsInRead: true,
+		}
+		out, err := g.ExecCommand([]string{}, options)
+		Expect(err).Should(HaveOccurred(), "The command should technically always fail because we don't have access to a gauntlet executable, if it passed without error then we have an issue")
+		Expect(out).To(ContainSubstring("yarn"), "Did not contain expected output")
 	})
 	It("should find an expected error in the output", func() {
-		g, err := gauntlet.NewGauntlet(ls)
+		g, err := gauntlet.NewGauntlet()
 		Expect(err).ShouldNot(HaveOccurred(), "Could not get a new gauntlet struct")
-		_, err = g.ExecCommandWithRetries([]string{}, []string{"unrecognized option"}, 1)
+		options := gauntlet.ExecCommandOptions{
+			ErrHandling: []string{"yarn"},
+			RetryCount:  1,
+		}
+		_, err = g.ExecCommandWithRetries([]string{}, options)
 		Expect(err).Should(HaveOccurred(), "Failed to find the expected error")
 	})
 })

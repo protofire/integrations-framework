@@ -1,3 +1,4 @@
+// Package utils contains some common paths used in configuration and tests
 package utils
 
 import (
@@ -15,4 +16,6 @@ var (
 	ContractsDir = filepath.Join(ProjectRoot, "contracts")
 	// EthereumContractsDir path to our ethereum contracts
 	EthereumContractsDir = filepath.Join(ContractsDir, "ethereum")
+	// RemoteRunnerConfigLocation is the path to the remote runner config
+	RemoteRunnerConfigLocation = filepath.Join(ProjectRoot, "remote_runner_config.yaml")
 )
