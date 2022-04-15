@@ -848,6 +848,16 @@ func NewOffchainAggregatorRoundConfirmer(
 	}
 }
 
+func IsClosed(ch <-chan struct{}) bool {
+	select {
+	case <-ch:
+		return true
+	default:
+	}
+
+	return false
+}
+
 // ReceiveBlock will query the latest OffchainAggregator round and check to see whether the round has confirmed
 func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ blockchain.NodeBlock) error {
 	if channelClosed(o.doneChan) {
@@ -858,6 +868,10 @@ func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ blockchain.NodeBlock) 
 	if err != nil {
 		return err
 	}
+	if IsClosed(o.doneChan) {
+		return nil
+	}
+
 	o.blocksSinceAnswer++
 	currRound := lr.RoundId
 	ocrLog := log.Info().
