@@ -22,7 +22,7 @@ import (
 	"github.com/smartcontractkit/integrations-framework/contracts"
 	"github.com/smartcontractkit/integrations-framework/testreporters"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/ethereum/go-ethereum/common"
 	uuid "github.com/satori/go.uuid"
 	"github.com/smartcontractkit/integrations-framework/client"
 )

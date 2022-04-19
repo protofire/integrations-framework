@@ -26,7 +26,7 @@ func TestSoakOCR(t *testing.T) {
 
 	config := environment.NewChainlinkConfig(
 		environment.ChainlinkReplicas(6, config.ChainlinkVals()),
-		"chainlink-soak-celo",
+		"chainlink-soak",
 		config.GethNetworks()...,
 	)
 

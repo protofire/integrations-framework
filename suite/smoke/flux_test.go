@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/ethereum/go-ethereum/common"
 	uuid "github.com/satori/go.uuid"
 	"github.com/smartcontractkit/helmenv/environment"
 	"github.com/smartcontractkit/helmenv/tools"

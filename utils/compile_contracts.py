@@ -9,8 +9,8 @@ import re
 # Can be run from the Makefile with make compile_contracts
 
 solc_versions = ["v0.4", "v0.6", "v0.7"]
-rootdir = "./artifacts/contracts/celo/"
-targetdir = "./contracts/celo"
+rootdir = "./artifacts/contracts/ethereum/"
+targetdir = "./contracts/ethereum"
 
 # The names of the contracts that we're actually compiling to use.
 used_contract_names = [
@@ -122,7 +122,7 @@ for version in solc_versions:
                     # Replace package name in file, abigen doesn't let you specify differently
                     with open(go_file_name, 'r+') as f:
                         text = f.read()
-                        text = re.sub("package " + contract_name, "package celo", text)
+                        text = re.sub("package " + contract_name, "package ethereum", text)
                         f.seek(0)
                         f.write(text)
                         f.truncate()
