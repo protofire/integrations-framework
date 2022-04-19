@@ -8,12 +8,12 @@ logging:
     level: 0
 
 # Specify the image and version of the chainlink image you want to run tests against. Leave blank for default.
-chainlink_image: drewhyte/celo-chainlink
-chainlink_version: v1.1.0
+chainlink_image: 
+chainlink_version: 
 chainlink_env_values:
-    eth_url: wss://alfajores-forno.celo-testnet.org/ws
-    eth_chain_id: "44787"
-    eth_min_gas_price_wei: "100000000"
+   eth_url: wss://exchaintestws.okex.org:8443
+   eth_chain_id: 65
+   LINK_CONTRACT_ADDRESS: 0xBaE2e38B9152b2e451b103e380F55Ff02f25F548
 
 # Setting an environment file allows for persistent, not ephemeral environments on test execution
 #
