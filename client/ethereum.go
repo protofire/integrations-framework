@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -587,23 +588,36 @@ func (e *EthereumClient) DeployContract(
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	suggestedTipCap, err := e.Client.SuggestGasTipCap(context.Background())
-	if err != nil {
-		return nil, nil, nil, err
+
+	if strings.Contains(strings.ToLower(e.NetworkConfig.ID), "klaytn") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "oec") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "oec") {
+		log.Warn().
+			Str("Network ID", e.NetworkConfig.ID).
+			Msg("Setting GasTipCap = nil for a special case of running on a Klaytn network." +
+				"This should make Klaytn correctly set it.")
+		opts.GasTipCap = nil
+	} else {
+		suggestedTipCap, err := e.Client.SuggestGasTipCap(context.Background())
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
+		opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
+		if e.NetworkConfig.GasEstimationBuffer > 0 {
+			log.Debug().
+				Uint64("Suggested Gas Tip Cap", big.NewInt(0).Sub(suggestedTipCap, gasPriceBuffer).Uint64()).
+				Uint64("Bumped Gas Price", suggestedTipCap.Uint64()).
+				Str("Contract Name", contractName).
+				Msg("Bumping Suggested Gas Price")
+		}
 	}
-	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
-	opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
 	contractAddress, transaction, contractInstance, err := deployer(opts, e.Client)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	if e.NetworkConfig.GasEstimationBuffer > 0 {
-		log.Debug().
-			Uint64("Suggested Gas Tip Cap", big.NewInt(0).Sub(suggestedTipCap, gasPriceBuffer).Uint64()).
-			Uint64("Bumped Gas Price", suggestedTipCap.Uint64()).
-			Str("Contract Name", contractName).
-			Msg("Bumping Suggested Gas Price")
-	}
+
 	if err := e.ProcessTransaction(transaction); err != nil {
 		return nil, nil, nil, err
 	}
