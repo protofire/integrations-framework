@@ -589,9 +589,7 @@ func (e *EthereumClient) DeployContract(
 		return nil, nil, nil, err
 	}
 
-	if strings.Contains(strings.ToLower(e.NetworkConfig.ID), "klaytn") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "oec") ||
+	if strings.Contains(strings.ToLower(e.NetworkConfig.ID), "oec") ||
 		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "oec") {
 		log.Warn().
 			Str("Network ID", e.NetworkConfig.ID).

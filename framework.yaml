@@ -12,9 +12,9 @@ logging:
 chainlink_image: public.ecr.aws/chainlink/chainlink
 chainlink_version: 1.2.1
 chainlink_env_values:
-   eth_url: wss://exchaintestws.okex.org:8443
-   eth_chain_id: 65
-   LINK_CONTRACT_ADDRESS: 0xBaE2e38B9152b2e451b103e380F55Ff02f25F548
+   eth_url: "wss://exchaintestws.okex.org:8443"
+   eth_chain_id: "65"
+   LINK_CONTRACT_ADDRESS: "0xBaE2e38B9152b2e451b103e380F55Ff02f25F548"
 
 # Setting an environment file allows for persistent, not ephemeral environments on test execution
 #
