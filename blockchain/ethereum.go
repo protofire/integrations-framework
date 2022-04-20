@@ -265,22 +265,24 @@ func (e *EthereumClient) DeployContract(
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	suggestedTipCap, err := e.Client.SuggestGasTipCap(context.Background())
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
-	opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
 
 	// https://docs.klaytn.com/klaytn/design/transaction-fees#unit-price
 	if strings.Contains(strings.ToLower(e.NetworkConfig.ID), "klaytn") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") {
+		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "oec") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "oec") {
 		log.Warn().
 			Str("Network ID", e.NetworkConfig.ID).
 			Msg("Setting GasTipCap = nil for a special case of running on a Klaytn network." +
 				"This should make Klaytn correctly set it.")
 		opts.GasTipCap = nil
 	} else if e.NetworkConfig.GasEstimationBuffer > 0 {
+		suggestedTipCap, err := e.Client.SuggestGasTipCap(context.Background())
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
+		opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
 		log.Debug().
 			Uint64("Suggested Gas Tip Cap", big.NewInt(0).Sub(suggestedTipCap, gasPriceBuffer).Uint64()).
 			Uint64("Bumped Gas Price", suggestedTipCap.Uint64()).
