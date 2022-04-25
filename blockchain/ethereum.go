@@ -270,7 +270,9 @@ func (e *EthereumClient) DeployContract(
 	if strings.Contains(strings.ToLower(e.NetworkConfig.ID), "klaytn") ||
 		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") ||
 		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "oec") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "oec") {
+		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "oec") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "meter") ||
+		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "meter") {
 		log.Warn().
 			Str("Network ID", e.NetworkConfig.ID).
 			Msg("Setting GasTipCap = nil for a special case of running on a Klaytn network." +
