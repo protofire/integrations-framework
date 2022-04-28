@@ -267,16 +267,13 @@ func (e *EthereumClient) DeployContract(
 	}
 
 	// https://docs.klaytn.com/klaytn/design/transaction-fees#unit-price
-	if strings.Contains(strings.ToLower(e.NetworkConfig.ID), "klaytn") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "oec") ||
+	if strings.Contains(strings.ToLower(e.NetworkConfig.Name), "klaytn") ||
 		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "oec") ||
-		strings.Contains(strings.ToLower(e.NetworkConfig.ID), "meter") ||
 		strings.Contains(strings.ToLower(e.NetworkConfig.Name), "meter") {
 		log.Warn().
-			Str("Network ID", e.NetworkConfig.ID).
-			Msg("Setting GasTipCap = nil for a special case of running on a Klaytn network." +
-				"This should make Klaytn correctly set it.")
+			Str("Network Name", e.NetworkConfig.Name).
+			Msg("Setting GasTipCap = nil for a special case of running on a current network." +
+				"This should make network correctly set it.")
 		opts.GasTipCap = nil
 	} else if e.NetworkConfig.GasEstimationBuffer > 0 {
 		suggestedTipCap, err := e.Client.SuggestGasTipCap(context.Background())
