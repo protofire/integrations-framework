@@ -58,6 +58,8 @@ func NewContractDeployer(bcClient blockchain.EVMClient) (ContractDeployer, error
 		return &KlaytnContractDeployer{NewEthereumContractDeployer(clientImpl)}, nil
 	case *blockchain.MetisClient:
 		return &MetisContractDeployer{NewEthereumContractDeployer(clientImpl)}, nil
+	case *blockchain.MeterClient:
+		return &MeterContractDeployer{NewEthereumContractDeployer(clientImpl)}, nil
 	}
 	return nil, errors.New("unknown blockchain client implementation for contract deployer. Register blockchain client in NewContractDeployer")
 }
@@ -74,6 +76,11 @@ type KlaytnContractDeployer struct {
 
 // MetisContractDeployer wraps ethereum contract deployments for Metis
 type MetisContractDeployer struct {
+	*EthereumContractDeployer
+}
+
+// MeterContractDeployer wraps ethereum contract deployments for Meter
+type MeterContractDeployer struct {
 	*EthereumContractDeployer
 }
 

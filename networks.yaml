@@ -182,7 +182,7 @@ networks:
         type: "klaytn_testnet"
         chain_id: 1001
         urls:
-            - wss://url.here
+            - wss://api.baobab.klaytn.net:8652
         private_keys:
             - klaytn_key
     metis_testnet:
@@ -194,3 +194,12 @@ networks:
             - wss://stardust-ws.metis.io/
         private_keys:
             - metis_key
+    meter_testnet:
+        <<: *common_ethereum_testnet
+        name: "Meter testnet"
+        type: "meter_testnet"
+        chain_id: 83
+        urls:
+            - ws://wstest.meter.io/
+        private_keys:
+            - 9941d2a0f81d3a5bdc5a027551adfe223ab3012af9304947d23fd9e170d7f181
