@@ -23,6 +23,7 @@ const (
 	LiveEthTestNetwork    = "eth_testnet"
 	LiveKlaytnTestNetwork = "klaytn_testnet"
 	LiveMetisTestNetwork  = "metis_testnet"
+	LiveOecTestNetwork    = "oec_testnet"
 )
 
 // NewBlockchainClientFn external client implementation function
@@ -157,6 +158,10 @@ func NewDefaultNetworkRegistry() *NetworkRegistry {
 				newBlockchainClientFn: NewMetisMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
+			LiveOecTestNetwork: {
+				newBlockchainClientFn: NewOecMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
 		},
 	}
 }
@@ -179,6 +184,10 @@ func NewSoakNetworkRegistry() *NetworkRegistry {
 			},
 			LiveMetisTestNetwork: {
 				newBlockchainClientFn: NewMetisMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+			LiveOecTestNetwork: {
+				newBlockchainClientFn: NewOecMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
 		},
