@@ -46,3 +46,4 @@ remote_runner_config.yaml
 
 # Common report file format
 *.csv
+.key
