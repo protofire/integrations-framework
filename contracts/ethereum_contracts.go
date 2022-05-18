@@ -14,17 +14,19 @@ import (
 	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/integrations-framework/client"
-	"github.com/smartcontractkit/integrations-framework/contracts/celo"
-	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
-	ocrTypes "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
-	"github.com/smartcontractkit/integrations-framework/testreporters"
+
+	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
+	"github.com/smartcontractkit/chainlink-testing-framework/client"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
+	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
+	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
+	ocrTypes "github.com/smartcontractkit/libocr/offchainreporting/types"
 )
 
 // EthereumOracle oracle for "directrequest" job tests
 type EthereumOracle struct {
 	address *common.Address
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	oracle  *celo.Oracle
 }
 
@@ -38,7 +40,7 @@ func (e *EthereumOracle) Fund(ethAmount *big.Float) error {
 
 // SetFulfillmentPermission sets fulfillment permission for particular address
 func (e *EthereumOracle) SetFulfillmentPermission(address string, allowed bool) error {
-	opts, err := e.client.TransactionOpts(e.client.DefaultWallet)
+	opts, err := e.client.TransactionOpts(e.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -52,7 +54,7 @@ func (e *EthereumOracle) SetFulfillmentPermission(address string, allowed bool) 
 // EthereumAPIConsumer API consumer for job type "directrequest" tests
 type EthereumAPIConsumer struct {
 	address  *common.Address
-	client   *client.EthereumClient
+	client   blockchain.EVMClient
 	consumer *celo.APIConsumer
 }
 
@@ -62,7 +64,7 @@ func (e *EthereumAPIConsumer) Address() string {
 
 func (e *EthereumAPIConsumer) RoundID(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(e.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(e.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	return e.consumer.CurrentRoundID(opts)
@@ -98,7 +100,7 @@ func (e *EthereumAPIConsumer) WatchPerfEvents(ctx context.Context, eventChan cha
 
 func (e *EthereumAPIConsumer) Data(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(e.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(e.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	data, err := e.consumer.Data(opts)
@@ -117,7 +119,7 @@ func (e *EthereumAPIConsumer) CreateRequestTo(
 	path string,
 	times *big.Int,
 ) error {
-	opts, err := e.client.TransactionOpts(e.client.DefaultWallet)
+	opts, err := e.client.TransactionOpts(e.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -130,7 +132,7 @@ func (e *EthereumAPIConsumer) CreateRequestTo(
 
 // EthereumFluxAggregator represents the basic flux aggregation contract
 type EthereumFluxAggregator struct {
-	client         *client.EthereumClient
+	client         blockchain.EVMClient
 	fluxAggregator *celo.FluxAggregator
 	address        *common.Address
 }
@@ -145,7 +147,7 @@ func (f *EthereumFluxAggregator) Fund(ethAmount *big.Float) error {
 }
 
 func (f *EthereumFluxAggregator) UpdateAvailableFunds() error {
-	opts, err := f.client.TransactionOpts(f.client.DefaultWallet)
+	opts, err := f.client.TransactionOpts(f.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -158,7 +160,7 @@ func (f *EthereumFluxAggregator) UpdateAvailableFunds() error {
 
 func (f *EthereumFluxAggregator) PaymentAmount(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	payment, err := f.fluxAggregator.PaymentAmount(opts)
@@ -169,7 +171,7 @@ func (f *EthereumFluxAggregator) PaymentAmount(ctx context.Context) (*big.Int, e
 }
 
 func (f *EthereumFluxAggregator) RequestNewRound(ctx context.Context) error {
-	opts, err := f.client.TransactionOpts(f.client.DefaultWallet)
+	opts, err := f.client.TransactionOpts(f.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -208,7 +210,7 @@ func (f *EthereumFluxAggregator) WatchSubmissionReceived(ctx context.Context, ev
 }
 
 func (f *EthereumFluxAggregator) SetRequesterPermissions(ctx context.Context, addr common.Address, authorized bool, roundsDelay uint32) error {
-	opts, err := f.client.TransactionOpts(f.client.DefaultWallet)
+	opts, err := f.client.TransactionOpts(f.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -221,7 +223,7 @@ func (f *EthereumFluxAggregator) SetRequesterPermissions(ctx context.Context, ad
 
 func (f *EthereumFluxAggregator) GetOracles(ctx context.Context) ([]string, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	addresses, err := f.fluxAggregator.GetOracles(opts)
@@ -237,7 +239,7 @@ func (f *EthereumFluxAggregator) GetOracles(ctx context.Context) ([]string, erro
 
 func (f *EthereumFluxAggregator) LatestRoundID(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	rID, err := f.fluxAggregator.LatestRound(opts)
@@ -252,7 +254,7 @@ func (f *EthereumFluxAggregator) WithdrawPayment(
 	from common.Address,
 	to common.Address,
 	amount *big.Int) error {
-	opts, err := f.client.TransactionOpts(f.client.DefaultWallet)
+	opts, err := f.client.TransactionOpts(f.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -265,7 +267,7 @@ func (f *EthereumFluxAggregator) WithdrawPayment(
 
 func (f *EthereumFluxAggregator) WithdrawablePayment(ctx context.Context, addr common.Address) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	balance, err := f.fluxAggregator.WithdrawablePayment(opts, addr)
@@ -277,7 +279,7 @@ func (f *EthereumFluxAggregator) WithdrawablePayment(ctx context.Context, addr c
 
 func (f *EthereumFluxAggregator) LatestRoundData(ctx context.Context) (RoundData, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	lr, err := f.fluxAggregator.LatestRoundData(opts)
@@ -290,7 +292,7 @@ func (f *EthereumFluxAggregator) LatestRoundData(ctx context.Context) (RoundData
 // GetContractData retrieves basic data for the flux aggregator contract
 func (f *EthereumFluxAggregator) GetContractData(ctx context.Context) (*FluxAggregatorData, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 
@@ -325,7 +327,7 @@ func (f *EthereumFluxAggregator) GetContractData(ctx context.Context) (*FluxAggr
 
 // SetOracles allows the ability to add and/or remove oracles from the contract, and to set admins
 func (f *EthereumFluxAggregator) SetOracles(o FluxAggregatorSetOraclesOptions) error {
-	opts, err := f.client.TransactionOpts(f.client.DefaultWallet)
+	opts, err := f.client.TransactionOpts(f.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -340,7 +342,7 @@ func (f *EthereumFluxAggregator) SetOracles(o FluxAggregatorSetOraclesOptions) e
 // Description returns the description of the flux aggregator contract
 func (f *EthereumFluxAggregator) Description(ctxt context.Context) (string, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(f.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(f.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 	return f.fluxAggregator.Description(opts)
@@ -373,7 +375,7 @@ func NewFluxAggregatorRoundConfirmer(
 }
 
 // ReceiveBlock will query the latest FluxAggregator round and check to see whether the round has confirmed
-func (f *FluxAggregatorRoundConfirmer) ReceiveBlock(block client.NodeBlock) error {
+func (f *FluxAggregatorRoundConfirmer) ReceiveBlock(block blockchain.NodeBlock) error {
 	if block.Block == nil {
 		return nil
 	}
@@ -439,7 +441,7 @@ func NewVRFConsumerRoundConfirmer(
 }
 
 // ReceiveBlock will query the latest VRFConsumer round and check to see whether the round has confirmed
-func (f *VRFConsumerRoundConfirmer) ReceiveBlock(block client.NodeBlock) error {
+func (f *VRFConsumerRoundConfirmer) ReceiveBlock(block blockchain.NodeBlock) error {
 	if f.done {
 		return nil
 	}
@@ -482,31 +484,9 @@ func (f *VRFConsumerRoundConfirmer) Wait() error {
 
 // EthereumLinkToken represents a LinkToken address
 type EthereumLinkToken struct {
-	client   *client.EthereumClient
+	client   blockchain.EVMClient
 	instance *celo.LinkToken
 	address  common.Address
-}
-
-func (l *EthereumLinkToken) Deploy() (LinkToken, error) {
-	opts, err := l.client.TransactionOpts(l.client.DefaultWallet)
-	if err != nil {
-		return nil, err
-	}
-	contractAddress, tx, contractInstance, err := celo.DeployLinkToken(opts, l.client.Client)
-	if err != nil {
-		return nil, err
-	}
-	if err := l.client.ProcessTransaction(tx); err != nil {
-		return nil, err
-	}
-	log.Info().
-		Str("Contract Address", contractAddress.Hex()).
-		Str("Contract Name", "Link Token").
-		Str("From", l.client.DefaultWallet.Address()).
-		Str("Gas Cost", tx.Cost().String()).
-		Str("NetworkName", l.client.NetworkConfig.Name).
-		Msg("Deployed contract")
-	return &EthereumLinkToken{client: l.client, instance: contractInstance, address: contractAddress}, nil
 }
 
 // Fund the LINK Token contract with ETH to distribute the token
@@ -516,7 +496,7 @@ func (l *EthereumLinkToken) Fund(ethAmount *big.Float) error {
 
 func (l *EthereumLinkToken) BalanceOf(ctx context.Context, addr string) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(l.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(l.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	balance, err := l.instance.BalanceOf(opts, common.HexToAddress(addr))
@@ -529,7 +509,7 @@ func (l *EthereumLinkToken) BalanceOf(ctx context.Context, addr string) (*big.In
 // Name returns the name of the link token
 func (l *EthereumLinkToken) Name(ctxt context.Context) (string, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(l.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(l.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 	return l.instance.Name(opts)
@@ -540,10 +520,16 @@ func (l *EthereumLinkToken) Address() string {
 }
 
 func (l *EthereumLinkToken) Approve(to string, amount *big.Int) error {
-	opts, err := l.client.TransactionOpts(l.client.DefaultWallet)
+	opts, err := l.client.TransactionOpts(l.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
+	log.Info().
+		Str("From", l.client.GetDefaultWallet().Address()).
+		Str("To", to).
+		Str("Amount", amount.String()).
+		Uint64("Nonce", opts.Nonce.Uint64()).
+		Msg("Approving LINK Transfer")
 	tx, err := l.instance.Approve(opts, common.HexToAddress(to), amount)
 	if err != nil {
 		return err
@@ -552,15 +538,16 @@ func (l *EthereumLinkToken) Approve(to string, amount *big.Int) error {
 }
 
 func (l *EthereumLinkToken) Transfer(to string, amount *big.Int) error {
-	log.Info().
-		Str("From", l.client.DefaultWallet.Address()).
-		Str("To", to).
-		Str("Amount", amount.String()).
-		Msg("Transferring LINK")
-	opts, err := l.client.TransactionOpts(l.client.DefaultWallet)
+	opts, err := l.client.TransactionOpts(l.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
+	log.Info().
+		Str("From", l.client.GetDefaultWallet().Address()).
+		Str("To", to).
+		Str("Amount", amount.String()).
+		Uint64("Nonce", opts.Nonce.Uint64()).
+		Msg("Transferring LINK")
 	tx, err := l.instance.Transfer(opts, common.HexToAddress(to), amount)
 	if err != nil {
 		return err
@@ -569,10 +556,16 @@ func (l *EthereumLinkToken) Transfer(to string, amount *big.Int) error {
 }
 
 func (l *EthereumLinkToken) TransferAndCall(to string, amount *big.Int, data []byte) error {
-	opts, err := l.client.TransactionOpts(l.client.DefaultWallet)
+	opts, err := l.client.TransactionOpts(l.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
+	log.Info().
+		Str("From", l.client.GetDefaultWallet().Address()).
+		Str("To", to).
+		Str("Amount", amount.String()).
+		Uint64("Nonce", opts.Nonce.Uint64()).
+		Msg("Transferring and Calling LINK")
 	tx, err := l.instance.TransferAndCall(opts, common.HexToAddress(to), amount, data)
 	if err != nil {
 		return err
@@ -582,7 +575,7 @@ func (l *EthereumLinkToken) TransferAndCall(to string, amount *big.Int, data []b
 
 // EthereumOffchainAggregator represents the offchain aggregation contract
 type EthereumOffchainAggregator struct {
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	ocr     *celo.OffchainAggregator
 	address *common.Address
 }
@@ -595,7 +588,7 @@ func (o *EthereumOffchainAggregator) Fund(ethAmount *big.Float) error {
 // GetContractData retrieves basic data for the offchain aggregator contract
 func (o *EthereumOffchainAggregator) GetContractData(ctxt context.Context) (*OffchainAggregatorData, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(o.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(o.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 
@@ -614,18 +607,23 @@ func (o *EthereumOffchainAggregator) GetContractData(ctxt context.Context) (*Off
 func (o *EthereumOffchainAggregator) SetPayees(
 	transmitters, payees []string,
 ) error {
-	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
+	opts, err := o.client.TransactionOpts(o.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
-	transmittersAddr := make([]common.Address, 0)
+	var transmittersAddr, payeesAddr []common.Address
 	for _, tr := range transmitters {
 		transmittersAddr = append(transmittersAddr, common.HexToAddress(tr))
 	}
-	payeesAddr := make([]common.Address, 0)
 	for _, p := range payees {
-		transmittersAddr = append(transmittersAddr, common.HexToAddress(p))
+		payeesAddr = append(payeesAddr, common.HexToAddress(p))
 	}
+
+	log.Info().
+		Str("Transmitters", fmt.Sprintf("%v", transmitters)).
+		Str("Payees", fmt.Sprintf("%v", payees)).
+		Str("OCR Address", o.Address()).
+		Msg("Setting OCR Payees")
 
 	tx, err := o.ocr.SetPayees(opts, transmittersAddr, payeesAddr)
 	if err != nil {
@@ -634,7 +632,7 @@ func (o *EthereumOffchainAggregator) SetPayees(
 	return o.client.ProcessTransaction(tx)
 }
 
-// SetConfig sets offchain reporting protocol configuration including participating oracles
+// SetConfig sets the payees and the offchain reporting protocol configuration
 func (o *EthereumOffchainAggregator) SetConfig(
 	chainlinkNodes []client.Chainlink,
 	ocrConfig OffChainAggregatorConfig,
@@ -704,25 +702,12 @@ func (o *EthereumOffchainAggregator) SetConfig(
 		return err
 	}
 
-	// Set Payees
-	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
-	if err != nil {
-		return err
-	}
-	tx, err := o.ocr.SetPayees(opts, transmitters, transmitters)
-	if err != nil {
-		return err
-	}
-	if err := o.client.ProcessTransaction(tx); err != nil {
-		return err
-	}
-
 	// Set Config
-	opts, err = o.client.TransactionOpts(o.client.DefaultWallet)
+	opts, err := o.client.TransactionOpts(o.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
-	tx, err = o.ocr.SetConfig(opts, signers, transmitters, threshold, encodedConfigVersion, encodedConfig)
+	tx, err := o.ocr.SetConfig(opts, signers, transmitters, threshold, encodedConfigVersion, encodedConfig)
 	if err != nil {
 		return err
 	}
@@ -731,7 +716,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 
 // RequestNewRound requests the OCR contract to create a new round
 func (o *EthereumOffchainAggregator) RequestNewRound() error {
-	opts, err := o.client.TransactionOpts(o.client.DefaultWallet)
+	opts, err := o.client.TransactionOpts(o.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -747,7 +732,7 @@ func (o *EthereumOffchainAggregator) RequestNewRound() error {
 // GetLatestAnswer returns the latest answer from the OCR contract
 func (o *EthereumOffchainAggregator) GetLatestAnswer(ctxt context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(o.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(o.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 	return o.ocr.LatestAnswer(opts)
@@ -760,7 +745,7 @@ func (o *EthereumOffchainAggregator) Address() string {
 // GetLatestRound returns data from the latest round
 func (o *EthereumOffchainAggregator) GetLatestRound(ctxt context.Context) (*RoundData, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(o.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(o.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 
@@ -804,7 +789,7 @@ func NewRunlogRoundConfirmer(
 }
 
 // ReceiveBlock will query the latest Runlog round and check to see whether the round has confirmed
-func (o *RunlogRoundConfirmer) ReceiveBlock(_ client.NodeBlock) error {
+func (o *RunlogRoundConfirmer) ReceiveBlock(_ blockchain.NodeBlock) error {
 	currentRoundID, err := o.consumer.RoundID(context.Background())
 	if err != nil {
 		return err
@@ -865,7 +850,11 @@ func NewOffchainAggregatorRoundConfirmer(
 }
 
 // ReceiveBlock will query the latest OffchainAggregator round and check to see whether the round has confirmed
-func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ client.NodeBlock) error {
+func (o *OffchainAggregatorRoundConfirmer) ReceiveBlock(_ blockchain.NodeBlock) error {
+	if channelClosed(o.doneChan) {
+		return nil
+	}
+
 	lr, err := o.ocrInstance.GetLatestRound(context.Background())
 	if err != nil {
 		return err
@@ -897,6 +886,7 @@ func (o *OffchainAggregatorRoundConfirmer) Wait() error {
 		select {
 		case <-o.doneChan:
 			o.cancel()
+			close(o.doneChan)
 			return nil
 		case <-o.context.Done():
 			return fmt.Errorf("timeout waiting for OCR round to confirm: %d", o.roundID)
@@ -930,7 +920,7 @@ func NewKeeperConsumerRoundConfirmer(
 }
 
 // ReceiveBlock will query the latest Keeper round and check to see whether the round has confirmed
-func (o *KeeperConsumerRoundConfirmer) ReceiveBlock(_ client.NodeBlock) error {
+func (o *KeeperConsumerRoundConfirmer) ReceiveBlock(_ blockchain.NodeBlock) error {
 	upkeeps, err := o.instance.Counter(context.Background())
 	if err != nil {
 		return err
@@ -976,7 +966,7 @@ type KeeperConsumerPerformanceRoundConfirmer struct {
 	allMissedUpkeeps            []int64 // Tracks the amount of blocks missed in each missed upkeep
 	totalSuccessfulUpkeeps      int64
 
-	metricsReporter *testreporters.KeeperBlockTimeTestReporter // File to write report into
+	metricsReporter *testreporters.KeeperBlockTimeTestReporter // Testreporter to track results
 }
 
 // NewKeeperConsumerPerformanceRoundConfirmer provides a new instance of a KeeperConsumerPerformanceRoundConfirmer
@@ -997,7 +987,7 @@ func NewKeeperConsumerPerformanceRoundConfirmer(
 		blockRange:                  blockRange,
 		blocksSinceSubscription:     0,
 		blocksSinceSuccessfulUpkeep: 0,
-		expectedUpkeepCount:         1, // Upkeep usually starts at 1
+		expectedUpkeepCount:         1,
 		allMissedUpkeeps:            []int64{},
 		totalSuccessfulUpkeeps:      0,
 		metricsReporter:             metricsReporter,
@@ -1005,7 +995,7 @@ func NewKeeperConsumerPerformanceRoundConfirmer(
 }
 
 // ReceiveBlock will query the latest Keeper round and check to see whether the round has confirmed
-func (o *KeeperConsumerPerformanceRoundConfirmer) ReceiveBlock(receivedBlock client.NodeBlock) error {
+func (o *KeeperConsumerPerformanceRoundConfirmer) ReceiveBlock(receivedBlock blockchain.NodeBlock) error {
 	// Increment block counters
 	o.blocksSinceSubscription++
 	o.blocksSinceSuccessfulUpkeep++
@@ -1019,12 +1009,12 @@ func (o *KeeperConsumerPerformanceRoundConfirmer) ReceiveBlock(receivedBlock cli
 		return err
 	}
 	if isEligible {
-		log.Info().
+		log.Trace().
 			Str("Contract Address", o.instance.Address()).
 			Int64("Upkeeps Performed", upkeepCount.Int64()).
 			Msg("Upkeep Now Eligible")
 	}
-	if upkeepCount.Int64() == o.expectedUpkeepCount { // Upkeep was successful
+	if upkeepCount.Int64() >= o.expectedUpkeepCount { // Upkeep was successful
 		if o.blocksSinceSuccessfulUpkeep < o.blockCadence { // If there's an early upkeep, that's weird
 			log.Error().
 				Str("Contract Address", o.instance.Address()).
@@ -1107,13 +1097,13 @@ func (o *KeeperConsumerPerformanceRoundConfirmer) logDetails() {
 
 // EthereumStorage acts as a conduit for the celo version of the storage contract
 type EthereumStorage struct {
-	client *client.EthereumClient
+	client blockchain.EVMClient
 	store  *celo.Store
 }
 
 // Set sets a value in the storage contract
 func (e *EthereumStorage) Set(value *big.Int) error {
-	opts, err := e.client.TransactionOpts(e.client.DefaultWallet)
+	opts, err := e.client.TransactionOpts(e.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1128,7 +1118,7 @@ func (e *EthereumStorage) Set(value *big.Int) error {
 // Get retrieves a set value from the storage contract
 func (e *EthereumStorage) Get(ctxt context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(e.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(e.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 	return e.store.Get(opts)
@@ -1136,7 +1126,7 @@ func (e *EthereumStorage) Get(ctxt context.Context) (*big.Int, error) {
 
 // EthereumVRF represents a VRF contract
 type EthereumVRF struct {
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	vrf     *celo.VRF
 	address *common.Address
 }
@@ -1149,7 +1139,7 @@ func (v *EthereumVRF) Fund(ethAmount *big.Float) error {
 // ProofLength returns the PROOFLENGTH call from the VRF contract
 func (v *EthereumVRF) ProofLength(ctxt context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctxt,
 	}
 	return v.vrf.PROOFLENGTH(opts)
@@ -1157,8 +1147,8 @@ func (v *EthereumVRF) ProofLength(ctxt context.Context) (*big.Int, error) {
 
 // EthereumMockETHLINKFeed represents mocked ETH/LINK feed contract
 type EthereumMockETHLINKFeed struct {
-	client  *client.EthereumClient
-	feed    *celo.MockETHLINKAggregator
+	client  blockchain.EVMClient
+	feed    *celo.MockV3AggregatorContract
 	address *common.Address
 }
 
@@ -1166,9 +1156,20 @@ func (v *EthereumMockETHLINKFeed) Address() string {
 	return v.address.Hex()
 }
 
+func (v *EthereumMockETHLINKFeed) LatestRoundData() (*big.Int, error) {
+	data, err := v.feed.LatestRoundData(&bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: context.Background(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return data.Answer, nil
+}
+
 // EthereumMockGASFeed represents mocked Gas feed contract
 type EthereumMockGASFeed struct {
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	feed    *celo.MockGASAggregator
 	address *common.Address
 }
@@ -1179,7 +1180,7 @@ func (v *EthereumMockGASFeed) Address() string {
 
 // EthereumKeeperRegistry represents keeper registry contract
 type EthereumKeeperRegistry struct {
-	client   *client.EthereumClient
+	client   blockchain.EVMClient
 	registry *celo.KeeperRegistry
 	address  *common.Address
 }
@@ -1193,7 +1194,7 @@ func (v *EthereumKeeperRegistry) Fund(ethAmount *big.Float) error {
 }
 
 func (v *EthereumKeeperRegistry) SetRegistrar(registrarAddr string) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1206,7 +1207,7 @@ func (v *EthereumKeeperRegistry) SetRegistrar(registrarAddr string) error {
 
 // AddUpkeepFunds adds link for particular upkeep id
 func (v *EthereumKeeperRegistry) AddUpkeepFunds(id *big.Int, amount *big.Int) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1220,7 +1221,7 @@ func (v *EthereumKeeperRegistry) AddUpkeepFunds(id *big.Int, amount *big.Int) er
 // GetUpkeepInfo gets upkeep info
 func (v *EthereumKeeperRegistry) GetUpkeepInfo(ctx context.Context, id *big.Int) (*UpkeepInfo, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	uk, err := v.registry.GetUpkeep(opts, id)
@@ -1240,7 +1241,7 @@ func (v *EthereumKeeperRegistry) GetUpkeepInfo(ctx context.Context, id *big.Int)
 
 func (v *EthereumKeeperRegistry) GetKeeperInfo(ctx context.Context, keeperAddr string) (*KeeperInfo, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	info, err := v.registry.GetKeeperInfo(opts, common.HexToAddress(keeperAddr))
@@ -1255,7 +1256,7 @@ func (v *EthereumKeeperRegistry) GetKeeperInfo(ctx context.Context, keeperAddr s
 }
 
 func (v *EthereumKeeperRegistry) SetKeepers(keepers []string, payees []string) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1276,7 +1277,7 @@ func (v *EthereumKeeperRegistry) SetKeepers(keepers []string, payees []string) e
 
 // RegisterUpkeep registers contract to perform upkeep
 func (v *EthereumKeeperRegistry) RegisterUpkeep(target string, gasLimit uint32, admin string, checkData []byte) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1290,7 +1291,7 @@ func (v *EthereumKeeperRegistry) RegisterUpkeep(target string, gasLimit uint32, 
 // GetKeeperList get list of all registered keeper addresses
 func (v *EthereumKeeperRegistry) GetKeeperList(ctx context.Context) ([]string, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	list, err := v.registry.GetKeeperList(opts)
@@ -1304,9 +1305,82 @@ func (v *EthereumKeeperRegistry) GetKeeperList(ctx context.Context) ([]string, e
 	return addrs, nil
 }
 
+// EthereumUpkeepCounter represents keeper consumer (upkeep) counter contract
+type EthereumUpkeepCounter struct {
+	client   blockchain.EVMClient
+	consumer *ethereum.UpkeepCounter
+	address  *common.Address
+}
+
+func (v *EthereumUpkeepCounter) Address() string {
+	return v.address.Hex()
+}
+
+func (v *EthereumUpkeepCounter) Fund(ethAmount *big.Float) error {
+	return v.client.Fund(v.address.Hex(), ethAmount)
+}
+func (v *EthereumUpkeepCounter) Counter(ctx context.Context) (*big.Int, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: ctx,
+	}
+	cnt, err := v.consumer.Counter(opts)
+	if err != nil {
+		return nil, err
+	}
+	return cnt, nil
+}
+
+func (v *EthereumUpkeepCounter) SetSpread(testRange *big.Int, interval *big.Int) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.SetSpread(opts, testRange, interval)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+// EthereumUpkeepPerformCounterRestrictive represents keeper consumer (upkeep) counter contract
+type EthereumUpkeepPerformCounterRestrictive struct {
+	client   blockchain.EVMClient
+	consumer *ethereum.UpkeepPerformCounterRestrictive
+	address  *common.Address
+}
+
+func (v *EthereumUpkeepPerformCounterRestrictive) Address() string {
+	return v.address.Hex()
+}
+
+func (v *EthereumUpkeepPerformCounterRestrictive) Fund(ethAmount *big.Float) error {
+	return v.client.Fund(v.address.Hex(), ethAmount)
+}
+func (v *EthereumUpkeepPerformCounterRestrictive) Counter(ctx context.Context) (*big.Int, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: ctx,
+	}
+	count, err := v.consumer.GetCountPerforms(opts)
+	return count, err
+}
+
+func (v *EthereumUpkeepPerformCounterRestrictive) SetSpread(testRange *big.Int, interval *big.Int) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.SetSpread(opts, testRange, interval)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
 // EthereumKeeperConsumer represents keeper consumer (upkeep) contract
 type EthereumKeeperConsumer struct {
-	client   *client.EthereumClient
+	client   blockchain.EVMClient
 	consumer *celo.KeeperConsumer
 	address  *common.Address
 }
@@ -1321,7 +1395,7 @@ func (v *EthereumKeeperConsumer) Fund(ethAmount *big.Float) error {
 
 func (v *EthereumKeeperConsumer) Counter(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	cnt, err := v.consumer.Counter(opts)
@@ -1334,7 +1408,7 @@ func (v *EthereumKeeperConsumer) Counter(ctx context.Context) (*big.Int, error) 
 // EthereumKeeperConsumerPerformance represents a more complicated keeper consumer contract, one intended only for
 // performance tests.
 type EthereumKeeperConsumerPerformance struct {
-	client   *client.EthereumClient
+	client   blockchain.EVMClient
 	consumer *celo.KeeperConsumerPerformance
 	address  *common.Address
 }
@@ -1349,7 +1423,7 @@ func (v *EthereumKeeperConsumerPerformance) Fund(ethAmount *big.Float) error {
 
 func (v *EthereumKeeperConsumerPerformance) CheckEligible(ctx context.Context) (bool, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	eligible, err := v.consumer.CheckEligible(opts)
@@ -1358,7 +1432,7 @@ func (v *EthereumKeeperConsumerPerformance) CheckEligible(ctx context.Context) (
 
 func (v *EthereumKeeperConsumerPerformance) GetUpkeepCount(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	eligible, err := v.consumer.GetCountPerforms(opts)
@@ -1367,7 +1441,7 @@ func (v *EthereumKeeperConsumerPerformance) GetUpkeepCount(ctx context.Context) 
 
 // EthereumUpkeepRegistrationRequests keeper contract to register upkeeps
 type EthereumUpkeepRegistrationRequests struct {
-	client    *client.EthereumClient
+	client    blockchain.EVMClient
 	registrar *celo.UpkeepRegistrationRequests
 	address   *common.Address
 }
@@ -1384,7 +1458,7 @@ func (v *EthereumUpkeepRegistrationRequests) SetRegistrarConfig(
 	registryAddr string,
 	minLinkJuels *big.Int,
 ) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1434,7 +1508,7 @@ func (v *EthereumUpkeepRegistrationRequests) EncodeRegisterRequest(
 // EthereumBlockhashStore represents a blockhash store for VRF contract
 type EthereumBlockhashStore struct {
 	address        *common.Address
-	client         *client.EthereumClient
+	client         blockchain.EVMClient
 	blockHashStore *celo.BlockhashStore
 }
 
@@ -1442,20 +1516,20 @@ func (v *EthereumBlockhashStore) Address() string {
 	return v.address.Hex()
 }
 
-// EthereumVRFCoordinator represents VRF coordinator contract
-type EthereumVRFCoordinator struct {
+// EthereumVRFCoordinatorV2 represents VRFV2 coordinator contract
+type EthereumVRFCoordinatorV2 struct {
 	address     *common.Address
-	client      *client.EthereumClient
-	coordinator *celo.VRFCoordinator
+	client      blockchain.EVMClient
+	coordinator *ethereum.VRFCoordinatorV2
 }
 
-func (v *EthereumVRFCoordinator) Address() string {
+func (v *EthereumVRFCoordinatorV2) Address() string {
 	return v.address.Hex()
 }
 
-func (v *EthereumVRFCoordinator) HashOfKey(ctx context.Context, pubKey [2]*big.Int) ([32]byte, error) {
+func (v *EthereumVRFCoordinatorV2) HashOfKey(ctx context.Context, pubKey [2]*big.Int) ([32]byte, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	hash, err := v.coordinator.HashOfKey(opts, pubKey)
@@ -1465,13 +1539,73 @@ func (v *EthereumVRFCoordinator) HashOfKey(ctx context.Context, pubKey [2]*big.I
 	return hash, nil
 }
 
+func (v *EthereumVRFCoordinatorV2) SetConfig(minimumRequestConfirmations uint16, maxGasLimit uint32, stalenessSeconds uint32, gasAfterPaymentCalculation uint32, fallbackWeiPerUnitLink *big.Int, feeConfig ethereum.VRFCoordinatorV2FeeConfig) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.coordinator.SetConfig(
+		opts,
+		minimumRequestConfirmations,
+		maxGasLimit,
+		stalenessSeconds,
+		gasAfterPaymentCalculation,
+		fallbackWeiPerUnitLink,
+		feeConfig,
+	)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+func (v *EthereumVRFCoordinatorV2) RegisterProvingKey(
+	oracleAddr string,
+	publicProvingKey [2]*big.Int,
+) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.coordinator.RegisterProvingKey(opts, common.HexToAddress(oracleAddr), publicProvingKey)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+// EthereumVRFCoordinator represents VRF coordinator contract
+type EthereumVRFCoordinator struct {
+	address     *common.Address
+	client      blockchain.EVMClient
+	coordinator *celo.VRFCoordinator
+}
+
+func (v *EthereumVRFCoordinator) Address() string {
+	return v.address.Hex()
+}
+
+// HashOfKey get a hash of proving key to use it as a request ID part for VRF
+func (v *EthereumVRFCoordinator) HashOfKey(ctx context.Context, pubKey [2]*big.Int) ([32]byte, error) {
+	opts := &bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: ctx,
+	}
+	hash, err := v.coordinator.HashOfKey(opts, pubKey)
+	if err != nil {
+		return [32]byte{}, err
+	}
+	return hash, nil
+}
+
+// RegisterProvingKey register VRF proving key
 func (v *EthereumVRFCoordinator) RegisterProvingKey(
 	fee *big.Int,
 	oracleAddr string,
 	publicProvingKey [2]*big.Int,
 	jobID [32]byte,
 ) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1482,10 +1616,104 @@ func (v *EthereumVRFCoordinator) RegisterProvingKey(
 	return v.client.ProcessTransaction(tx)
 }
 
+// EthereumVRFConsumerV2 represents VRFv2 consumer contract
+type EthereumVRFConsumerV2 struct {
+	address  *common.Address
+	client   blockchain.EVMClient
+	consumer *ethereum.VRFConsumerV2
+}
+
+// CurrentSubscription get current VRFv2 subscription
+func (v *EthereumVRFConsumerV2) CurrentSubscription() (uint64, error) {
+	return v.consumer.SSubId(&bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: context.Background(),
+	})
+}
+
+// CreateFundedSubscription create funded subscription for VRFv2 randomness
+func (v *EthereumVRFConsumerV2) CreateFundedSubscription(funds *big.Int) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.TestCreateSubscriptionAndFund(opts, funds)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+// TopUpSubscriptionFunds add funds to a VRFv2 subscription
+func (v *EthereumVRFConsumerV2) TopUpSubscriptionFunds(funds *big.Int) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.TopUpSubscription(opts, funds)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+func (v *EthereumVRFConsumerV2) Address() string {
+	return v.address.Hex()
+}
+
+// GasAvailable get available gas after randomness fulfilled
+func (v *EthereumVRFConsumerV2) GasAvailable() (*big.Int, error) {
+	return v.consumer.SGasAvailable(&bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: context.Background(),
+	})
+}
+
+func (v *EthereumVRFConsumerV2) Fund(ethAmount *big.Float) error {
+	return v.client.Fund(v.address.Hex(), ethAmount)
+}
+
+// RequestRandomness request VRFv2 random words
+func (v *EthereumVRFConsumerV2) RequestRandomness(hash [32]byte, subID uint64, confs uint16, gasLimit uint32, numWords uint32) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.TestRequestRandomness(opts, hash, subID, confs, gasLimit, numWords)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+// RandomnessOutput get VRFv2 randomness output (word)
+func (v *EthereumVRFConsumerV2) RandomnessOutput(ctx context.Context, arg0 *big.Int) (*big.Int, error) {
+	return v.consumer.SRandomWords(&bind.CallOpts{
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+		Context: ctx,
+	}, arg0)
+}
+
+// GetAllRandomWords get all VRFv2 randomness output words
+func (v *EthereumVRFConsumerV2) GetAllRandomWords(ctx context.Context, num int) ([]*big.Int, error) {
+	words := make([]*big.Int, 0)
+	for i := 0; i < num; i++ {
+		word, err := v.consumer.SRandomWords(&bind.CallOpts{
+			From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
+			Context: ctx,
+		}, big.NewInt(int64(i)))
+		if err != nil {
+			return nil, err
+		}
+		words = append(words, word)
+	}
+	return words, nil
+}
+
 // EthereumVRFConsumer represents VRF consumer contract
 type EthereumVRFConsumer struct {
 	address  *common.Address
-	client   *client.EthereumClient
+	client   blockchain.EVMClient
 	consumer *celo.VRFConsumer
 }
 
@@ -1497,8 +1725,9 @@ func (v *EthereumVRFConsumer) Fund(ethAmount *big.Float) error {
 	return v.client.Fund(v.address.Hex(), ethAmount)
 }
 
+// RequestRandomness requests VRF randomness
 func (v *EthereumVRFConsumer) RequestRandomness(hash [32]byte, fee *big.Int) error {
-	opts, err := v.client.TransactionOpts(v.client.DefaultWallet)
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1512,7 +1741,7 @@ func (v *EthereumVRFConsumer) RequestRandomness(hash [32]byte, fee *big.Int) err
 // CurrentRoundID helper roundID counter in consumer to check when all randomness requests are finished
 func (v *EthereumVRFConsumer) CurrentRoundID(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	return v.consumer.CurrentRoundID(opts)
@@ -1542,9 +1771,10 @@ func (v *EthereumVRFConsumer) WatchPerfEvents(ctx context.Context, eventChan cha
 	}
 }
 
+// RandomnessOutput get VRF randomness output
 func (v *EthereumVRFConsumer) RandomnessOutput(ctx context.Context) (*big.Int, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(v.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(v.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	out, err := v.consumer.RandomnessOutput(opts)
@@ -1556,14 +1786,14 @@ func (v *EthereumVRFConsumer) RandomnessOutput(ctx context.Context) (*big.Int, e
 
 // EthereumReadAccessController represents read access controller contract
 type EthereumReadAccessController struct {
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	rac     *celo.SimpleReadAccessController
 	address *common.Address
 }
 
 // AddAccess grants access to particular address to raise a flag
 func (e *EthereumReadAccessController) AddAccess(addr string) error {
-	opts, err := e.client.TransactionOpts(e.client.DefaultWallet)
+	opts, err := e.client.TransactionOpts(e.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1577,7 +1807,7 @@ func (e *EthereumReadAccessController) AddAccess(addr string) error {
 
 // DisableAccessCheck disables all access checks
 func (e *EthereumReadAccessController) DisableAccessCheck() error {
-	opts, err := e.client.TransactionOpts(e.client.DefaultWallet)
+	opts, err := e.client.TransactionOpts(e.client.GetDefaultWallet())
 	if err != nil {
 		return err
 	}
@@ -1594,7 +1824,7 @@ func (e *EthereumReadAccessController) Address() string {
 
 // EthereumFlags represents flags contract
 type EthereumFlags struct {
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	flags   *celo.Flags
 	address *common.Address
 }
@@ -1606,7 +1836,7 @@ func (e *EthereumFlags) Address() string {
 // GetFlag returns boolean if a flag was set for particular address
 func (e *EthereumFlags) GetFlag(ctx context.Context, addr string) (bool, error) {
 	opts := &bind.CallOpts{
-		From:    common.HexToAddress(e.client.DefaultWallet.Address()),
+		From:    common.HexToAddress(e.client.GetDefaultWallet().Address()),
 		Context: ctx,
 	}
 	flag, err := e.flags.GetFlag(opts, common.HexToAddress(addr))
@@ -1618,11 +1848,21 @@ func (e *EthereumFlags) GetFlag(ctx context.Context, addr string) (bool, error) 
 
 // EthereumDeviationFlaggingValidator represents deviation flagging validator contract
 type EthereumDeviationFlaggingValidator struct {
-	client  *client.EthereumClient
+	client  blockchain.EVMClient
 	dfv     *celo.DeviationFlaggingValidator
 	address *common.Address
 }
 
 func (e *EthereumDeviationFlaggingValidator) Address() string {
 	return e.address.Hex()
+}
+
+func channelClosed(ch <-chan struct{}) bool {
+	select {
+	case <-ch:
+		return true
+	default:
+	}
+
+	return false
 }

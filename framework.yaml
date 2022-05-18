@@ -4,6 +4,7 @@
 # KEEP_ENVIRONMENTS=OnFail
 keep_environments: Always # Options: Always, OnFail, Never
 logging:
+    write_pod_logs: OnFail # Options: Always, OnFail
     # panic=5, fatal=4, error=3, warn=2, info=1, debug=0, trace=-1
     level: 0
 
@@ -14,7 +15,6 @@ chainlink_env_values:
     eth_url: wss://alfajores-forno.celo-testnet.org/ws
     eth_chain_id: "44787"
     eth_min_gas_price_wei: "100000000"
-
 # Setting an environment file allows for persistent, not ephemeral environments on test execution
 #
 # For example, if an environment is created with helmenv CLI, then the YAML file outputted on creation can be

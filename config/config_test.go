@@ -4,9 +4,8 @@ import (
 	"errors"
 	"os"
 	"testing"
-
-	"github.com/smartcontractkit/integrations-framework/config"
-	"github.com/smartcontractkit/integrations-framework/utils"
+	"github.com/smartcontractkit/chainlink-testing-framework/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/utils"
 	"github.com/stretchr/testify/require"
 )
 

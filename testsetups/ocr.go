@@ -1,8 +1,12 @@
+
+// Package testsetups compresses common test setups and more complicated setups like performance and chaos tests.
 package testsetups
 
 //revive:disable:dot-imports
 import (
 	"context"
+
+	"fmt"
 	"math/big"
 	"sync"
 	"time"
@@ -10,22 +14,28 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
+
+	"github.com/smartcontractkit/chainlink-testing-framework/actions"
+	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
+	"github.com/smartcontractkit/chainlink-testing-framework/client"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
+	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
 	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/integrations-framework/actions"
-	"github.com/smartcontractkit/integrations-framework/client"
-	"github.com/smartcontractkit/integrations-framework/contracts"
-	"github.com/smartcontractkit/integrations-framework/testreporters"
 )
 
 // OCRSoakTest defines a typical OCR soak test
 type OCRSoakTest struct {
 	Inputs *OCRSoakTestInputs
 
-	TestReporter   testreporters.OCRSoakTestReporter
-	ocrInstances   []contracts.OffchainAggregator
+
+	TestReporter testreporters.OCRSoakTestReporter
+	ocrInstances []contracts.OffchainAggregator
+	mockServer   *client.MockserverClient
+
+	env            *environment.Environment
 	chainlinkNodes []client.Chainlink
-	mockServer     *client.MockserverClient
-	defaultNetwork client.BlockchainClient
+	networks       *blockchain.Networks
+	defaultNetwork blockchain.EVMClient
 }
 
 // OCRSoakTestInputs define required inputs to run an OCR soak test
@@ -33,7 +43,10 @@ type OCRSoakTestInputs struct {
 	TestDuration         time.Duration // How long to run the test for (assuming things pass)
 	NumberOfContracts    int           // Number of OCR contracts to launch
 	ChainlinkNodeFunding *big.Float    // Amount of ETH to fund each chainlink node with
-	RoundTimeout         time.Duration // How long to wait for a round to update before timing out
+
+	RoundTimeout         time.Duration // How long to wait for a round to update before failing the test
+	ExpectedRoundTime    time.Duration // How long each round is expected to take
+	TimeBetweenRounds    time.Duration // How long to wait after a completed round to start a new one, set 0 for instant
 	StartingAdapterValue int
 }
 
@@ -45,7 +58,9 @@ func NewOCRSoakTest(inputs *OCRSoakTestInputs) *OCRSoakTest {
 	return &OCRSoakTest{
 		Inputs: inputs,
 		TestReporter: testreporters.OCRSoakTestReporter{
-			Reports: make(map[string]*testreporters.OCRSoakTestReport),
+
+			Reports:           make(map[string]*testreporters.OCRSoakTestReport),
+			ExpectedRoundTime: inputs.ExpectedRoundTime,
 		},
 	}
 }
@@ -53,13 +68,15 @@ func NewOCRSoakTest(inputs *OCRSoakTestInputs) *OCRSoakTest {
 // Setup sets up the test environment, deploying contracts and funding chainlink nodes
 func (t *OCRSoakTest) Setup(env *environment.Environment) {
 	t.ensureInputValues()
+
+	t.env = env
 	var err error
 
 	// Make connections to soak test resources
-	networkRegistry := client.NewSoakNetworkRegistry()
-	networks, err := networkRegistry.GetNetworks(env)
+	networkRegistry := blockchain.NewSoakNetworkRegistry()
+	t.networks, err = networkRegistry.GetNetworks(env)
 	Expect(err).ShouldNot(HaveOccurred(), "Connecting to blockchain nodes shouldn't fail")
-	t.defaultNetwork = networks.Default
+	t.defaultNetwork = t.networks.Default
 	contractDeployer, err := contracts.NewContractDeployer(t.defaultNetwork)
 	Expect(err).ShouldNot(HaveOccurred(), "Deploying contracts shouldn't fail")
 	t.chainlinkNodes, err = client.ConnectChainlinkNodesSoak(env)
@@ -67,28 +84,30 @@ func (t *OCRSoakTest) Setup(env *environment.Environment) {
 	t.mockServer, err = client.ConnectMockServerSoak(env)
 	Expect(err).ShouldNot(HaveOccurred(), "Creating mockserver clients shouldn't fail")
 	t.defaultNetwork.ParallelTransactions(true)
-	Expect(err).ShouldNot(HaveOccurred())
+
 
 	// Deploy LINK
 	linkTokenContract, err := contractDeployer.DeployLinkTokenContract()
 	Expect(err).ShouldNot(HaveOccurred(), "Deploying Link Token Contract shouldn't fail")
 
-	// Fund Chainlink nodes
-	err = actions.FundChainlinkNodes(t.chainlinkNodes, t.defaultNetwork, t.Inputs.ChainlinkNodeFunding)
-	Expect(err).ShouldNot(HaveOccurred())
+
+	// Fund Chainlink nodes, excluding the bootstrap node
+	err = actions.FundChainlinkNodes(t.chainlinkNodes[1:], t.defaultNetwork, t.Inputs.ChainlinkNodeFunding)
+	Expect(err).ShouldNot(HaveOccurred(), "Error funding Chainlink nodes")
 
 	t.ocrInstances = actions.DeployOCRContracts(
 		t.Inputs.NumberOfContracts,
 		linkTokenContract,
 		contractDeployer,
 		t.chainlinkNodes,
-		networks,
+		t.networks,
 	)
 	err = t.defaultNetwork.WaitForEvents()
-	Expect(err).ShouldNot(HaveOccurred())
+	Expect(err).ShouldNot(HaveOccurred(), "Error waiting for OCR contracts to be deployed")
 	for _, ocrInstance := range t.ocrInstances {
 		t.TestReporter.Reports[ocrInstance.Address()] = &testreporters.OCRSoakTestReport{
-			ContractAddress: ocrInstance.Address(),
+			ContractAddress:   ocrInstance.Address(),
+			ExpectedRoundtime: t.Inputs.ExpectedRoundTime,
 		}
 	}
 }
@@ -109,21 +128,39 @@ func (t *OCRSoakTest) Run() {
 	testContext, testCancel := context.WithTimeout(context.Background(), t.Inputs.TestDuration)
 	defer testCancel()
 
+
+	stopTestChannel := make(chan struct{}, 1)
+	StartRemoteControlServer("OCR Soak Test", stopTestChannel)
+
 	// Test Loop
 	roundNumber := 1
+	newRoundTrigger, cancelFunc := context.WithTimeout(context.Background(), 0)
 	for {
 		select {
-		case <-testContext.Done():
-			log.Info().Msg("Soak Test Complete")
+		case <-stopTestChannel:
+			cancelFunc()
+			t.TestReporter.UnexpectedShutdown = true
+			log.Warn().Msg("Received shut down signal. Soak test stopping early")
 			return
-		default:
+		case <-testContext.Done():
+			cancelFunc()
+			log.Info().Msg("Soak test complete")
+			return
+		case <-newRoundTrigger.Done():
 			log.Info().Int("Round Number", roundNumber).Msg("Starting new Round")
 			adapterValue := t.changeAdapterValue(roundNumber)
 			t.waitForRoundToComplete(roundNumber)
 			t.checkLatestRound(adapterValue, roundNumber)
 			roundNumber++
+
 		}
 	}
+}
+
+
+// Networks returns the networks that the test is running on
+func (t *OCRSoakTest) TearDownVals() (*environment.Environment, *blockchain.Networks, []client.Chainlink, testreporters.TestReporter) {
+	return t.env, t.networks, t.chainlinkNodes, &t.TestReporter
 }
 
 // ensureValues ensures that all values needed to run the test are present
@@ -132,7 +169,10 @@ func (t *OCRSoakTest) ensureInputValues() {
 	Expect(inputs.NumberOfContracts).Should(BeNumerically(">=", 1), "Expecting at least 1 OCR contract")
 	Expect(inputs.ChainlinkNodeFunding.Float64()).Should(BeNumerically(">", 0), "Expecting non-zero chainlink node funding amount")
 	Expect(inputs.TestDuration).Should(BeNumerically(">=", time.Minute*1), "Expected test duration to be more than a minute")
-	Expect(inputs.RoundTimeout).Should(BeNumerically(">=", time.Second*15), "Expected test duration to be more than 15 seconds")
+	Expect(inputs.ExpectedRoundTime).Should(BeNumerically(">=", time.Second*1), "Expected ExpectedRoundTime to be greater than 1 second")
+	Expect(inputs.RoundTimeout).Should(BeNumerically(">=", inputs.ExpectedRoundTime), "Expected RoundTimeout to be greater than ExpectedRoundTime")
+	Expect(inputs.TimeBetweenRounds).ShouldNot(BeNil(), "You forgot to set TimeBetweenRounds")
+	Expect(inputs.TimeBetweenRounds).Should(BeNumerically("<", time.Hour), "TimeBetweenRounds must be less than 1 hour")
 }
 
 // changes the mock adapter value for OCR instances to retrieve answers from
@@ -176,10 +216,10 @@ func (t *OCRSoakTest) checkLatestRound(expectedValue, roundNumber int) {
 		roundAnswerGroup.Add(1)
 		ocrInstance := ocrInstance
 		go func() {
-			defer func() {
-				GinkgoRecover() // This doesn't seem to work properly (ginkgo still panics without recovery). Possible Ginkgo bug?
-				roundAnswerGroup.Done()
-			}()
+
+			defer GinkgoRecover() // This doesn't seem to work properly (ginkgo still panics without recovery). Possible Ginkgo bug?
+			defer roundAnswerGroup.Done()
+
 			answer, err := ocrInstance.GetLatestAnswer(context.Background())
 			Expect(err).ShouldNot(HaveOccurred(), "Error retrieving latest answer from the OCR contract at %s", ocrInstance.Address())
 			log.Info().

@@ -10,27 +10,37 @@ import (
 	"strings"
 	"time"
 
+	"github.com/avast/retry-go"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"github.com/pkg/errors"
 	"github.com/smartcontractkit/helmenv/environment"
+
+	"golang.org/x/sync/errgroup"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/integrations-framework/config"
-	"github.com/smartcontractkit/integrations-framework/contracts"
-	"github.com/smartcontractkit/integrations-framework/testreporters"
+	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
+	"github.com/smartcontractkit/chainlink-testing-framework/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
+	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
 
 	"github.com/celo-org/celo-blockchain/common"
+
 	uuid "github.com/satori/go.uuid"
-	"github.com/smartcontractkit/integrations-framework/client"
+	"github.com/smartcontractkit/chainlink-testing-framework/client"
 )
 
 const (
 	// DefaultArtifactsDir default artifacts dir
 	DefaultArtifactsDir string = "logs"
 )
+
+
+// ContractDeploymentInterval After how many contract actions to wait before starting any more
+// Example: When deploying 1000 contracts, stop every ContractDeploymentInterval have been deployed to wait before continuing
+var ContractDeploymentInterval = 500
 
 // GinkgoSuite provides the default setup for running a Ginkgo test suite
 func GinkgoSuite(frameworkConfigFileLocation string) {
@@ -80,7 +90,7 @@ func LoadConfigs(frameworkConfigFileLocation string) {
 // FundChainlinkNodes will fund all of the provided Chainlink nodes with a set amount of native currency
 func FundChainlinkNodes(
 	nodes []client.Chainlink,
-	blockchain client.BlockchainClient,
+	client blockchain.EVMClient,
 	amount *big.Float,
 ) error {
 	for _, cl := range nodes {
@@ -88,7 +98,33 @@ func FundChainlinkNodes(
 		if err != nil {
 			return err
 		}
-		err = blockchain.Fund(toAddress, amount)
+		err = client.Fund(toAddress, amount)
+		if err != nil {
+			return err
+		}
+	}
+	// required in Geth when you need to call "simulate" transactions from nodes
+	if client.GetNetworkType() == blockchain.SimulatedEthNetwork {
+		if err := client.Fund("0x0", big.NewFloat(10)); err != nil {
+			return err
+		}
+	}
+	return client.WaitForEvents()
+}
+
+// FundChainlinkNodes will fund all of the provided Chainlink nodes with a set amount of native currency
+func FundChainlinkNodesLink(
+	nodes []client.Chainlink,
+	blockchain blockchain.EVMClient,
+	linkToken contracts.LinkToken,
+	linkAmount *big.Int,
+) error {
+	for _, cl := range nodes {
+		toAddress, err := cl.PrimaryEthAddress()
+		if err != nil {
+			return err
+		}
+		err = linkToken.Transfer(toAddress, linkAmount)
 		if err != nil {
 			return err
 		}
@@ -97,7 +133,7 @@ func FundChainlinkNodes(
 }
 
 // FundAddresses will fund a list of addresses with an amount of native currency
-func FundAddresses(blockchain client.BlockchainClient, amount *big.Float, addresses ...string) error {
+func FundAddresses(blockchain blockchain.EVMClient, amount *big.Float, addresses ...string) error {
 	for _, address := range addresses {
 		if err := blockchain.Fund(address, amount); err != nil {
 			return err
@@ -213,20 +249,16 @@ func GetMockserverInitializerDataForOTPE(
 }
 
 // TeardownSuite tears down networks/clients and environment and creates a logs folder for failed tests in the
-// specified path. Can also accept a testsetup (if one was used) to log results
+// specified path. Can also accept a testreporter (if one was used) to log further results
 func TeardownSuite(
 	env *environment.Environment,
-	nets *client.Networks,
+	nets *blockchain.Networks,
 	logsFolderPath string,
+	chainlinkNodes []client.Chainlink,
 	optionalTestReporter testreporters.TestReporter, // Optionally pass in a test reporter to log further metrics
 ) error {
 	if err := writeTeardownLogs(env, optionalTestReporter); err != nil {
 		return errors.Wrap(err, "Error dumping environment logs, leaving environment running for manual retrieval")
-	}
-	if nets != nil {
-		if err := nets.Teardown(); err != nil {
-			return err
-		}
 	}
 	switch strings.ToUpper(config.ProjectFrameworkSettings.KeepEnvironments) {
 	case "ALWAYS":
@@ -241,6 +273,22 @@ func TeardownSuite(
 		log.Warn().Str("Invalid Keep Value", config.ProjectFrameworkSettings.KeepEnvironments).
 			Msg("Invalid 'keep_environments' value, see the 'framework.yaml' file")
 	}
+
+	if nets != nil && chainlinkNodes != nil && len(chainlinkNodes) > 0 {
+		if err := returnFunds(chainlinkNodes, nets); err != nil {
+			log.Error().Err(err).Str("Namespace", env.Namespace).
+				Msg("Error attempting to return funds from chainlink nodes to network's default wallet. " +
+					"Environment is left running so you can try manually!")
+			env.Persistent = true
+		}
+	} else {
+		log.Info().Msg("Successfully returned funds from chainlink nodes to default network wallets")
+	}
+	if nets != nil {
+		if err := nets.Teardown(); err != nil {
+			return err
+		}
+	}
 	if !env.Config.Persistent {
 		if err := env.Teardown(); err != nil {
 			return err
@@ -251,10 +299,27 @@ func TeardownSuite(
 
 // TeardownRemoteSuite is used when running a test within a remote-test-runner, like for long-running performance and
 // soak tests
-func TeardownRemoteSuite(env *environment.Environment, optionalTestReporter testreporters.TestReporter) error {
-	return writeTeardownLogs(env, optionalTestReporter)
+func TeardownRemoteSuite(
+	env *environment.Environment,
+	nets *blockchain.Networks,
+	chainlinkNodes []client.Chainlink,
+	optionalTestReporter testreporters.TestReporter, // Optionally pass in a test reporter to log further metrics
+) error {
+	err := writeTeardownLogs(env, optionalTestReporter)
+	if err != nil {
+		log.Err(err).Msg("Error writing logs for soak tests. Working on improving and fixing this.")
+	}
+	err = returnFunds(chainlinkNodes, nets)
+	if err != nil {
+		log.Error().Err(err).Str("Namespace", env.Namespace).
+			Msg("Error attempting to return funds from chainlink nodes to network's default wallet. " +
+				"Environment is left running so you can try manually!")
+	}
+	return err
 }
 
+// attempts to download the logs of all ephemeral test deployments onto the test runner, also writing a test report
+// if one is provided
 func writeTeardownLogs(env *environment.Environment, optionalTestReporter testreporters.TestReporter) error {
 	if ginkgo.CurrentSpecReport().Failed() || optionalTestReporter != nil {
 		testFilename := strings.Split(ginkgo.CurrentSpecReport().FileName(), ".")[0]
@@ -282,4 +347,147 @@ func writeTeardownLogs(env *environment.Environment, optionalTestReporter testre
 		}
 	}
 	return nil
+}
+
+// Returns all the funds from the chainlink nodes to the networks default address
+func returnFunds(chainlinkNodes []client.Chainlink, networks *blockchain.Networks) error {
+	if networks == nil {
+		log.Warn().Msg("No network connections found, unable to return funds from chainlink nodes.")
+	}
+	for _, node := range chainlinkNodes {
+		if err := node.SetSessionCookie(); err != nil {
+			return err
+		}
+	}
+	log.Info().Msg("Attempting to return Chainlink node funds to default network wallets")
+	for _, network := range networks.AllNetworks() {
+		if network.GetNetworkType() == blockchain.SimulatedEthNetwork {
+			log.Info().Str("Network Name", network.GetNetworkName()).
+				Msg("Network is a `eth_simulated` network. Skipping fund return.")
+			continue
+		}
+		addressMap, err := sendFunds(chainlinkNodes, network)
+		if err != nil {
+			return err
+		}
+
+		err = checkFunds(chainlinkNodes, addressMap, strings.ToLower(network.GetDefaultWallet().Address()))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Requests that all the chainlink nodes send their funds back to the network's default wallet
+// This is surprisingly tricky, and fairly annoying due to Go's lack of syntactic sugar and how chainlink nodes handle txs
+func sendFunds(chainlinkNodes []client.Chainlink, network blockchain.EVMClient) (map[int]string, error) {
+	chainlinkTransactionAddresses := make(map[int]string)
+	sendFundsErrGroup := new(errgroup.Group)
+	for ni, n := range chainlinkNodes {
+		nodeIndex := ni // https://golang.org/doc/faq#closures_and_goroutines
+		node := n
+		// Send async request to each chainlink node to send a transaction back to the network default wallet
+		sendFundsErrGroup.Go(
+			func() error {
+				primaryEthKeyData, err := node.ReadPrimaryETHKey()
+				if err != nil {
+					// TODO: Support non-EVM chain fund returns
+					if strings.Contains(err.Error(), "No ETH keys present") {
+						log.Warn().Msg("Not returning any funds. Only support EVM chains for fund returns at the moment")
+						return nil
+					}
+					return err
+				}
+
+				nodeBalanceString := primaryEthKeyData.Attributes.ETHBalance
+				if nodeBalanceString != "0" { // If key has a non-zero balance, attempt to transfer it back
+					gasCost, err := network.EstimateTransactionGasCost()
+					if err != nil {
+						return err
+					}
+
+					// TODO: Imperfect gas calculation buffer of 50 Gwei. Seems to be the result of differences in chainlink
+					// gas handling. Working with core team on a better solution
+					gasCost = gasCost.Add(gasCost, big.NewInt(50000000000))
+					nodeBalance, _ := big.NewInt(0).SetString(nodeBalanceString, 10)
+					transferAmount := nodeBalance.Sub(nodeBalance, gasCost)
+					_, err = node.SendNativeToken(transferAmount, primaryEthKeyData.Attributes.Address, network.GetDefaultWallet().Address())
+					if err != nil {
+						return err
+					}
+					// Add the address to our map to check for later (hashes aren't returned, sadly)
+					chainlinkTransactionAddresses[nodeIndex] = strings.ToLower(primaryEthKeyData.Attributes.Address)
+				}
+				return nil
+			},
+		)
+
+	}
+	return chainlinkTransactionAddresses, sendFundsErrGroup.Wait()
+}
+
+// checks that the funds made it from the chainlink node to the network address
+// this turns out to be tricky to do, given how chainlink handles pending transactions, thus the complexity
+func checkFunds(chainlinkNodes []client.Chainlink, sentFromAddressesMap map[int]string, toAddress string) error {
+	successfulConfirmations := make(map[int]bool)
+	err := retry.Do( // Might take some time for txs to confirm, check up on the nodes a few times
+		func() error {
+			log.Debug().Msg("Attempting to confirm chainlink nodes transferred back funds")
+			transactionErrGroup := new(errgroup.Group)
+			for i, n := range chainlinkNodes {
+				nodeIndex := i
+				node := n // https://golang.org/doc/faq#closures_and_goroutines
+				sentFromAddress, nodeHasFunds := sentFromAddressesMap[nodeIndex]
+				successfulConfirmation := successfulConfirmations[nodeIndex]
+				// Async check on all the nodes if their transactions are confirmed
+				if nodeHasFunds && !successfulConfirmation { // Only if node has funds and hasn't already sent them
+					transactionErrGroup.Go(func() error {
+						err := confirmTransaction(node, sentFromAddress, toAddress, transactionErrGroup)
+						if err == nil {
+							successfulConfirmations[nodeIndex] = true
+						}
+						return err
+					})
+				} else {
+					log.Debug().Int("Node Number", nodeIndex).Msg("Chainlink node had no funds to return")
+				}
+			}
+
+			return transactionErrGroup.Wait()
+		},
+		retry.Delay(time.Second*5),
+		retry.MaxDelay(time.Second*5),
+		retry.Attempts(20),
+	)
+
+	return err
+}
+
+// helper to confirm that the latest attempted transaction on the chainlink node with the expected from and to addresses
+// has been confirmed
+func confirmTransaction(
+	chainlinkNode client.Chainlink,
+	fromAddress string,
+	toAddress string,
+	transactionErrGroup *errgroup.Group,
+) error {
+	transactionAttempts, err := chainlinkNode.ReadTransactionAttempts()
+	if err != nil {
+		return err
+	}
+	log.Debug().Str("From", fromAddress).
+		Str("To", toAddress).
+		Msg("Attempting to confirm node returned funds")
+	// Loop through all transactions on the node
+	for _, tx := range transactionAttempts.Data {
+		if tx.Attributes.From == fromAddress && strings.ToLower(tx.Attributes.To) == toAddress {
+			if tx.Attributes.State == "confirmed" {
+				return nil
+			}
+			return fmt.Errorf("Expected transaction to be confirmed. From: %s To: %s State: %s", fromAddress, toAddress, tx.Attributes.State)
+		}
+	}
+	return fmt.Errorf("Did not find expected transaction on node. From: %s To: %s", fromAddress, toAddress)
 }

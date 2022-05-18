@@ -1,65 +1,85 @@
-// Package client handles connections between chainlink nodes and different blockchain networks
-package client
+// Package blockchain handles connections to various blockchains
+package blockchain
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"math/big"
-	"net/http"
 	"net/url"
 
+
+	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
+	"github.com/celo-org/celo-blockchain/common"
 	"github.com/celo-org/celo-blockchain/core/types"
 	"github.com/smartcontractkit/helmenv/environment"
 	"gopkg.in/yaml.v2"
 
-	"github.com/smartcontractkit/integrations-framework/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/config"
 )
 
 // Commonly used blockchain network types
 const (
-	SimulatedEthNetwork    = "eth_simulated"
-	LiveEthTestNetwork     = "eth_testnet"
-	NetworkGethPerformance = "ethereum_geth_performance"
+	SimulatedEthNetwork   = "eth_simulated"
+	LiveEthTestNetwork    = "eth_testnet"
+	LiveKlaytnTestNetwork = "klaytn_testnet"
+	LiveMetisTestNetwork  = "metis_testnet"
 )
 
 // NewBlockchainClientFn external client implementation function
 // networkName must match a key in "networks" in networks.yaml config
 // networkConfig is just an arbitrary config you provide in "networks" for your key
-type NewBlockchainClientFn func(
+type NewEVMClientFn func(
 	networkName string,
 	networkConfig map[string]interface{},
 	urls []*url.URL,
-) (BlockchainClient, error)
+) (EVMClient, error)
 
-// BlockchainClientURLFn are used to be able to return a list of URLs from the environment to connect
-type BlockchainClientURLFn func(e *environment.Environment) ([]*url.URL, error)
+// ClientURLFn are used to be able to return a list of URLs from the environment to connect
+type ClientURLFn func(e *environment.Environment) ([]*url.URL, error)
 
-// BlockchainClient is the interface that wraps a given client implementation for a blockchain, to allow for switching
+// EVMClient is the interface that wraps a given client implementation for a blockchain, to allow for switching
 // of network types within the test suite
-// BlockchainClient can be connected to a single or multiple nodes,
-type BlockchainClient interface {
-	ContractsDeployed() bool
-	LoadWallets(ns interface{}) error
-	SetWallet(num int) error
-	GetDefaultWallet() *EthereumWallet
-
-	EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error)
-
+// EVMClient can be connected to a single or multiple nodes,
+type EVMClient interface {
+	// Getters
 	Get() interface{}
 	GetNetworkName() string
 	GetNetworkType() string
-	GetChainID() int64
+	GetChainID() *big.Int
+	GetClients() []EVMClient
+	GetDefaultWallet() *EthereumWallet
+	GetWallets() []*EthereumWallet
+	GetNetworkConfig() *config.ETHNetwork
+
+	// Setters
+	SetID(id int)
+	SetDefaultWallet(num int) error
+	SetWallets([]*EthereumWallet)
+	LoadWallets(ns interface{}) error
 	SwitchNode(node int) error
-	GetClients() []BlockchainClient
+
+	// On-chain Operations
 	HeaderHashByNumber(ctx context.Context, bn *big.Int) (string, error)
-	BlockNumber(ctx context.Context) (uint64, error)
 	HeaderTimestampByNumber(ctx context.Context, bn *big.Int) (uint64, error)
+	LatestBlockNumber(ctx context.Context) (uint64, error)
 	Fund(toAddress string, amount *big.Float) error
-	GasStats() *GasStats
+	DeployContract(
+		contractName string,
+		deployer ContractDeployer,
+	) (*common.Address, *types.Transaction, interface{}, error)
+	TransactionOpts(from *EthereumWallet) (*bind.TransactOpts, error)
+	ProcessTransaction(tx *types.Transaction) error
+	IsTxConfirmed(txHash common.Hash) (bool, error)
 	ParallelTransactions(enabled bool)
 	Close() error
 
+	// Gas Operations
+	EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error)
+	EstimateTransactionGasCost() (*big.Int, error)
+	GasStats() *GasStats
+
+	// Event Subscriptions
 	AddHeaderEventSubscription(key string, subscriber HeaderEventSubscription)
 	DeleteHeaderEventSubscription(key string)
 	WaitForEvents() error
@@ -69,8 +89,8 @@ type BlockchainClient interface {
 // if there is only one client it is chosen as Default
 // if there is multiple you just get clients you need in test
 type Networks struct {
-	clients []BlockchainClient
-	Default BlockchainClient
+	clients []EVMClient
+	Default EVMClient
 }
 
 // Teardown all clients
@@ -85,7 +105,7 @@ func (b *Networks) Teardown() error {
 
 // SetDefault chooses default client
 func (b *Networks) SetDefault(index int) error {
-	if len(b.clients) >= index {
+	if index > len(b.clients) {
 		return fmt.Errorf("index of %d is out of bounds", index)
 	}
 	b.Default = b.clients[index]
@@ -93,28 +113,16 @@ func (b *Networks) SetDefault(index int) error {
 }
 
 // Get gets blockchain network (client) by name
-func (b *Networks) Get(index int) (BlockchainClient, error) {
-	if len(b.clients) >= index {
+func (b *Networks) Get(index int) (EVMClient, error) {
+	if index > len(b.clients) {
 		return nil, fmt.Errorf("index of %d is out of bounds", index)
 	}
 	return b.clients[index], nil
 }
 
-// ConnectMockServer creates a connection to a deployed mockserver in the environment
-func ConnectMockServer(e *environment.Environment) (*MockserverClient, error) {
-	localURL, err := e.Charts.Connections("mockserver").LocalURLByPort("serviceport", environment.HTTP)
-	if err != nil {
-		return nil, err
-	}
-	remoteURL, err := e.Config.Charts.Connections("mockserver").RemoteURLByPort("serviceport", environment.HTTP)
-	if err != nil {
-		return nil, err
-	}
-	c := NewMockserverClient(&MockserverConfig{
-		LocalURL:   localURL.String(),
-		ClusterURL: remoteURL.String(),
-	})
-	return c, nil
+// AllNetworks returns all the network clients
+func (b *Networks) AllNetworks() []EVMClient {
+	return b.clients
 }
 
 // ConnectMockServerSoak creates a connection to a deployed mockserver, assuming runner is in a soak test runner
@@ -137,8 +145,8 @@ type NetworkRegistry struct {
 }
 
 type registeredNetwork struct {
-	newBlockchainClientFn NewBlockchainClientFn
-	blockchainClientURLFn BlockchainClientURLFn
+	newBlockchainClientFn NewEVMClientFn
+	blockchainClientURLFn ClientURLFn
 }
 
 // NewDefaultNetworkRegistry returns an instance of the network registry with the default supported networks registered
@@ -151,6 +159,38 @@ func NewDefaultNetworkRegistry() *NetworkRegistry {
 			},
 			LiveEthTestNetwork: {
 				newBlockchainClientFn: NewEthereumMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+			LiveKlaytnTestNetwork: {
+				newBlockchainClientFn: NewKlaytnMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+			LiveMetisTestNetwork: {
+				newBlockchainClientFn: NewMetisMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+		},
+	}
+}
+
+// NewSoakNetworkRegistry retrieves a network registry for use in soak tests
+func NewSoakNetworkRegistry() *NetworkRegistry {
+	return &NetworkRegistry{
+		registeredNetworks: map[string]registeredNetwork{
+			SimulatedEthNetwork: {
+				newBlockchainClientFn: NewEthereumMultiNodeClient,
+				blockchainClientURLFn: SimulatedSoakEthereumURLs,
+			},
+			LiveEthTestNetwork: {
+				newBlockchainClientFn: NewEthereumMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+			LiveKlaytnTestNetwork: {
+				newBlockchainClientFn: NewKlaytnMultiNodeClient,
+				blockchainClientURLFn: LiveEthTestnetURLs,
+			},
+			LiveMetisTestNetwork: {
+				newBlockchainClientFn: NewMetisMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
 		},
@@ -174,7 +214,7 @@ func NewSoakNetworkRegistry() *NetworkRegistry {
 }
 
 // RegisterNetwork registers a new type of network within the registry
-func (n *NetworkRegistry) RegisterNetwork(networkType string, fn NewBlockchainClientFn, urlFn BlockchainClientURLFn) {
+func (n *NetworkRegistry) RegisterNetwork(networkType string, fn NewEVMClientFn, urlFn ClientURLFn) {
 	n.registeredNetworks[networkType] = registeredNetwork{
 		newBlockchainClientFn: fn,
 		blockchainClientURLFn: urlFn,
@@ -184,7 +224,7 @@ func (n *NetworkRegistry) RegisterNetwork(networkType string, fn NewBlockchainCl
 // GetNetworks returns a networks object with all the BlockchainClient(s) initialized
 func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, error) {
 	nc := config.ProjectNetworkSettings
-	var clients []BlockchainClient
+	var clients []EVMClient
 	for _, networkName := range nc.SelectedNetworks {
 		networkSettings, ok := nc.NetworkSettings[networkName]
 		if !ok {
@@ -208,102 +248,14 @@ func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, 
 		}
 		clients = append(clients, client)
 	}
-	var defaultClient BlockchainClient
-	if len(clients) == 1 {
-		for _, c := range clients {
-			defaultClient = c
-		}
+	var defaultClient EVMClient
+	if len(clients) >= 1 {
+		defaultClient = clients[0]
 	}
 	return &Networks{
 		clients: clients,
 		Default: defaultClient,
 	}, nil
-}
-
-// ConnectChainlinkNodes creates new chainlink clients
-func ConnectChainlinkNodes(e *environment.Environment) ([]Chainlink, error) {
-	return ConnectChainlinkNodesByCharts(e, []string{"chainlink"})
-}
-
-func ConnectChainlinkDBs(e *environment.Environment) ([]*PostgresConnector, error) {
-	return ConnectChainlinkDBByCharts(e, []string{"chainlink"})
-}
-
-// ConnectChainlinkDBByCharts creates new chainlink DBs clients by charts
-func ConnectChainlinkDBByCharts(e *environment.Environment, charts []string) ([]*PostgresConnector, error) {
-	var dbs []*PostgresConnector
-	for _, chart := range charts {
-		pgUrls, err := e.Charts.Connections(chart).LocalURLsByPort("postgres", environment.HTTP)
-		if err != nil {
-			return nil, err
-		}
-		for _, u := range pgUrls {
-			c, err := NewPostgresConnector(&PostgresConfig{
-				Host:     "localhost",
-				Port:     u.Port(),
-				User:     "postgres",
-				Password: "node",
-				DBName:   "chainlink",
-			})
-			dbs = append(dbs, c)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return dbs, nil
-}
-
-// ConnectChainlinkNodesByCharts creates new chainlink clients by charts
-func ConnectChainlinkNodesByCharts(e *environment.Environment, charts []string) ([]Chainlink, error) {
-	var clients []Chainlink
-
-	for _, chart := range charts {
-		localURLs, err := e.Charts.Connections(chart).LocalURLsByPort("access", environment.HTTP)
-		if err != nil {
-			return nil, err
-		}
-		remoteURLs, err := e.Charts.Connections(chart).RemoteURLsByPort("access", environment.HTTP)
-		if err != nil {
-			return nil, err
-		}
-		for urlIndex, localURL := range localURLs {
-			c, err := NewChainlink(&ChainlinkConfig{
-				URL:      localURL.String(),
-				Email:    "notreal@fakeemail.ch",
-				Password: "twochains",
-				RemoteIP: remoteURLs[urlIndex].Hostname(),
-			}, http.DefaultClient)
-			clients = append(clients, c)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return clients, nil
-}
-
-// ConnectChainlinkNodesSoak assumes that the tests are being run from an internal soak test runner
-func ConnectChainlinkNodesSoak(e *environment.Environment) ([]Chainlink, error) {
-	var clients []Chainlink
-
-	remoteURLs, err := e.Charts.Connections("chainlink").RemoteURLsByPort("access", environment.HTTP)
-	if err != nil {
-		return nil, err
-	}
-	for urlIndex, localURL := range remoteURLs {
-		c, err := NewChainlink(&ChainlinkConfig{
-			URL:      localURL.String(),
-			Email:    "notreal@fakeemail.ch",
-			Password: "twochains",
-			RemoteIP: remoteURLs[urlIndex].Hostname(),
-		}, http.DefaultClient)
-		clients = append(clients, c)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return clients, nil
 }
 
 // NodeBlock block with a node ID which mined it
@@ -326,3 +278,11 @@ func UnmarshalNetworkConfig(config map[string]interface{}, obj interface{}) erro
 	}
 	return yaml.Unmarshal(b, obj)
 }
+
+// ContractDeployer acts as a go-between function for general contract deployment
+type ContractDeployer func(auth *bind.TransactOpts, backend bind.ContractBackend) (
+	common.Address,
+	*types.Transaction,
+	interface{},
+	error,
+)

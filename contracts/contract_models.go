@@ -6,7 +6,8 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/smartcontractkit/integrations-framework/client"
+	"github.com/smartcontractkit/chainlink-testing-framework/client"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts/ethereum"
 
 	"github.com/celo-org/celo-blockchain/common"
 	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
@@ -178,6 +179,7 @@ type JobByInstance struct {
 
 type MockETHLINKFeed interface {
 	Address() string
+	LatestRoundData() (*big.Int, error)
 }
 
 type MockGasFeed interface {
@@ -224,6 +226,20 @@ type KeeperConsumer interface {
 	Counter(ctx context.Context) (*big.Int, error)
 }
 
+type UpkeepCounter interface {
+	Address() string
+	Fund(ethAmount *big.Float) error
+	Counter(ctx context.Context) (*big.Int, error)
+	SetSpread(testRange *big.Int, interval *big.Int) error
+}
+
+type UpkeepPerformCounterRestrictive interface {
+	Address() string
+	Fund(ethAmount *big.Float) error
+	Counter(ctx context.Context) (*big.Int, error)
+	SetSpread(testRange *big.Int, interval *big.Int) error
+}
+
 // KeeperConsumerPerformance is a keeper consumer contract that is more complicated than the typical consumer,
 // it's intended to only be used for performance tests.
 type KeeperConsumerPerformance interface {
@@ -246,6 +262,26 @@ type KeeperRegistryOpts struct {
 	GasCeilingMultiplier uint16
 	FallbackGasPrice     *big.Int
 	FallbackLinkPrice    *big.Int
+}
+
+// KeeperRegistrySettings represents the fine tuning settings for each upkeep contract
+type KeeperRegistrySettings struct {
+	PaymentPremiumPPB    uint32   // payment premium rate oracles receive on top of being reimbursed for gas, measured in parts per billion
+	BlockCountPerTurn    *big.Int // number of blocks each oracle has during their turn to perform upkeep before it will be the next keeper's turn to submit
+	CheckGasLimit        uint32   // gas limit when checking for upkeep
+	StalenessSeconds     *big.Int // number of seconds that is allowed for feed data to be stale before switching to the fallback pricing
+	GasCeilingMultiplier uint16   // multiplier to apply to the fast gas feed price when calculating the payment ceiling for keepers
+	FallbackGasPrice     *big.Int // gas price used if the gas price feed is stale
+	FallbackLinkPrice    *big.Int // LINK price used if the LINK price feed is stale
+}
+
+// KeeperRegistrarSettings represents settings for registrar contract
+type KeeperRegistrarSettings struct {
+	AutoRegister     bool
+	WindowSizeBlocks uint32
+	AllowedPerWindow uint16
+	RegistryAddr     string
+	MinLinkJuels     *big.Int
 }
 
 // KeeperInfo keeper status and balance info
@@ -281,12 +317,40 @@ type VRFCoordinator interface {
 	Address() string
 }
 
+type VRFCoordinatorV2 interface {
+	SetConfig(
+		minimumRequestConfirmations uint16,
+		maxGasLimit uint32,
+		stalenessSeconds uint32,
+		gasAfterPaymentCalculation uint32,
+		fallbackWeiPerUnitLink *big.Int, feeConfig ethereum.VRFCoordinatorV2FeeConfig,
+	) error
+	RegisterProvingKey(
+		oracleAddr string,
+		publicProvingKey [2]*big.Int,
+	) error
+	HashOfKey(ctx context.Context, pubKey [2]*big.Int) ([32]byte, error)
+	Address() string
+}
+
 type VRFConsumer interface {
 	Address() string
 	RequestRandomness(hash [32]byte, fee *big.Int) error
 	CurrentRoundID(ctx context.Context) (*big.Int, error)
 	RandomnessOutput(ctx context.Context) (*big.Int, error)
 	WatchPerfEvents(ctx context.Context, eventChan chan<- *PerfEvent) error
+	Fund(ethAmount *big.Float) error
+}
+
+type VRFConsumerV2 interface {
+	Address() string
+	CurrentSubscription() (uint64, error)
+	CreateFundedSubscription(funds *big.Int) error
+	TopUpSubscriptionFunds(funds *big.Int) error
+	RequestRandomness(hash [32]byte, subID uint64, confs uint16, gasLimit uint32, numWords uint32) error
+	RandomnessOutput(ctx context.Context, arg0 *big.Int) (*big.Int, error)
+	GetAllRandomWords(ctx context.Context, num int) ([]*big.Int, error)
+	GasAvailable() (*big.Int, error)
 	Fund(ethAmount *big.Float) error
 }
 
