@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
 )
 
 type Limiter interface {

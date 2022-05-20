@@ -8,8 +8,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/config"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
 )
 
 func limits(cfg config.PublicConfig, reportingPluginInfo types.ReportingPluginInfo, maxSigLen int) (types.BinaryNetworkEndpointLimits, error) {

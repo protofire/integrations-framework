@@ -1,7 +1,7 @@
-package ethereum
+package celo
 
 import (
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 )
 
 // AbigenLog is an interface for abigen generated log topics

@@ -4,8 +4,8 @@ import (
 	"math"
 	"sync"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/msgbuf"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/ratelimit"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/msgbuf"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/ratelimit"
 )
 
 type shouldPushResult int

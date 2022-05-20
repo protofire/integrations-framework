@@ -8,7 +8,7 @@ The soak tests are triggered by the [soak_runner_test.go](./suite/soak/soak_runn
 
 ```yaml
 test_regex: '@soak-ocr' # The regex of the test name to run
-test_directory: /Users/adam/Projects/integrations-framework/suite/soak/tests # The directory where the go tests you want the remote runner to run
+test_directory: /Users/adam/Projects/chainlink-testing-framework/suite/soak/tests # The directory where the go tests you want the remote runner to run
 # Slack values are covered below
 ```
 

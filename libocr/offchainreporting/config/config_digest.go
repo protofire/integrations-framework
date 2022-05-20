@@ -8,9 +8,9 @@ import (
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/celo-org/celo-blockchain/crypto"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers/exposedoffchainaggregator"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/gethwrappers/exposedoffchainaggregator"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/types"
 )
 
 func makeConfigDigestArgs() abi.Arguments {

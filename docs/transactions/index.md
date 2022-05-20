@@ -23,7 +23,7 @@ err = ocrContract.Fund(big.NewFloat(.001))
 
 ## Funding Chainlink Nodes
 
-Chainlink nodes are easy to fund with the handy [actions package](https://pkg.go.dev/github.com/smartcontractkit/integrations-framework/actions).
+Chainlink nodes are easy to fund with the handy [actions package](https://pkg.go.dev/github.com/smartcontractkit/chainlink-testing-framework/actions).
 
 ```go
 // Funds each node in the `chainlinkNodes` array with .01 of the network's native currency

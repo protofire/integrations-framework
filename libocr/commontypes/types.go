@@ -3,7 +3,7 @@ package commontypes
 import (
 	"bytes"
 	"fmt"
-	ragetypes "github.com/smartcontractkit/integrations-framework/libocr/ragep2p/types"
+	ragetypes "github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/types"
 	"net"
 	"strings"
 

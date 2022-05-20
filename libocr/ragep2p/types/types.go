@@ -4,7 +4,7 @@ import (
 	"crypto/ed25519"
 	"encoding"
 	"fmt"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/mtls"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/mtls"
 
 	"github.com/mr-tron/base58"
 	"github.com/pkg/errors"

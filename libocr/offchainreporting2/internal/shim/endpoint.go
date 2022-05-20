@@ -6,12 +6,12 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
-	"github.com/smartcontractkit/integrations-framework/libocr/internal/loghelper"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/protocol"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/serialization"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
-	"github.com/smartcontractkit/integrations-framework/libocr/subprocesses"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/internal/loghelper"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/protocol"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/serialization"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/subprocesses"
 )
 
 type SerializingEndpoint struct {

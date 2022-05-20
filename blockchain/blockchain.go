@@ -125,19 +125,6 @@ func (b *Networks) AllNetworks() []EVMClient {
 	return b.clients
 }
 
-// ConnectMockServerSoak creates a connection to a deployed mockserver, assuming runner is in a soak test runner
-func ConnectMockServerSoak(e *environment.Environment) (*MockserverClient, error) {
-	remoteURL, err := e.Config.Charts.Connections("mockserver").RemoteURLByPort("serviceport", environment.HTTP)
-	if err != nil {
-		return nil, err
-	}
-	c := NewMockserverClient(&MockserverConfig{
-		LocalURL:   remoteURL.String(),
-		ClusterURL: remoteURL.String(),
-	})
-	return c, nil
-}
-
 // NetworkRegistry holds all the registered network types that can be initialized, allowing
 // external libraries to register alternative network types to use
 type NetworkRegistry struct {
@@ -161,10 +148,10 @@ func NewDefaultNetworkRegistry() *NetworkRegistry {
 				newBlockchainClientFn: NewEthereumMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
-			LiveKlaytnTestNetwork: {
-				newBlockchainClientFn: NewKlaytnMultiNodeClient,
-				blockchainClientURLFn: LiveEthTestnetURLs,
-			},
+			//LiveKlaytnTestNetwork: {
+			//	newBlockchainClientFn: NewKlaytnMultiNodeClient,
+			//	blockchainClientURLFn: LiveEthTestnetURLs,
+			//},
 			LiveMetisTestNetwork: {
 				newBlockchainClientFn: NewMetisMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
@@ -185,28 +172,12 @@ func NewSoakNetworkRegistry() *NetworkRegistry {
 				newBlockchainClientFn: NewEthereumMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
-			LiveKlaytnTestNetwork: {
-				newBlockchainClientFn: NewKlaytnMultiNodeClient,
-				blockchainClientURLFn: LiveEthTestnetURLs,
-			},
+			//LiveKlaytnTestNetwork: {
+			//	newBlockchainClientFn: NewKlaytnMultiNodeClient,
+			//	blockchainClientURLFn: LiveEthTestnetURLs,
+			//},
 			LiveMetisTestNetwork: {
 				newBlockchainClientFn: NewMetisMultiNodeClient,
-				blockchainClientURLFn: LiveEthTestnetURLs,
-			},
-		},
-	}
-}
-
-// NewSoakNetworkRegistry retrieves a network registry for use in soak tests
-func NewSoakNetworkRegistry() *NetworkRegistry {
-	return &NetworkRegistry{
-		registeredNetworks: map[string]registeredNetwork{
-			SimulatedEthNetwork: {
-				newBlockchainClientFn: NewEthereumMultiNodeClient,
-				blockchainClientURLFn: SimulatedSoakEthereumURLs,
-			},
-			LiveEthTestNetwork: {
-				newBlockchainClientFn: NewEthereumMultiNodeClient,
 				blockchainClientURLFn: LiveEthTestnetURLs,
 			},
 		},

@@ -1,6 +1,6 @@
 # Docs
 
-We use the handy theme [just the docs](https://just-the-docs.github.io/just-the-docs/docs/navigation-structure/) for our more extensive documentation, and host it on github pages [here](https://smartcontractkit.github.io/integrations-framework/). Anything about the framework that can't be covered in our short-and-sweet [README](../README.md) should find a home in these docs.
+We use the handy theme [just the docs](https://just-the-docs.github.io/just-the-docs/docs/navigation-structure/) for our more extensive documentation, and host it on github pages [here](https://smartcontractkit.github.io/chainlink-testing-framework/). Anything about the framework that can't be covered in our short-and-sweet [README](../README.md) should find a home in these docs.
 
 ## Local Development
 

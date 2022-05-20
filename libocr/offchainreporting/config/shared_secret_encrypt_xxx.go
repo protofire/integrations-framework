@@ -8,7 +8,7 @@ import (
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/celo-org/celo-blockchain/crypto"
 	"github.com/pkg/errors"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/types"
 	"golang.org/x/crypto/curve25519"
 )
 

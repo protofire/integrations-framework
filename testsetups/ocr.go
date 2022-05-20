@@ -5,12 +5,9 @@ package testsetups
 //revive:disable:dot-imports
 import (
 	"context"
-
-	"fmt"
 	"math/big"
 	"sync"
 	"time"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"

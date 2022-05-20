@@ -12,8 +12,8 @@ import (
 	"github.com/celo-org/celo-blockchain/accounts/abi"
 	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
 	"github.com/celo-org/celo-blockchain/ethclient"
-	"github.com/smartcontractkit/integrations-framework/libocr/gethwrappers2/ocr2titlerequest"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/gethwrappers2/ocr2titlerequest"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
 )
 
 // Transactions that are buried confirmationDepth blocks deep in the chain are

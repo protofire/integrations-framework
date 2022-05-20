@@ -7,7 +7,7 @@ parent: Writing a Test
 
 # Soak Tests
 
-Soak tests refer to running longer tests, that can take anywhere from hours to days to see how the application fares over long stretches of time. See some examples in our [soak test suite](https://github.com/smartcontractkit/integrations-framework/tree/main/suite/soak).
+Soak tests refer to running longer tests, that can take anywhere from hours to days to see how the application fares over long stretches of time. See some examples in our [soak test suite](https://github.com/smartcontractkit/chainlink-testing-framework/tree/main/suite/soak).
 
 The test framework is designed around you launching a test environment to a K8s cluster, then running the test from your personal machine. Your personal machine coordinates the chainlink nodes, reads the blockchain, etc. This works fine for running tests that take < 5 minutes, but soak tests often last days or weeks. So the tests become dependent on your local machine maintaining power and network connection for that time frame. This quickly becomes untenable. So the solution is to launch a `remote-test-runner` container along with the test environment.
 
@@ -34,11 +34,11 @@ log.Info().Msg("Soak Test Concluded")
 
 ## Running the Test
 
-The soak tests are triggered by the [soak_runner_test.go](https://github.com/smartcontractkit/integrations-framework/blob/main/suite/soak/soak_runner_test.go) tests, or with `make test_soak`. When running, the test will check for a local config file: `remote_runner_config.yaml`. If it's not already created, it will generate one with some default values, and then inform you that you should modify those values.
+The soak tests are triggered by the [soak_runner_test.go](https://github.com/smartcontractkit/chainlink-testing-framework/blob/main/suite/soak/soak_runner_test.go) tests, or with `make test_soak`. When running, the test will check for a local config file: `remote_runner_config.yaml`. If it's not already created, it will generate one with some default values, and then inform you that you should modify those values.
 
 ```yaml
 test_regex: '@soak-ocr' # The regex of the test name to run
-test_directory: /Users/adam/Projects/integrations-framework/suite/soak/tests # The directory where the go tests you want the remote runner to run
+test_directory: /Users/adam/Projects/chainlink-testing-framework/suite/soak/tests # The directory where the go tests you want the remote runner to run
 # Slack values are covered below
 ```
 

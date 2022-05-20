@@ -3,11 +3,11 @@ package protocol
 import (
 	"context"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
-	"github.com/smartcontractkit/integrations-framework/libocr/internal/loghelper"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/config"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
-	"github.com/smartcontractkit/integrations-framework/libocr/subprocesses"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/internal/loghelper"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/subprocesses"
 )
 
 const futureMessageBufferSize = 10 // big enough for a couple of full rounds of repgen protocol

@@ -11,7 +11,7 @@ The framework draws on 2 config files, `framework.yaml` and `networks.yaml`. Whe
 
 ## `framework.yaml`
 
-This config handles how the framework should handle logging, deploying, and tearing down test environments. Check out the example below, or the most up-to-date version [here](https://github.com/smartcontractkit/integrations-framework/blob/main/framework.yaml).
+This config handles how the framework should handle logging, deploying, and tearing down test environments. Check out the example below, or the most up-to-date version [here](https://github.com/smartcontractkit/chainlink-testing-framework/blob/main/framework.yaml).
 
 Location of this file can be overridden by setting a file path as the `FRAMEWORK_CONFIG_FILE` environment variable.
 
@@ -39,7 +39,7 @@ environment_file:
 
 ## `networks.yaml`
 
-This file handles the settings for each network you want to connect to. This is a truncated version, see the full one [here](https://github.com/smartcontractkit/integrations-framework/blob/main/networks.yaml).
+This file handles the settings for each network you want to connect to. This is a truncated version, see the full one [here](https://github.com/smartcontractkit/chainlink-testing-framework/blob/main/networks.yaml).
 
 Location of this file can be overridden by setting a file path as the `NETWORKS_CONFIG_FILE` environment variable. **The first private key listed will be considered the default one to use for deploying contracts and funding addresses**.
 

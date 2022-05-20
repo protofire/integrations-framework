@@ -3,9 +3,9 @@ package serialization
 import (
 	"fmt"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/protocol"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/protocol"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
 
 	"google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

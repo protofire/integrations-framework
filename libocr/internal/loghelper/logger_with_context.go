@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
 )
 
 type LoggerWithContext interface {

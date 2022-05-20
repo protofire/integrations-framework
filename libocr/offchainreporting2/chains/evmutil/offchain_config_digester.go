@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/celo-org/celo-blockchain/common"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
 )
 
 var _ types.OffchainConfigDigester = EVMOffchainConfigDigester{}

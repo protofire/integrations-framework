@@ -3,10 +3,10 @@ package managed
 import (
 	"context"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
-	"github.com/smartcontractkit/integrations-framework/libocr/internal/loghelper"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/internal/config"
-	"github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/internal/loghelper"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
 )
 
 // RunManagedBootstrapper runs a "managed" bootstrapper. It handles

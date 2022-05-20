@@ -7,7 +7,7 @@ import (
 	"crypto/ed25519"
 	"time"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
 	"golang.org/x/crypto/curve25519"
 )
 

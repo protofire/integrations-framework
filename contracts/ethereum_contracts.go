@@ -19,8 +19,8 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
 	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
-	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
-	ocrTypes "github.com/smartcontractkit/libocr/offchainreporting/types"
+	ocrConfigHelper "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/confighelper"
+	ocrTypes "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/types"
 )
 
 // EthereumOracle oracle for "directrequest" job tests
@@ -698,6 +698,7 @@ func (o *EthereumOffchainAggregator) SetConfig(
 		ocrConfig.OracleIdentities,
 		ocrConfig.F,
 	)
+
 	if err != nil {
 		return err
 	}
@@ -1308,7 +1309,7 @@ func (v *EthereumKeeperRegistry) GetKeeperList(ctx context.Context) ([]string, e
 // EthereumUpkeepCounter represents keeper consumer (upkeep) counter contract
 type EthereumUpkeepCounter struct {
 	client   blockchain.EVMClient
-	consumer *ethereum.UpkeepCounter
+	consumer *celo.UpkeepCounter
 	address  *common.Address
 }
 
@@ -1346,7 +1347,7 @@ func (v *EthereumUpkeepCounter) SetSpread(testRange *big.Int, interval *big.Int)
 // EthereumUpkeepPerformCounterRestrictive represents keeper consumer (upkeep) counter contract
 type EthereumUpkeepPerformCounterRestrictive struct {
 	client   blockchain.EVMClient
-	consumer *ethereum.UpkeepPerformCounterRestrictive
+	consumer *celo.UpkeepPerformCounterRestrictive
 	address  *common.Address
 }
 
@@ -1520,7 +1521,7 @@ func (v *EthereumBlockhashStore) Address() string {
 type EthereumVRFCoordinatorV2 struct {
 	address     *common.Address
 	client      blockchain.EVMClient
-	coordinator *ethereum.VRFCoordinatorV2
+	coordinator *celo.VRFCoordinatorV2
 }
 
 func (v *EthereumVRFCoordinatorV2) Address() string {
@@ -1539,7 +1540,7 @@ func (v *EthereumVRFCoordinatorV2) HashOfKey(ctx context.Context, pubKey [2]*big
 	return hash, nil
 }
 
-func (v *EthereumVRFCoordinatorV2) SetConfig(minimumRequestConfirmations uint16, maxGasLimit uint32, stalenessSeconds uint32, gasAfterPaymentCalculation uint32, fallbackWeiPerUnitLink *big.Int, feeConfig ethereum.VRFCoordinatorV2FeeConfig) error {
+func (v *EthereumVRFCoordinatorV2) SetConfig(minimumRequestConfirmations uint16, maxGasLimit uint32, stalenessSeconds uint32, gasAfterPaymentCalculation uint32, fallbackWeiPerUnitLink *big.Int, feeConfig celo.VRFCoordinatorV2FeeConfig) error {
 	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
 	if err != nil {
 		return err
@@ -1620,7 +1621,7 @@ func (v *EthereumVRFCoordinator) RegisterProvingKey(
 type EthereumVRFConsumerV2 struct {
 	address  *common.Address
 	client   blockchain.EVMClient
-	consumer *ethereum.VRFConsumerV2
+	consumer *celo.VRFConsumerV2
 }
 
 // CurrentSubscription get current VRFv2 subscription

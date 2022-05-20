@@ -15,16 +15,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/commontypes"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/msgbuf"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/msgbuf"
 
-	"github.com/smartcontractkit/integrations-framework/libocr/internal/loghelper"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/knock"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/mtls"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/ratelimit"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/internal/ratelimitedconn"
-	"github.com/smartcontractkit/integrations-framework/libocr/ragep2p/types"
-	"github.com/smartcontractkit/integrations-framework/libocr/subprocesses"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/internal/loghelper"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/knock"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/mtls"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/ratelimit"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/internal/ratelimitedconn"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/ragep2p/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/subprocesses"
 )
 
 // Maximum number of streams with another peer that can be opened on a host

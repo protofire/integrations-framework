@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
-	"github.com/smartcontractkit/chainlink-testing-framework/contracts/ethereum"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
 
 	"github.com/celo-org/celo-blockchain/common"
-	ocrConfigHelper "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting/confighelper"
-	ocrConfigHelper2 "github.com/smartcontractkit/integrations-framework/libocr/offchainreporting2/confighelper"
+	ocrConfigHelper "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/confighelper"
+	ocrConfigHelper2 "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/confighelper"
 )
 
 type FluxAggregatorOptions struct {
@@ -323,7 +323,7 @@ type VRFCoordinatorV2 interface {
 		maxGasLimit uint32,
 		stalenessSeconds uint32,
 		gasAfterPaymentCalculation uint32,
-		fallbackWeiPerUnitLink *big.Int, feeConfig ethereum.VRFCoordinatorV2FeeConfig,
+		fallbackWeiPerUnitLink *big.Int, feeConfig celo.VRFCoordinatorV2FeeConfig,
 	) error
 	RegisterProvingKey(
 		oracleAddr string,

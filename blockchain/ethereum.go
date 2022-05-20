@@ -9,15 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/celo-org/celo-blockchain"
 	"github.com/smartcontractkit/chainlink-testing-framework/config"
 	"github.com/smartcontractkit/chainlink-testing-framework/utils"
 	"github.com/smartcontractkit/helmenv/environment"
 
 	"golang.org/x/sync/errgroup"
-
-	"github.com/celo-org/celo-blockchain/accounts/abi"
-	"github.com/pkg/errors"
 
 	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
 	"github.com/celo-org/celo-blockchain/common"
@@ -226,11 +222,12 @@ func (e *EthereumClient) Fund(
 	if err != nil {
 		return err
 	}
-	latestBlock, err := e.Client.BlockByNumber(context.Background(), nil)
+	//latestBlock, err := e.Client.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		return err
 	}
-	baseFeeMult := big.NewInt(1).Mul(latestBlock.BaseFee(), big.NewInt(2))
+	// @Todo Get Gas Price Minimum from GasPriceMinimumProxy
+	baseFeeMult := big.NewInt(1).Mul(big.NewInt(2000000000000000000), big.NewInt(2))
 	gasFeeCap := baseFeeMult.Add(baseFeeMult, suggestedGasTipCap)
 
 	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(e.GetChainID()), &types.DynamicFeeTx{
