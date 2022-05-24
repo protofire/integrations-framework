@@ -123,7 +123,8 @@ func (c OffchainConfig) Encode() []byte {
 	result, err := proto.Marshal(&configProto)
 	if err != nil {
 		// assertion
-		panic(fmt.Sprintf("unexpected error while encoding Config: %v", err))
+		fmt.Printf("unexpected error while encoding Config: %v", err)
+		//panic(fmt.Sprintf("unexpected error while encoding Config: %v", err))
 	}
 	return result
 }

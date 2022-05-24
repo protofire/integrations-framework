@@ -18,9 +18,9 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
-	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
 	ocrConfigHelper "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/confighelper"
 	ocrTypes "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/types"
+	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
 )
 
 // EthereumOracle oracle for "directrequest" job tests
