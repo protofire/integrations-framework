@@ -319,6 +319,9 @@ func (e *EthereumClient) TransactionOpts(from *EthereumWallet) (*bind.TransactOp
 	}
 	opts.Nonce = big.NewInt(int64(nonce))
 
+	//@Todo Set Default Gas Fee for Transmit not Globally
+	opts.GasLimit = 1000000
+
 	return opts, nil
 }
 
