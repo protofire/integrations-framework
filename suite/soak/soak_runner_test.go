@@ -2,6 +2,7 @@ package soak_runner
 
 import (
 	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,7 +18,49 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSoak(t *testing.T) {
+func TestSoakOCR(t *testing.T) {
+	t.Parallel()
+	actions.LoadConfigs(utils.ProjectRoot)
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	remoteConfig, err := config.ReadWriteRemoteRunnerConfig()
+	require.NoError(t, err)
+
+	_config := environment.NewChainlinkConfig(
+		environment.ChainlinkReplicas(4, config.ChainlinkVals()),
+		"chainlink-soak-celo",
+		config.GethNetworks()...,
+	)
+
+	err = envconfig.Process("", _config)
+	if err != nil {
+
+		var _err any
+
+		_err = err
+
+		panic(_err)
+	}
+
+	env, err := environment.DeployLongTestEnvironment(
+		_config,
+		tools.ChartsRoot,
+		remoteConfig.TestRegex,    // Name of the test to run
+		remoteConfig.SlackAPIKey,  // API key to use to upload artifacts to slack
+		remoteConfig.SlackChannel, // Slack Channel to upload test artifacts to
+		remoteConfig.SlackUserID,  // Slack user to notify on completion
+		filepath.Join(utils.ProjectRoot, "framework.yaml"), // Path of the framework config
+		filepath.Join(utils.ProjectRoot, "networks.yaml"),  // Path to the networks config
+		"", // Path to the executable test file
+	)
+	require.NoError(t, err)
+	require.NotNil(t, env)
+	log.Info().Str("Namespace", env.Namespace).
+		Str("Environment File", fmt.Sprintf("%s.%s", env.Namespace, "yaml")).
+		Msg("Soak Test Successfully Launched. Save the environment file to collect logs when test is done.")
+}
+
+
+func _TestSoak(t *testing.T) {
 	actions.LoadConfigs(utils.ProjectRoot)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	exePath, remoteConfig := buildGoTests(t)
