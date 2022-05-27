@@ -61,7 +61,7 @@ test_soak:
 	go test -v -count=1 ./suite/soak/soak_runner_test.go
 
 test_smoke:
-	ginkgo -v -r --junit-report=tests-smoke-report.xml --keep-going --trace --randomize-all --randomize-suites --progress $(args) ./suite/smoke 
+	ginkgo -v -r -timeout=30m --junit-report=tests-smoke-report.xml --keep-going --trace --randomize-all --randomize-suites --progress $(args) ./suite/smoke
 
 test_performance:
 	ginkgo -v -r -timeout=200h --junit-report=tests-performance-report.xml --keep-going --trace --randomize-all --randomize-suites --progress $(args) ./suite/performance 

@@ -3,6 +3,7 @@ package smoke
 //revive:disable:dot-imports
 import (
 	"context"
+	"github.com/smartcontractkit/chainlink-testing-framework/utils"
 	"math/big"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -12,7 +13,6 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/config"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
-	"github.com/smartcontractkit/chainlink-testing-framework/utils"
 	"github.com/smartcontractkit/helmenv/environment"
 	"github.com/smartcontractkit/helmenv/tools"
 )

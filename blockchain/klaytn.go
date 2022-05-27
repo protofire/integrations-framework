@@ -88,14 +88,15 @@ func (k *KlaytnClient) Fund(
 		Str("Network Name", k.NetworkConfig.Name).
 		Msg("Setting GasTipCap = SuggestedGasPrice for Klaytn network")
 	// https://docs.klaytn.com/klaytn/design/transaction-fees#gas
-	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(k.GetChainID()), &types.DynamicFeeTx{
-		ChainID:   k.GetChainID(),
+	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(k.GetChainID()), &types.LegacyTx{
+		//ChainID:   k.GetChainID(),
 		Nonce:     nonce,
 		To:        &to,
 		Value:     utils.EtherToWei(amount),
-		GasTipCap: gasPrice,
-		GasFeeCap: gasPrice,
+		//GasTipCap: gasPrice,
+		//GasFeeCap: gasPrice,
 		Gas:       22000,
+		GasPrice: gasPrice,
 	})
 	if err != nil {
 		return err

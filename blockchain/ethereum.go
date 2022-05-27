@@ -217,6 +217,7 @@ func (e *EthereumClient) Fund(
 	// Bump Tip Cap
 	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
 	suggestedGasTipCap.Add(suggestedGasTipCap, gasPriceBuffer)
+	gasPrice, err := e.Client.SuggestGasPrice(context.Background())
 
 	nonce, err := e.GetNonce(context.Background(), common.HexToAddress(e.DefaultWallet.Address()))
 	if err != nil {
@@ -227,17 +228,18 @@ func (e *EthereumClient) Fund(
 		return err
 	}
 	// @Todo Get Gas Price Minimum from GasPriceMinimumProxy
-	baseFeeMult := big.NewInt(1).Mul(big.NewInt(2000000000000000000), big.NewInt(2))
-	gasFeeCap := baseFeeMult.Add(baseFeeMult, suggestedGasTipCap)
+	//baseFeeMult := big.NewInt(1).Mul(big.NewInt(2000000000000000000), big.NewInt(2))
+	//gasFeeCap := baseFeeMult.Add(baseFeeMult, suggestedGasTipCap)
 
-	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(e.GetChainID()), &types.DynamicFeeTx{
-		ChainID:   e.GetChainID(),
+	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(e.GetChainID()), &types.LegacyTx{
+		//ChainID:   e.GetChainID(),
 		Nonce:     nonce,
 		To:        &to,
 		Value:     utils.EtherToWei(amount),
-		GasTipCap: suggestedGasTipCap,
-		GasFeeCap: gasFeeCap,
+		//GasTipCap: suggestedGasTipCap,
+		//GasFeeCap: gasFeeCap,
 		Gas:       22000,
+		GasPrice: gasPrice,
 	})
 	if err != nil {
 		return err
@@ -270,7 +272,20 @@ func (e *EthereumClient) DeployContract(
 		return nil, nil, nil, err
 	}
 	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
-	opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
+	//opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
+	gasPrice, err := e.Client.SuggestGasPrice(context.Background())
+
+	if err != nil{
+		var _err any
+		_err = err
+		panic(_err)
+	}
+
+	opts.GasPrice = gasPrice
+	//opts.GasLimit = 21000
+
+	fmt.Println("Transaction Opts below")
+	fmt.Println(opts)
 
 	if e.NetworkConfig.GasEstimationBuffer > 0 {
 		log.Debug().
