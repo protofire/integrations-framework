@@ -962,6 +962,8 @@ github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/slack-go/slack v0.10.2 h1:KMN/h2sgUninHXvQI8PrR/PHBUuWp2NPvz2Kr66tki4=
 github.com/slack-go/slack v0.10.2/go.mod h1:5FLdBRv7VW/d9EBxx/eEktOptWygbA9K2QK/KW7ds1s=
+github.com/smartcontractkit/helmenv v1.0.54-0.20220412134859-8365a744647b h1:LDNSS6QtW5+paufQbYfLWz0tD7RUZT4h4y0lKY7OMRI=
+github.com/smartcontractkit/helmenv v1.0.54-0.20220412134859-8365a744647b/go.mod h1:VbfetB06uItvuxJKdZ6AftpbATYCnT40IaKRr75ebcs=
 github.com/smartcontractkit/helmenv v1.0.67 h1:2AlDrY0dFF3/p/6iHlJDWNGWCVLYSu/kXlN5+dN25k4=
 github.com/smartcontractkit/helmenv v1.0.67/go.mod h1:VbfetB06uItvuxJKdZ6AftpbATYCnT40IaKRr75ebcs=
 github.com/smartcontractkit/helmenv v1.2.2 h1:jP6dHikMXEg90h4PiH1o3DxrC9YncRnXpEx2NFL9FF4=
