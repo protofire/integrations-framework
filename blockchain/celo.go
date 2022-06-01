@@ -1,6 +1,6 @@
 package blockchain
 
-// Contans implementations for multi and single node ethereum clients
+// Contains implementations for multi and single node ethereum clients
 import (
 	"context"
 	"fmt"
@@ -190,7 +190,7 @@ func (e *EthereumClient) HeaderTimestampByNumber(ctx context.Context, bn *big.In
 	return h.Time, nil
 }
 
-// BlockNumber gets latest block number
+// LatestBlockNumber gets latest block number
 func (e *EthereumClient) LatestBlockNumber(ctx context.Context) (uint64, error) {
 	bn, err := e.Client.BlockNumber(ctx)
 	if err != nil {
