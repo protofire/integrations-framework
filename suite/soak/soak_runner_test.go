@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSoakOCR(t *testing.T) {
+func _TestSoakOCR(t *testing.T) {
 	t.Parallel()
 	actions.LoadConfigs(utils.ProjectRoot)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
@@ -60,7 +60,7 @@ func TestSoakOCR(t *testing.T) {
 }
 
 
-func _TestSoak(t *testing.T) {
+func TestSoak(t *testing.T) {
 	actions.LoadConfigs(utils.ProjectRoot)
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	exePath, remoteConfig := buildGoTests(t)

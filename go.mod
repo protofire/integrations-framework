@@ -15,7 +15,7 @@ require (
 	github.com/rs/zerolog v1.26.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
-	github.com/smartcontractkit/helmenv v1.0.54-0.20220412134859-8365a744647b
+	github.com/smartcontractkit/helmenv v1.2.2
 	github.com/spf13/viper v1.10.1
 	go.uber.org/atomic v1.9.0
 	go.uber.org/multierr v1.6.0
