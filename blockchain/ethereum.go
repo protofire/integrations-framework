@@ -280,7 +280,8 @@ func (e *EthereumClient) DeployContract(
 	}
 	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
 	// opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
-
+	// opts.GasTipCap = nil
+	// opts.GasPrice = nil
 	if e.NetworkConfig.GasEstimationBuffer > 0 {
 		log.Debug().
 			Uint64("Suggested Gas Tip Cap", big.NewInt(0).Sub(suggestedTipCap, gasPriceBuffer).Uint64()).
