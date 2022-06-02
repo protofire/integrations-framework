@@ -6,9 +6,9 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/celo-org/celo-blockchain/params"
 )
 
 // PrivateKeyToAddress is a handy converter for an ecdsa private key to a usable eth address
@@ -21,7 +21,7 @@ func PrivateKeyToAddress(privateKey *ecdsa.PrivateKey) (common.Address, error) {
 	return crypto.PubkeyToAddress(*publicKeyECDSA), nil
 }
 
-// Credit to kimxilxyong: https://github.com/ethereum/go-ethereum/issues/21221#issuecomment-802092592
+// Credit to kimxilxyong: https://github.com/celo-org/celo-blockchain/issues/21221#issuecomment-802092592
 
 // EtherToWei converts an ETH float amount to wei
 func EtherToWei(eth *big.Float) *big.Int {

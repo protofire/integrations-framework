@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/celo-org/celo-blockchain"
+	"github.com/celo-org/celo-blockchain/accounts/abi"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/core/types"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/chainlink-testing-framework/config"
@@ -197,7 +197,7 @@ func (e *EthereumClient) receiveHeader(header *types.Header) {
 
 // errorReason decodes tx revert reason
 func (e *EthereumClient) errorReason(
-	b ethereum.ContractCaller,
+	b celo.ContractCaller,
 	tx *types.Transaction,
 	receipt *types.Receipt,
 ) (string, error) {
@@ -209,7 +209,7 @@ func (e *EthereumClient) errorReason(
 	if err != nil {
 		return "", err
 	}
-	callMsg := ethereum.CallMsg{
+	callMsg := celo.CallMsg{
 		From:     msg.From(),
 		To:       tx.To(),
 		Gas:      tx.Gas(),

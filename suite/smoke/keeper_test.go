@@ -13,7 +13,7 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/config"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
-	"github.com/smartcontractkit/chainlink-testing-framework/contracts/ethereum"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
 	"github.com/smartcontractkit/chainlink-testing-framework/utils"
 	"github.com/smartcontractkit/helmenv/environment"
 )
@@ -67,7 +67,7 @@ var _ = Describe("Keeper suite @keeper", func() {
 			Expect(err).ShouldNot(HaveOccurred(), "Deploying Link Token Contract shouldn't fail")
 
 			r, consumers, _ := actions.DeployKeeperContracts(
-				ethereum.RegistryVersion_1_1,
+				celo.RegistryVersion_1_1,
 				contracts.KeeperRegistrySettings{
 					PaymentPremiumPPB:    uint32(200000000),
 					FlatFeeMicroLINK:     uint32(0),

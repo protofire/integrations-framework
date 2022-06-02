@@ -15,11 +15,11 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/celo-org/celo-blockchain/accounts/abi/bind"
+	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/core/types"
+	"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/celo-org/celo-blockchain/ethclient"
 	"github.com/rs/zerolog/log"
 )
 
@@ -408,7 +408,7 @@ func (e *EthereumClient) Close() error {
 // EstimateCostForChainlinkOperations calculates required amount of ETH for amountOfOperations Chainlink operations
 // based on the network's suggested gas price and the chainlink gas limit. This is fairly imperfect and should be used
 // as only a rough, upper-end estimate instead of an exact calculation.
-// See https://ethereum.org/en/developers/docs/gas/#post-london for info on how gas calculation works
+// See https://celo.org/en/developers/docs/gas/#post-london for info on how gas calculation works
 func (e *EthereumClient) EstimateCostForChainlinkOperations(amountOfOperations int) (*big.Float, error) {
 	bigAmountOfOperations := big.NewInt(int64(amountOfOperations))
 	gasPriceInWei, err := e.Client.SuggestGasPrice(context.Background())
@@ -416,7 +416,7 @@ func (e *EthereumClient) EstimateCostForChainlinkOperations(amountOfOperations i
 		return nil, err
 	}
 
-	// https://ethereum.stackexchange.com/questions/19665/how-to-calculate-transaction-fee
+	// https://celo.stackexchange.com/questions/19665/how-to-calculate-transaction-fee
 	// total gas limit = chainlink gas limit + gas limit buffer
 	gasLimit := e.NetworkConfig.GasEstimationBuffer + e.NetworkConfig.ChainlinkTransactionLimit
 	// gas cost for TX = total gas limit * estimated gas price
