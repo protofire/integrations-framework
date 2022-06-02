@@ -223,25 +223,28 @@ func (e *EthereumClient) Fund(
 	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
 	suggestedGasTipCap.Add(suggestedGasTipCap, gasPriceBuffer)
 
+	gasPrice, err := e.Client.SuggestGasPrice(context.Background())
+
 	nonce, err := e.GetNonce(context.Background(), common.HexToAddress(e.DefaultWallet.Address()))
 	if err != nil {
 		return err
 	}
-	latestBlock, err := e.Client.BlockByNumber(context.Background(), nil)
+	// latestBlock, err := e.Client.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		return err
 	}
-	baseFeeMult := big.NewInt(1).Mul(latestBlock.BaseFee(), big.NewInt(2))
-	gasFeeCap := baseFeeMult.Add(baseFeeMult, suggestedGasTipCap)
+	// baseFeeMult := big.NewInt(1).Mul(latestBlock.BaseFee(), big.NewInt(2))
+	// gasFeeCap := baseFeeMult.Add(baseFeeMult, suggestedGasTipCap)
 
-	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(e.GetChainID()), &types.DynamicFeeTx{
-		ChainID:   e.GetChainID(),
-		Nonce:     nonce,
-		To:        &to,
-		Value:     utils.EtherToWei(amount),
-		GasTipCap: suggestedGasTipCap,
-		GasFeeCap: gasFeeCap,
-		Gas:       22000,
+	tx, err := types.SignNewTx(privateKey, types.LatestSignerForChainID(e.GetChainID()), &types.LegacyTx{
+		// ChainID:   e.GetChainID(),
+		Nonce: nonce,
+		To:    &to,
+		Value: utils.EtherToWei(amount),
+		// GasTipCap: suggestedGasTipCap,
+		// GasFeeCap: gasFeeCap,
+		Gas:      22000,
+		GasPrice: gasPrice,
 	})
 	if err != nil {
 		return err
