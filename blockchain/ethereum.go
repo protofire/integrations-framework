@@ -224,7 +224,9 @@ func (e *EthereumClient) Fund(
 	suggestedGasTipCap.Add(suggestedGasTipCap, gasPriceBuffer)
 
 	gasPrice, err := e.Client.SuggestGasPrice(context.Background())
-
+	if err != nil {
+		return err
+	}
 	nonce, err := e.GetNonce(context.Background(), common.HexToAddress(e.DefaultWallet.Address()))
 	if err != nil {
 		return err
@@ -277,7 +279,7 @@ func (e *EthereumClient) DeployContract(
 		return nil, nil, nil, err
 	}
 	gasPriceBuffer := big.NewInt(0).SetUint64(e.NetworkConfig.GasEstimationBuffer)
-	opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
+	// opts.GasTipCap = suggestedTipCap.Add(gasPriceBuffer, suggestedTipCap)
 
 	if e.NetworkConfig.GasEstimationBuffer > 0 {
 		log.Debug().
@@ -286,6 +288,11 @@ func (e *EthereumClient) DeployContract(
 			Str("Contract Name", contractName).
 			Msg("Bumping Suggested Gas Price")
 	}
+	gasPrice, err := e.Client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	opts.GasPrice = gasPrice
 
 	contractAddress, transaction, contractInstance, err := deployer(opts, e.Client)
 	if err != nil {
