@@ -7,4 +7,4 @@ parent: Writing a Test
 
 # Integration Tests
 
-Integration tests refer to standard, and (relatively) quick running tests. You can see some examples in our [smoke test suite](https://github.com/smartcontractkit/integrations-framework/tree/main/suite/smoke).
+Integration tests refer to standard, and (relatively) quick running tests. You can see some examples in our [smoke test suite](https://github.com/smartcontractkit/chainlink-testing-framework/tree/main/suite/smoke).
