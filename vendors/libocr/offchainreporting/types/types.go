@@ -200,7 +200,7 @@ type SharedSecretEncryptionPublicKey [curve25519.PointSize]byte // X25519
 // All its functions should be thread-safe.
 type PrivateKeys interface {
 
-	// SignOnChain returns an ethereum-style ECDSA secp256k1 signature on msg. See
+	// SignOnChain returns an celo-style ECDSA secp256k1 signature on msg. See
 	// signature.OnChainPrivateKey.Sign for the logic it needs to implement
 	SignOnChain(msg []byte) (signature []byte, err error)
 

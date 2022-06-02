@@ -1,6 +1,6 @@
 package blockchain
 
-// Contans implementations for multi and single node ethereum clients
+// Contans implementations for multi and single node celo clients
 import (
 	"context"
 	"fmt"
@@ -263,7 +263,7 @@ func (e *EthereumClient) Fund(
 	return e.ProcessTransaction(tx)
 }
 
-// DeployContract acts as a general contract deployment tool to an ethereum chain
+// DeployContract acts as a general contract deployment tool to an celo chain
 func (e *EthereumClient) DeployContract(
 	contractName string,
 	deployer ContractDeployer,

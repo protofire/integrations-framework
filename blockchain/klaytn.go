@@ -64,7 +64,7 @@ func NewKlaytnMultiNodeClient(
 	return &KlaytnMultinodeClient{multiNodeClient}, nil
 }
 
-// Fund overrides ethereum's fund to account for Klaytn's gas specifications
+// Fund overrides celo's fund to account for Klaytn's gas specifications
 // https://docs.klaytn.com/klaytn/design/transaction-fees#unit-price
 func (k *KlaytnClient) Fund(
 	toAddress string,
@@ -113,7 +113,7 @@ func (k *KlaytnClient) Fund(
 	return k.ProcessTransaction(tx)
 }
 
-// DeployContract acts as a general contract deployment tool to an ethereum chain
+// DeployContract acts as a general contract deployment tool to an celo chain
 func (k *KlaytnClient) DeployContract(
 	contractName string,
 	deployer ContractDeployer,

@@ -193,7 +193,7 @@ contract VRFCoordinator is VRF, VRFRequestIDBase, Ownable {
   function callBackWithRandomness(bytes32 requestId, uint256 randomness,
     address consumerContract) internal {
     // Dummy variable; allows access to method selector in next line. See
-    // https://github.com/ethereum/solidity/issues/3506#issuecomment-553727797
+    // https://github.com/celo/solidity/issues/3506#issuecomment-553727797
     VRFConsumerBase v;
     bytes memory resp = abi.encodeWithSelector(
       v.rawFulfillRandomness.selector, requestId, randomness);

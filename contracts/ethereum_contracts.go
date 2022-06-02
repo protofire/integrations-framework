@@ -891,7 +891,7 @@ func (o *OffchainAggregatorRoundConfirmer) Wait() error {
 	}
 }
 
-// EthereumStorage acts as a conduit for the ethereum version of the storage contract
+// EthereumStorage acts as a conduit for the celo version of the storage contract
 type EthereumStorage struct {
 	client blockchain.EVMClient
 	store  *celo.Store

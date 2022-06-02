@@ -55,7 +55,7 @@ type managedBootstrapNodeState struct {
 func (mb *managedBootstrapNodeState) run() {
 	var subprocesses subprocesses.Subprocesses
 
-	// Restore config from database, so that we can run even if the ethereum node
+	// Restore config from database, so that we can run even if the celo node
 	// isn't working.
 	{
 		var cc *types.ContractConfig

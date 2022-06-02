@@ -9,8 +9,8 @@ import re
 # Can be run from the Makefile with make compile_contracts
 
 solc_versions = ["v0.4", "v0.6", "v0.7", "v0.8"]
-rootdir = "./artifacts/contracts/ethereum/"
-targetdir = "./contracts/ethereum"
+rootdir = "./artifacts/contracts/celo/"
+targetdir = "./contracts/celo"
 
 # The names of the contracts that we're actually compiling to use.
 used_contract_names = [

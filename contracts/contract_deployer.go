@@ -69,12 +69,12 @@ type EthereumContractDeployer struct {
 	client blockchain.EVMClient
 }
 
-// KlaytnContractDeployer wraps ethereum contract deployments for Klaytn
+// KlaytnContractDeployer wraps celo contract deployments for Klaytn
 type KlaytnContractDeployer struct {
 	*EthereumContractDeployer
 }
 
-// MetisContractDeployer wraps ethereum contract deployments for Metis
+// MetisContractDeployer wraps celo contract deployments for Metis
 type MetisContractDeployer struct {
 	*EthereumContractDeployer
 }

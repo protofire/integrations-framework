@@ -90,7 +90,7 @@ func (mo *managedOracleState) run() {
 		collectGarbage(mo.ctx, mo.database, mo.localConfig, mo.logger)
 	})
 
-	// Restore config from database, so that we can run even if the ethereum node
+	// Restore config from database, so that we can run even if the celo node
 	// isn't working.
 	{
 		var cc *types.ContractConfig

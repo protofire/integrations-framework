@@ -78,7 +78,7 @@ pragma solidity 0.6.6;
   * @dev   the value computed by Reggie as the nonce times the secp256k1
   * @dev   generator point, see steps 5 and 7 of
   * @dev   https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-vrf-05#section-5.3
-  * @dev   ) is replaced by its ethereum address, i.e. the lower 160 bits of the
+  * @dev   ) is replaced by its celo address, i.e. the lower 160 bits of the
   * @dev   keccak hash of the original u. This is because we only verify the
   * @dev   calculation of u up to its address, by abusing ECRECOVER.
   * ****************************************************************************

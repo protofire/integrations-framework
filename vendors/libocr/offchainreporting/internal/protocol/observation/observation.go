@@ -22,7 +22,7 @@ type Observations []Observation
 
 var i = big.NewInt
 
-// Bounds on an ethereum int192
+// Bounds on an celo int192
 const byteWidth = 24
 const bitWidth = byteWidth * 8
 
@@ -33,7 +33,7 @@ func tooLarge(o *big.Int) error {
 	return errors.Errorf("value won't fit in int%v: 0x%x", bitWidth, o)
 }
 
-// MakeObservation returns v as an ethereum int192, if it fits, errors otherwise.
+// MakeObservation returns v as an celo int192, if it fits, errors otherwise.
 func MakeObservation(w types.Observation) (Observation, error) {
 	v := (*big.Int)(w)
 	// nil can sometimes occur here because it's the zero value for a pointer in a

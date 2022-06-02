@@ -57,7 +57,7 @@ type runWithContractConfigState struct {
 }
 
 func (rwcc *runWithContractConfigState) run() {
-	// Restore config from database, so that we can run even if the ethereum node
+	// Restore config from database, so that we can run even if the celo node
 	// isn't working.
 	rwcc.restoreFromDatabase()
 
