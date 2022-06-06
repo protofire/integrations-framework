@@ -12,7 +12,7 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
-	"github.com/smartcontractkit/chainlink-testing-framework/contracts/ethereum"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
 	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
 	"github.com/smartcontractkit/helmenv/environment"
 )
@@ -80,7 +80,7 @@ func (k *KeeperBlockTimeTest) Setup(env *environment.Environment) {
 	Expect(err).ShouldNot(HaveOccurred(), "Failed waiting for LINK Contract deployment")
 
 	k.keeperRegistry, k.keeperConsumerContracts, _ = actions.DeployPerformanceKeeperContracts(
-		ethereum.RegistryVersion_1_1,
+		celo.RegistryVersion_1_1,
 		inputs.NumberOfContracts,
 		uint32(2500000), //upkeepGasLimit
 		linkToken,

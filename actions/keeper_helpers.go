@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/celo-org/celo-blockchain/common"
 	. "github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
-	"github.com/smartcontractkit/chainlink-testing-framework/contracts/ethereum"
+	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
 )
 
 var ZeroAddress = common.Address{}
@@ -46,7 +46,7 @@ func CreateKeeperJobs(chainlinkNodes []client.Chainlink, keeperRegistry contract
 
 // DeployKeeperContracts deploys keeper registry and a number of basic upkeep contracts with an update interval of 5
 func DeployKeeperContracts(
-	registryVersion ethereum.KeeperRegistryVersion,
+	registryVersion celo.KeeperRegistryVersion,
 	registrySettings contracts.KeeperRegistrySettings,
 	numberOfUpkeeps int,
 	upkeepGasLimit uint32,
@@ -98,7 +98,7 @@ func DeployKeeperContracts(
 
 // DeployPerformanceKeeperContracts deploys a set amount of keeper performance contracts registered to a single registry
 func DeployPerformanceKeeperContracts(
-	registryVersion ethereum.KeeperRegistryVersion,
+	registryVersion celo.KeeperRegistryVersion,
 	numberOfContracts int,
 	upkeepGasLimit uint32,
 	linkToken contracts.LinkToken,
