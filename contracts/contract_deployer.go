@@ -73,6 +73,9 @@ type EthereumContractDeployer struct {
 type KlaytnContractDeployer struct {
 	*EthereumContractDeployer
 }
+type CeloContractDeployer struct {
+	*EthereumContractDeployer
+}
 
 // MetisContractDeployer wraps celo contract deployments for Metis
 type MetisContractDeployer struct {

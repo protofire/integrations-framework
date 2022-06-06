@@ -245,8 +245,9 @@ func (e *EthereumClient) Fund(
 		Value: utils.EtherToWei(amount),
 		// GasTipCap: suggestedGasTipCap,
 		// GasFeeCap: gasFeeCap,
-		Gas:      22000,
-		GasPrice: gasPrice,
+		Gas:           22000,
+		GasPrice:      gasPrice,
+		EthCompatible: true,
 	})
 	if err != nil {
 		return err
@@ -294,7 +295,7 @@ func (e *EthereumClient) DeployContract(
 		return nil, nil, nil, err
 	}
 	opts.GasPrice = gasPrice
-
+	
 	contractAddress, transaction, contractInstance, err := deployer(opts, e.Client)
 	if err != nil {
 		return nil, nil, nil, err
