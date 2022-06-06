@@ -11,10 +11,9 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
 	"github.com/smartcontractkit/chainlink-testing-framework/testsetups"
 	"github.com/smartcontractkit/helmenv/environment"
-	"github.com/smartcontractkit/helmenv/tools"
 )
 
-var _ = Describe("Keeper performance suite @block-time-keeper", func() {
+var _ = Describe("Keeper block time soak test @soak-keeper-block-time", func() {
 	var (
 		err                 error
 		env                 *environment.Environment
@@ -24,7 +23,6 @@ var _ = Describe("Keeper performance suite @block-time-keeper", func() {
 	BeforeEach(func() {
 		By("Deploying the environment", func() {
 			env, err = environment.DeployOrLoadEnvironmentFromConfigFile(
-				tools.ChartsRoot,
 				"/root/test-env.json", // Default location for the soak-test-runner container
 			)
 			Expect(err).ShouldNot(HaveOccurred(), "Environment deployment shouldn't fail")
@@ -37,10 +35,13 @@ var _ = Describe("Keeper performance suite @block-time-keeper", func() {
 					NumberOfContracts: 50,
 					KeeperRegistrySettings: &contracts.KeeperRegistrySettings{
 						PaymentPremiumPPB:    uint32(200000000),
+						FlatFeeMicroLINK:     uint32(0),
 						BlockCountPerTurn:    big.NewInt(3),
 						CheckGasLimit:        uint32(2500000),
 						StalenessSeconds:     big.NewInt(90000),
 						GasCeilingMultiplier: uint16(1),
+						MinUpkeepSpend:       big.NewInt(0),
+						MaxPerformGas:        uint32(5000000),
 						FallbackGasPrice:     big.NewInt(2e11),
 						FallbackLinkPrice:    big.NewInt(2e18),
 					},

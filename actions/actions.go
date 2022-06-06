@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -19,7 +18,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
 	"github.com/smartcontractkit/chainlink-testing-framework/config"
@@ -43,47 +41,31 @@ const (
 var ContractDeploymentInterval = 500
 
 // GinkgoSuite provides the default setup for running a Ginkgo test suite
-func GinkgoSuite(frameworkConfigFileLocation string) {
-	LoadConfigs(frameworkConfigFileLocation)
+func GinkgoSuite() {
+	LoadConfigs()
 	gomega.RegisterFailHandler(ginkgo.Fail)
 }
 
-func LoadConfigs(frameworkConfigFileLocation string) {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+// GinkgoRemoteSuite provides the default setup for running tests from a remote test runner
+func GinkgoRemoteSuite() {
+	LoadRemoteConfigs()
+	gomega.RegisterFailHandler(ginkgo.Fail)
+}
 
-	absoluteConfigFileLocation, err := filepath.Abs(frameworkConfigFileLocation)
-	if err != nil {
-		log.Fatal().
-			Str("Path", frameworkConfigFileLocation).
-			Msg("Unable to resolve path to an absolute path")
-		return
+// LoadConfigs load all config files, with overrides in order:
+// 1. `default` tag fields on config.Config struct
+// 2. Decode function calls on major config structs, see config.Config
+// 3. `envconfig` tags on previously decoded major configs, see Decode functions in config package
+func LoadConfigs() {
+	if err := config.LoadFromEnv(); err != nil {
+		log.Fatal().Err(err).Msg("failed to load config file")
 	}
+}
 
-	frameworkConfig := filepath.Join(absoluteConfigFileLocation, "framework.yaml")
-	if os.Getenv("FRAMEWORK_CONFIG_FILE") != "" {
-		frameworkConfig = os.Getenv("FRAMEWORK_CONFIG_FILE")
-	}
-	fConf, err := config.LoadFrameworkConfig(frameworkConfig)
-	if err != nil {
-		log.Fatal().
-			Err(err).
-			Str("Path", absoluteConfigFileLocation).
-			Msg("Failed to load config")
-		return
-	}
-	log.Logger = log.Logger.Level(zerolog.Level(fConf.Logging.Level))
-
-	networksConfig := filepath.Join(absoluteConfigFileLocation, "networks.yaml")
-	if os.Getenv("NETWORKS_CONFIG_FILE") != "" {
-		networksConfig = os.Getenv("NETWORKS_CONFIG_FILE")
-	}
-	_, err = config.LoadNetworksConfig(networksConfig)
-	if err != nil {
-		log.Fatal().
-			Err(err).
-			Str("Path", absoluteConfigFileLocation).
-			Msg("Failed to load config")
-		return
+// LoadRemoteConfigs loads configs for tests running on a remote test runner
+func LoadRemoteConfigs() {
+	if err := config.LoadRemoteEnv(); err != nil {
+		log.Fatal().Err(err).Msg("failed to load config file")
 	}
 }
 
@@ -105,7 +87,7 @@ func FundChainlinkNodes(
 	}
 	// required in Geth when you need to call "simulate" transactions from nodes
 	if client.GetNetworkType() == blockchain.SimulatedEthNetwork {
-		if err := client.Fund("0x0", big.NewFloat(10)); err != nil {
+		if err := client.Fund("0x0", big.NewFloat(1000)); err != nil {
 			return err
 		}
 	}
@@ -260,7 +242,7 @@ func TeardownSuite(
 	if err := writeTeardownLogs(env, optionalTestReporter); err != nil {
 		return errors.Wrap(err, "Error dumping environment logs, leaving environment running for manual retrieval")
 	}
-	switch strings.ToUpper(config.ProjectFrameworkSettings.KeepEnvironments) {
+	switch strings.ToUpper(config.ProjectConfig.FrameworkConfig.KeepEnvironments) {
 	case "ALWAYS":
 		env.Persistent = true
 	case "ONFAIL":
@@ -270,7 +252,7 @@ func TeardownSuite(
 	case "NEVER":
 		env.Persistent = false
 	default:
-		log.Warn().Str("Invalid Keep Value", config.ProjectFrameworkSettings.KeepEnvironments).
+		log.Warn().Str("Invalid Keep Value", config.ProjectConfig.FrameworkConfig.KeepEnvironments).
 			Msg("Invalid 'keep_environments' value, see the 'framework.yaml' file")
 	}
 

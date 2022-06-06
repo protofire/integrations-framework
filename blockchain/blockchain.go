@@ -60,6 +60,7 @@ type EVMClient interface {
 	SwitchNode(node int) error
 
 	// On-chain Operations
+	BalanceAt(ctx context.Context, address common.Address) (*big.Int, error)
 	HeaderHashByNumber(ctx context.Context, bn *big.Int) (string, error)
 	HeaderTimestampByNumber(ctx context.Context, bn *big.Int) (uint64, error)
 	LatestBlockNumber(ctx context.Context) (uint64, error)
@@ -71,6 +72,7 @@ type EVMClient interface {
 	TransactionOpts(from *EthereumWallet) (*bind.TransactOpts, error)
 	ProcessTransaction(tx *types.Transaction) error
 	IsTxConfirmed(txHash common.Hash) (bool, error)
+	GetTxReceipt(txHash common.Hash) (*types.Receipt, error)
 	ParallelTransactions(enabled bool)
 	Close() error
 
@@ -194,7 +196,7 @@ func (n *NetworkRegistry) RegisterNetwork(networkType string, fn NewEVMClientFn,
 
 // GetNetworks returns a networks object with all the BlockchainClient(s) initialized
 func (n *NetworkRegistry) GetNetworks(env *environment.Environment) (*Networks, error) {
-	nc := config.ProjectNetworkSettings
+	nc := config.ProjectConfig.NetworksConfig
 	var clients []EVMClient
 	for _, networkName := range nc.SelectedNetworks {
 		networkSettings, ok := nc.NetworkSettings[networkName]
