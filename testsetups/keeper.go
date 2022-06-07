@@ -14,7 +14,7 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts"
 	"github.com/smartcontractkit/chainlink-testing-framework/contracts/celo"
 	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/environment"
 )
 
 // KeeperBlockTimeTest builds a test to check that chainlink nodes are able to upkeep a specified amount of Upkeep

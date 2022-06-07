@@ -8,7 +8,7 @@ import (
 	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
 	"github.com/smartcontractkit/chainlink-testing-framework/client"
 	"github.com/smartcontractkit/chainlink-testing-framework/testreporters"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/environment"
 	"golang.org/x/sync/errgroup"
 )
 

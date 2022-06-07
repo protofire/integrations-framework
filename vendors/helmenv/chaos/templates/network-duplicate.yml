@@ -1,0 +1,15 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: {{ .Base.Name }}
+  namespace: {{ .Base.Namespace }}
+spec:
+  action: duplicate
+  mode: {{ .Mode }}
+  selector:
+    labelSelectors:
+      '{{ .LabelKey }}': '{{ .LabelValue }}'
+  duplicate:
+    duplicate: '{{ .Duplicate }}'
+    correlation: '{{ .Correlation }}'
+  duration: {{ .Duration }}

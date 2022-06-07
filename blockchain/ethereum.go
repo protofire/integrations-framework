@@ -11,7 +11,7 @@ import (
 
 	"github.com/smartcontractkit/chainlink-testing-framework/config"
 	"github.com/smartcontractkit/chainlink-testing-framework/utils"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/environment"
 
 	"golang.org/x/sync/errgroup"
 
@@ -295,7 +295,7 @@ func (e *EthereumClient) DeployContract(
 		return nil, nil, nil, err
 	}
 	opts.GasPrice = gasPrice
-	
+
 	contractAddress, transaction, contractInstance, err := deployer(opts, e.Client)
 	if err != nil {
 		return nil, nil, nil, err

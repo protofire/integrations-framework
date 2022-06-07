@@ -10,7 +10,7 @@ import (
 	"text/template"
 
 	"github.com/smartcontractkit/chainlink-testing-framework/utils"
-	"github.com/smartcontractkit/helmenv/chaos/experiments"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/chaos/experiments"
 
 	"github.com/ghodss/yaml"
 	"github.com/rs/zerolog/log"

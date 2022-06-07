@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/smartcontractkit/chainlink-testing-framework/blockchain"
-	"github.com/smartcontractkit/helmenv/chaos/experiments"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/chaos/experiments"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/environment"
 	"go.uber.org/atomic"
 )
 

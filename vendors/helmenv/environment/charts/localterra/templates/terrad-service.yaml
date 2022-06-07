@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: terrad
+    release: {{ .Release.Name }}
+  name: terrad
+spec:
+  type: ClusterIP
+  ports:
+    - name: "tendermint"
+      port: 26657
+      targetPort: tendermint
+    - name: "lcd"
+      port: 1317
+      targetPort: lcd
+    - name: "tendermint-grpc"
+      port: 9090
+      targetPort: tendermint-grpc
+    - name: "web-grpc"
+      port: 9091
+      targetPort: web-grpc
+  selector:
+    app: terrad
+    release: {{ .Release.Name }}

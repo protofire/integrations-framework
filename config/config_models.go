@@ -7,7 +7,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/rs/zerolog/log"
-	"github.com/smartcontractkit/helmenv/environment"
+	"github.com/smartcontractkit/chainlink-testing-framework/vendors/helmenv/environment"
 	"gopkg.in/yaml.v2"
 )
 

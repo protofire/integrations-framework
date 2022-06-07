@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: remote-test-runner
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: configmap-volume
+      configMap:
+        name: remote-test-runner-cm
+  containers:
+    - name: remote-test-runner
+      image: amd64/alpine
+      command: ["sh", "/root/init.sh"]
+      volumeMounts:
+        - name : configmap-volume
+          mountPath: /root/test-env.json
+          subPath: test-env.json
+        - name : configmap-volume
+          mountPath: /root/init.sh
+          subPath: init.sh
+      ports:
+        - name: access
+          containerPort: {{ .Values.remote_test_runner.access_port }}
+      env:
+        - name: ENVIRONMENT_FILE
+          value: /root/test-env.json
+        - name: SLACK_WEBHOOK
+          value: {{ .Values.remote_test_runner.slack_webhook }}
+        - name: SLACK_API
+          value: {{ .Values.remote_test_runner.slack_api }}
+        - name: SLACK_CHANNEL
+          value: {{ .Values.remote_test_runner.slack_channel }}
+        - name: SLACK_USER_ID
+          value: {{ .Values.remote_test_runner.slack_user_id }}
+        - name: ACCESS_PORT
+          value: "{{ .Values.remote_test_runner.access_port }}"
+        - name: "GOOS"
+          value: "linux"
+        - name: "GOARCH"
+          value: "amd64"
+        - name: "FRAMEWORK_CONFIG_FILE"
+          value: /root/framework.yaml
+        - name: "NETWORKS_CONFIG_FILE"
+          value: /root/networks.yaml
+        - name: "TEST_FILE"
+          value: "/root/remote.test"
+        - name: "TEST_FILE_SIZE"
+          value: "{{ .Values.remote_test_runner.test_file_size }}"
+{{- range $key, $value := .Values.remote_test_runner.custom_remote_env }}
+  {{- if $value }}
+        - name: {{ $key | upper}}
+          value: {{ $value | quote}}
+  {{- end }}
+{{- end }}
+{{- range $key, $value := .Values.remote_test_runner.secrets }}
+  {{- if $value }}
+        - name: {{ $key | upper}}
+          valueFrom:
+            secretKeyRef:
+              name: remote-runner-secrets
+              key: {{ $key | upper}}
+  {{- end }}
+{{- end }}
+      resources:
+        requests:
+          memory: {{ .Values.resources.requests.memory }}
+          cpu: {{ .Values.resources.requests.cpu }}
+        limits:
+          memory: {{ .Values.resources.limits.memory }}
+          cpu: {{ .Values.resources.limits.cpu }}
