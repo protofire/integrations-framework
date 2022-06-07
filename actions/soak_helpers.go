@@ -19,7 +19,7 @@ func BuildGoTests(executablePath, testsPath string) (string, error) {
 	exePath := filepath.Join(executablePath, "remote.test")
 	compileCmd := exec.Command("go", "test", "-ldflags=-s -w", "-c", testsPath, "-o", exePath) // #nosec G204
 	compileCmd.Env = os.Environ()
-	compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=0", "GOOS=linux", "GOARCH=amd64")
+	compileCmd.Env = append(compileCmd.Env, "CGO_ENABLED=1", "GOOS=linux", "GOARCH=amd64")
 
 	log.Info().Str("Test Directory", testsPath).Msg("Compiling tests")
 	compileOut, err := compileCmd.CombinedOutput()
