@@ -16,7 +16,7 @@ func getReportTypes() abi.Arguments {
 	mustNewType := func(t string) abi.Type {
 		result, err := abi.NewType(t, "", []abi.ArgumentMarshaling{})
 		if err != nil {
-			panic(fmt.Sprintf("Unexpected error during abi.NewType: %s", err))
+			panic(any(fmt.Sprintf("Unexpected error during abi.NewType: %s", err)))
 		}
 		return result
 	}
@@ -95,6 +95,10 @@ func (ReportCodec) MedianFromReport(report types.Report) (*big.Int, error) {
 	}
 
 	return median, nil
+}
+
+func (ReportCodec) MaxReportLength(n int) int {
+	return 32 /* timestamp */ + 32 /* rawObservers */ + (2*32 + n*32) /*observations*/ + 32 /* juelsPerFeeCoin */
 }
 
 func (ReportCodec) XXXJuelsPerFeeCoinFromReport(report types.Report) (*big.Int, error) {

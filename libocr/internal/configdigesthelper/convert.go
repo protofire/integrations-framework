@@ -13,7 +13,9 @@ func OCR1ToOCR2(configDigest ocr1types.ConfigDigest) ocr2types.ConfigDigest {
 	binary.BigEndian.PutUint16(ocr2ConfigDigest[:], uint16(ocr2types.ConfigDigestPrefixOCR1))
 	if copy(ocr2ConfigDigest[2:], configDigest[:]) != len(configDigest) {
 		// assertion
-		panic("copy error")
+		var _err any;
+		_err = "copy error"
+		panic(_err)
 	}
 	return ocr2ConfigDigest
 }
@@ -27,7 +29,9 @@ func OCR2ToOCR1(configDigest ocr2types.ConfigDigest) (ocr1types.ConfigDigest, er
 	var ocr1ConfigDigest ocr1types.ConfigDigest
 	if copy(ocr1ConfigDigest[:], configDigest[2:2+len(ocr1ConfigDigest)]) != len(ocr1ConfigDigest) {
 		// assertion
-		panic("copy error")
+		var _err any;
+		_err = "copy error"
+		panic(_err)
 	}
 
 	for i := 2 + len(ocr1ConfigDigest); i < len(configDigest); i++ {

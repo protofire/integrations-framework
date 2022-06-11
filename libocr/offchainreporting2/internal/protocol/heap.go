@@ -38,7 +38,7 @@ type MinHeapTimeToPendingTransmissionInternal []MinHeapTimeToPendingTransmission
 func (pq MinHeapTimeToPendingTransmissionInternal) Len() int { return len(pq) }
 
 func (pq MinHeapTimeToPendingTransmissionInternal) Less(i, j int) bool {
-	return pq[i].PendingTransmission.Time.Before(pq[j].PendingTransmission.Time)
+	return pq[i].Time.Before(pq[j].Time)
 }
 
 func (pq MinHeapTimeToPendingTransmissionInternal) Swap(i, j int) {

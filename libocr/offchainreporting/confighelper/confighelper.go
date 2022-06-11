@@ -10,7 +10,7 @@ import (
 
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/gethwrappers/offchainaggregator"
-	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/config"
+	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/internal/config"
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/types"
 )
 
@@ -77,7 +77,7 @@ func PublicConfigFromContractConfig(chainID *big.Int, skipChainSpecificChecks bo
 
 func ContractConfigFromConfigSetEvent(changed offchainaggregator.OffchainAggregatorConfigSet) types.ContractConfig {
 	return types.ContractConfig{
-		ConfigDigest: config.Digest(
+		config.ConfigDigest(
 			changed.Raw.Address,
 			changed.ConfigCount,
 			changed.Signers,
@@ -86,11 +86,11 @@ func ContractConfigFromConfigSetEvent(changed offchainaggregator.OffchainAggrega
 			changed.EncodedConfigVersion,
 			changed.Encoded,
 		),
-		Signers:              changed.Signers,
-		Transmitters:         changed.Transmitters,
-		Threshold:            changed.Threshold,
-		EncodedConfigVersion: changed.EncodedConfigVersion,
-		Encoded:              changed.Encoded,
+		changed.Signers,
+		changed.Transmitters,
+		changed.Threshold,
+		changed.EncodedConfigVersion,
+		changed.Encoded,
 	}
 }
 
@@ -118,28 +118,29 @@ func ContractSetConfigArgsForIntegrationTest(
 	for _, oracle := range oracles {
 		S = append(S, 1)
 		identities = append(identities, config.OracleIdentity{
-			PeerID:                oracle.PeerID,
-			OffchainPublicKey:     oracle.OffchainPublicKey,
-			OnChainSigningAddress: oracle.OnChainSigningAddress,
-			TransmitAddress:       oracle.TransmitAddress,
+			oracle.PeerID,
+			oracle.OffchainPublicKey,
+			oracle.OnChainSigningAddress,
+			oracle.TransmitAddress,
 		})
 		sharedSecretEncryptionPublicKeys = append(sharedSecretEncryptionPublicKeys, oracle.SharedSecretEncryptionPublicKey)
 	}
 	sharedConfig := config.SharedConfig{
-		PublicConfig: config.PublicConfig{
-			DeltaProgress:    2 * time.Second,
-			DeltaResend:      1 * time.Second,
-			DeltaRound:       1 * time.Second,
-			DeltaGrace:       500 * time.Millisecond,
-			AlphaPPB:         alphaPPB,
-			DeltaStage:       2 * time.Second,
-			RMax:             3,
-			S:                S,
-			OracleIdentities: identities,
-			F:                f,
-			ConfigDigest:     types.ConfigDigest{},
+		config.PublicConfig{
+			2 * time.Second,
+			1 * time.Second,
+			1 * time.Second,
+			500 * time.Millisecond,
+			0,
+			alphaPPB,
+			2 * time.Second,
+			3,
+			S,
+			identities,
+			f,
+			types.ConfigDigest{},
 		},
-		SharedSecret: &[config.SharedSecretSize]byte{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8},
+		&[config.SharedSecretSize]byte{1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8},
 	}
 	return config.XXXContractSetConfigArgsFromSharedConfig(sharedConfig, sharedSecretEncryptionPublicKeys)
 }
@@ -170,10 +171,10 @@ func ContractSetConfigArgs(
 	sharedSecretEncryptionPublicKeys := []types.SharedSecretEncryptionPublicKey{}
 	for _, oracle := range oracles {
 		identities = append(identities, config.OracleIdentity{
-			PeerID:                oracle.PeerID,
-			OffchainPublicKey:     oracle.OffchainPublicKey,
-			OnChainSigningAddress: oracle.OnChainSigningAddress,
-			TransmitAddress:       oracle.TransmitAddress,
+			oracle.PeerID,
+			oracle.OffchainPublicKey,
+			oracle.OnChainSigningAddress,
+			oracle.TransmitAddress,
 		})
 		sharedSecretEncryptionPublicKeys = append(sharedSecretEncryptionPublicKeys, oracle.SharedSecretEncryptionPublicKey)
 	}
@@ -184,21 +185,21 @@ func ContractSetConfigArgs(
 	}
 
 	sharedConfig := config.SharedConfig{
-		PublicConfig: config.PublicConfig{
-			DeltaProgress:    deltaProgress,
-			DeltaResend:      deltaResend,
-			DeltaRound:       deltaRound,
-			DeltaGrace:       deltaGrace,
-			DeltaC:           deltaC,
-			AlphaPPB:         alphaPPB,
-			DeltaStage:       deltaStage,
-			RMax:             rMax,
-			S:                s,
-			OracleIdentities: identities,
-			F:                f,
-			ConfigDigest:     types.ConfigDigest{},
+		config.PublicConfig{
+			deltaProgress,
+			deltaResend,
+			deltaRound,
+			deltaGrace,
+			deltaC,
+			alphaPPB,
+			deltaStage,
+			rMax,
+			s,
+			identities,
+			f,
+			types.ConfigDigest{},
 		},
-		SharedSecret: &sharedSecret,
+		&sharedSecret,
 	}
 	return config.XXXContractSetConfigArgsFromSharedConfig(sharedConfig, sharedSecretEncryptionPublicKeys)
 }

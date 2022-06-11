@@ -3,13 +3,11 @@ package evmutil
 import (
 	"fmt"
 	"math/big"
-
-	//"math/big"
 	"strings"
 
 	"github.com/celo-org/celo-blockchain/accounts/abi"
 	"github.com/celo-org/celo-blockchain/common"
-	//"github.com/celo-org/celo-blockchain/crypto"
+	"github.com/celo-org/celo-blockchain/crypto"
 
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/gethwrappers2/exposedocr2aggregator"
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/types"
@@ -20,7 +18,7 @@ func makeConfigDigestArgs() abi.Arguments {
 		exposedocr2aggregator.ExposedOCR2AggregatorABI))
 	if err != nil {
 		// assertion
-		panic(fmt.Sprintf("could not parse aggregator ABI: %s", err.Error()))
+		panic(any(fmt.Sprintf("could not parse aggregator ABI: %s", err.Error())))
 	}
 	return abi.Methods["exposedConfigDigestFromConfigData"].Inputs
 }
@@ -40,7 +38,7 @@ func configDigest(
 ) types.ConfigDigest {
 	chainIDBig := new(big.Int)
 	chainIDBig.SetUint64(chainID)
-	_, err := configDigestArgs.Pack(
+	msg, err := configDigestArgs.Pack(
 		chainIDBig,
 		contractAddress,
 		configCount,
@@ -53,17 +51,17 @@ func configDigest(
 	)
 	if err != nil {
 		// assertion
-		panic(err)
+		panic(any(err))
 	}
-	//rawHash := crypto.Keccak256(msg)
+	rawHash := crypto.Keccak256(msg)
 	configDigest := types.ConfigDigest{}
-	//if n := copy(configDigest[:], crypto.Keccak256(msg)); n != len(configDigest) {
-	//	// assertion
-	//	panic("copy too little data")
-	//}
+	if n := copy(configDigest[:], rawHash); n != len(configDigest) {
+		// assertion
+		panic(any("copy too little data"))
+	}
 	if types.ConfigDigestPrefixEVM != 1 {
 		// assertion
-		panic("wrong ConfigDigestPrefix")
+		panic(any("wrong ConfigDigestPrefix"))
 	}
 	configDigest[0] = 0
 	configDigest[1] = 1

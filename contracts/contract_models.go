@@ -12,8 +12,8 @@ import (
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/celo-org/celo-blockchain/core/types"
 
-	ocrConfigHelper "github.com/smartcontractkit/libocr/offchainreporting/confighelper"
-	ocrConfigHelper2 "github.com/smartcontractkit/libocr/offchainreporting2/confighelper"
+	ocrConfigHelper "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting/confighelper"
+	ocrConfigHelper2 "github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/confighelper"
 )
 
 type FluxAggregatorOptions struct {

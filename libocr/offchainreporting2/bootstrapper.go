@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/pkg/errors"
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/commontypes"
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/internal/loghelper"
 	"github.com/smartcontractkit/chainlink-testing-framework/libocr/offchainreporting2/internal/managed"
@@ -17,7 +16,7 @@ type BootstrapperArgs struct {
 	BootstrapperFactory    types.BootstrapperFactory
 	V2Bootstrappers        []commontypes.BootstrapperLocator
 	ContractConfigTracker  types.ContractConfigTracker
-	Database               types.Database
+	Database               types.ConfigDatabase
 	LocalConfig            types.LocalConfig
 	Logger                 commontypes.Logger
 	MonitoringEndpoint     commontypes.MonitoringEndpoint
@@ -51,8 +50,7 @@ type Bootstrapper struct {
 
 func NewBootstrapper(args BootstrapperArgs) (*Bootstrapper, error) {
 	if err := SanityCheckLocalConfig(args.LocalConfig); err != nil {
-		return nil, errors.Wrapf(err,
-			"bad local config while creating Bootstrapper")
+		return nil, fmt.Errorf("bad local config while creating Bootstrapper: %w", err)
 	}
 	return &Bootstrapper{
 		sync.Mutex{},

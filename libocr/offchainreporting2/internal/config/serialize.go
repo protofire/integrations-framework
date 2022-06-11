@@ -44,10 +44,10 @@ func (o offchainConfig) serialize() []byte {
 	offchainConfigProto := enprotoOffchainConfig(o)
 	rv, err := proto.Marshal(&offchainConfigProto)
 	if err != nil {
-		panic(err)
+		panic(any(err))
 	}
 	if len(rv) > configSizeBound {
-		panic("config serialization too large")
+		panic(any("config serialization too large"))
 	}
 	return rv
 }
@@ -78,8 +78,13 @@ func deprotoOffchainConfig(
 	}
 
 	offchainPublicKeys := make([]types.OffchainPublicKey, 0, len(offchainConfigProto.GetOffchainPublicKeys()))
-	for _, ocpk := range offchainConfigProto.GetOffchainPublicKeys() {
-		offchainPublicKeys = append(offchainPublicKeys, types.OffchainPublicKey(ocpk))
+	for _, ocpkRaw := range offchainConfigProto.GetOffchainPublicKeys() {
+		var ocpk types.OffchainPublicKey
+		if len(ocpkRaw) != len(ocpk) {
+			return offchainConfig{}, fmt.Errorf("invalid offchain public key: %x", ocpkRaw)
+		}
+		copy(ocpk[:], ocpkRaw)
+		offchainPublicKeys = append(offchainPublicKeys, ocpk)
 	}
 
 	sharedSecretEncryptions, err := deprotoSharedSecretEncryptions(offchainConfigProto.GetSharedSecretEncryptions())
@@ -144,6 +149,7 @@ func enprotoOffchainConfig(o offchainConfig) OffchainConfigProto {
 	}
 	offchainPublicKeys := make([][]byte, 0, len(o.OffchainPublicKeys))
 	for _, k := range o.OffchainPublicKeys {
+		k := k // have to copy or we append the same key over and over
 		offchainPublicKeys = append(offchainPublicKeys, k[:])
 	}
 	sharedSecretEncryptions := enprotoSharedSecretEncryptions(o.SharedSecretEncryptions)

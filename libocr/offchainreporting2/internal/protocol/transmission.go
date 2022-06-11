@@ -149,7 +149,7 @@ func (t *transmissionState) restoreFromDatabase() {
 
 	// if queue isn't empty, set tTransmit to expire at next transmission time
 	if t.times.Len() != 0 {
-		t.tTransmit = time.After(now.Sub(t.times.Peek().PendingTransmission.Time))
+		t.tTransmit = time.After(now.Sub(t.times.Peek().Time))
 	}
 }
 
@@ -221,7 +221,7 @@ func (t *transmissionState) eventTransmit(ev EventTransmit) {
 	t.times.Push(MinHeapTimeToPendingTransmissionItem{ts, transmission})
 
 	next := t.times.Peek()
-	if (EpochRound{ev.Epoch, ev.Round}) == (EpochRound{next.ReportTimestamp.Epoch, next.ReportTimestamp.Round}) {
+	if (EpochRound{ev.Epoch, ev.Round}) == (EpochRound{next.Epoch, next.Round}) {
 		t.tTransmit = time.After(delay)
 	}
 }
@@ -231,7 +231,7 @@ func (t *transmissionState) eventTTransmitTimeout() {
 		if t.times.Len() != 0 { // If there's other transmissions due later...
 			// ...reset timer to expire when the next one is due
 			item := t.times.Peek()
-			t.tTransmit = time.After(time.Until(item.PendingTransmission.Time))
+			t.tTransmit = time.After(time.Until(item.Time))
 		}
 	}()
 
@@ -244,8 +244,8 @@ func (t *transmissionState) eventTTransmitTimeout() {
 	case t.chPersist <- persist.TransmissionDBUpdate{
 		types.ReportTimestamp{
 			t.config.ConfigDigest,
-			item.ReportTimestamp.Epoch,
-			item.ReportTimestamp.Round,
+			item.Epoch,
+			item.Round,
 		},
 		nil,
 	}:
@@ -272,7 +272,7 @@ func (t *transmissionState) eventTTransmitTimeout() {
 		shouldTransmit, err := t.reportingPlugin.ShouldTransmitAcceptedReport(
 			ctx,
 			item.ReportTimestamp,
-			item.PendingTransmission.Report,
+			item.Report,
 		)
 
 		ins.Stop()
@@ -289,8 +289,8 @@ func (t *transmissionState) eventTTransmitTimeout() {
 	}
 
 	t.logger.Info("eventTTransmitTimeout: Transmitting", commontypes.LogFields{
-		"epoch": item.ReportTimestamp.Epoch,
-		"round": item.ReportTimestamp.Round,
+		"epoch": item.Epoch,
+		"round": item.Round,
 	})
 
 	{
@@ -313,10 +313,10 @@ func (t *transmissionState) eventTTransmitTimeout() {
 			ctx,
 			types.ReportContext{
 				item.ReportTimestamp,
-				item.PendingTransmission.ExtraHash,
+				item.ExtraHash,
 			},
-			item.PendingTransmission.Report,
-			item.PendingTransmission.AttributedSignatures,
+			item.Report,
+			item.AttributedSignatures,
 		)
 
 		ins.Stop()
@@ -329,8 +329,8 @@ func (t *transmissionState) eventTTransmitTimeout() {
 	}
 
 	t.logger.Info("eventTTransmitTimeout:❗️successfully transmitted report on-chain", commontypes.LogFields{
-		"epoch": item.ReportTimestamp.Epoch,
-		"round": item.ReportTimestamp.Round,
+		"epoch": item.Epoch,
+		"round": item.Round,
 	})
 }
 

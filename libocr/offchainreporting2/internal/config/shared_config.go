@@ -61,7 +61,7 @@ func SharedConfigFromContractConfig(
 			onchainPublicKey := onchainKeyring.PublicKey()
 			offchainPublicKey := offchainKeyring.OffchainPublicKey()
 			if bytes.Equal(identity.OnchainPublicKey, onchainPublicKey) {
-				if !bytes.Equal(identity.OffchainPublicKey, offchainPublicKey) {
+				if identity.OffchainPublicKey != offchainPublicKey {
 					return SharedConfig{}, 0, errors.Errorf(
 						"OnchainPublicKey %x in publicConfig matches "+
 							"mine, but OffchainPublicKey does not: %v (config) vs %v (mine)",
@@ -93,7 +93,7 @@ func SharedConfigFromContractConfig(
 
 	x, err := encSharedSecret.Decrypt(oracleID, offchainKeyring)
 	if err != nil {
-		return SharedConfig{}, 0, errors.Wrapf(err, "could not decrypt shared secret")
+		return SharedConfig{}, 0, fmt.Errorf("could not decrypt shared secret: %w", err)
 	}
 
 	return SharedConfig{

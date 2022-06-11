@@ -60,17 +60,17 @@ func (e SharedSecretEncryptions) Equal(e2 SharedSecretEncryptions) bool {
 func aesDecryptBlock(key, ciphertext []byte) [16]byte {
 	if len(key) != 16 {
 		// assertion
-		panic("key has wrong length")
+		panic(any("key has wrong length"))
 	}
 	if len(ciphertext) != 16 {
 		// assertion
-		panic("ciphertext has wrong length")
+		panic(any("ciphertext has wrong length"))
 	}
 
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		// assertion
-		panic(fmt.Sprintf("Unexpected error during aes.NewCipher: %v", err))
+		panic(any(fmt.Sprintf("Unexpected error during aes.NewCipher: %v", err)))
 	}
 
 	var plaintext [16]byte
