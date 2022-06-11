@@ -58,7 +58,7 @@ func BuildGoTests(executablePath, testsPath string) (string, error) {
 	return finalTestDestination, nil
 }
 
-// runs a soak test based on the tag, launching as many chainlink nodes as necessary
+// RunSoakTest based on the tag, launching as many chainlink nodes as necessary
 func RunSoakTest(testTag, namespacePrefix string, chainlinkReplicas int) error {
 	soakTestsPath := filepath.Join(utils.SoakRoot, "tests")
 	exePath, err := BuildGoTests(utils.ProjectRoot, soakTestsPath)

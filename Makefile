@@ -58,7 +58,7 @@ test_unit:
 	ginkgo -r --junit-report=tests-unit-report.xml --keep-going --trace --randomize-all --randomize-suites --progress -cover -covermode=count -coverprofile=unit-test-coverage.out -nodes=10 ./client ./config ./gauntlet ./testreporters
 
 test_soak_ocr:
-	go test -count=1 -v -timeout 10m -run ^TestOCRSoak ./suite/soak
+	go test -count=1 -v -timeout 20m -run ^TestOCRSoak ./suite/soak
 
 test_soak_keeper:
 	go test -count=1 -v -timeout 10m -run ^TestKeeperSoak  ./suite/soak
